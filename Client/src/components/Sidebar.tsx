@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Target, 
@@ -26,9 +26,10 @@ const navigationItems = [
 
 interface SidebarProps {
   className?: string;
+  onMobileClose?: () => void;
 }
 
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({ className, onMobileClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user } = useAuth();
 
@@ -54,12 +55,12 @@ export function Sidebar({ className }: SidebarProps) {
     )}>
       <div className="flex items-center justify-between p-4 border-b border-border">
         {!isCollapsed && (
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
             </div>
             <span className="font-semibold text-xl text-foreground">CodeTrail</span>
-          </div>
+          </Link>
         )}
         <Button
           variant="ghost"
@@ -76,6 +77,7 @@ export function Sidebar({ className }: SidebarProps) {
           <NavLink
             key={item.name}
             to={item.href}
+            onClick={() => onMobileClose?.()} // Close mobile menu when navigating
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",

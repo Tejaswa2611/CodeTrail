@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Search, Sun, Moon, User, Settings, LogOut } from "lucide-react";
+import { Bell, Search, Sun, Moon, User, Settings, LogOut, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,10 @@ import {
 interface TopNavbarProps {
   onThemeToggle?: () => void;
   theme?: 'light' | 'dark';
+  onMobileMenuToggle?: () => void;
 }
 
-export function TopNavbar({ onThemeToggle, theme = 'light' }: TopNavbarProps) {
+export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }: TopNavbarProps) {
   const [hasNotifications] = useState(true);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -67,13 +68,23 @@ export function TopNavbar({ onThemeToggle, theme = 'light' }: TopNavbarProps) {
   };
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-card border-b border-border">
+    <header className="flex items-center justify-between px-3 md:px-6 py-4 bg-card border-b border-border">
       <div className="flex items-center gap-4 flex-1">
+        {/* Mobile Menu Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onMobileMenuToggle}
+          className="md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        
         <div className="relative max-w-md w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search problems, topics, or platforms..."
-            className="pl-10 bg-background"
+            className="pl-10 bg-background text-sm"
           />
         </div>
       </div>
