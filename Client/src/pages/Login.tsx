@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Github, Mail, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Github, Mail, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from "@/components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +17,7 @@ export default function Login() {
   });
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -51,11 +50,6 @@ export default function Login() {
         ...prev,
         [name]: ''
       }));
-    }
-    
-    // Clear auth error when user starts typing
-    if (error) {
-      clearError();
     }
   };
 
@@ -105,13 +99,6 @@ export default function Login() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

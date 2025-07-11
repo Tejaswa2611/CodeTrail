@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Github, Mail, ArrowRight, User, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Github, Mail, ArrowRight, User, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navbar } from "@/components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,7 +19,7 @@ export default function Signup() {
     });
     const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
-    const { register, isLoading, error, clearError } = useAuth();
+    const { register, isLoading } = useAuth();
     const navigate = useNavigate();
 
     const validateForm = () => {
@@ -45,8 +44,6 @@ export default function Signup() {
 
         if (!formData.password) {
             errors.password = 'Password is required';
-        } else if (formData.password.length < 5) {
-            errors.password = 'Password must be at least 5 characters';
         }
 
         setFormErrors(errors);
@@ -66,11 +63,6 @@ export default function Signup() {
                 ...prev,
                 [name]: ''
             }));
-        }
-        
-        // Clear auth error when user starts typing
-        if (error) {
-            clearError();
         }
     };
 
@@ -126,13 +118,6 @@ export default function Signup() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {error && (
-                                <Alert variant="destructive">
-                                    <AlertCircle className="h-4 w-4" />
-                                    <AlertDescription>{error}</AlertDescription>
-                                </Alert>
-                            )}
-                            
                             <form onSubmit={handleEmailSignup} className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">

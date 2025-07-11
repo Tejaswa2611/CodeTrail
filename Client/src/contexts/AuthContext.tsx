@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { authService, User } from '../services/authService';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthState {
   user: User | null;
@@ -87,6 +88,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check if user is already authenticated on app start
@@ -102,6 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (response.success && response.data) {
           console.log('✅ AuthContext: Authentication successful, user found:', response.data.user);
           dispatch({ type: 'AUTH_SUCCESS', payload: response.data.user });
+          // Don't show welcome toast on auto-login check - only on manual login
         } else {
           console.log('❌ AuthContext: Authentication failed - no user data');
           dispatch({ type: 'AUTH_LOGOUT' });
@@ -109,11 +112,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } catch (error) {
         console.log('❌ AuthContext: Authentication error:', error);
         dispatch({ type: 'AUTH_LOGOUT' });
+        // Don't show error toast on initial auth check - user might not be logged in
       }
     };
 
     checkAuth();
-  }, []);
+  }, [toast]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     dispatch({ type: 'AUTH_START' });
@@ -121,14 +125,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login({ email, password });
       if (response.success && response.data) {
         dispatch({ type: 'AUTH_SUCCESS', payload: response.data.user });
+        toast({
+          title: "Login Successful",
+          description: `Welcome back, ${response.data.user.firstName}!`,
+          duration: 3000,
+        });
         return true;
       } else {
-        dispatch({ type: 'AUTH_ERROR', payload: response.error || 'Login failed' });
+        const errorMessage = response.error || 'Login failed';
+        dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: errorMessage,
+          duration: 5000,
+        });
         return false;
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+      toast({
+        variant: "destructive",
+        title: "Login Error",
+        description: errorMessage,
+        duration: 5000,
+      });
       return false;
     }
   };
@@ -144,14 +166,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register({ email, password, firstName, lastName });
       if (response.success && response.data) {
         dispatch({ type: 'AUTH_SUCCESS', payload: response.data.user });
+        toast({
+          title: "Registration Successful",
+          description: `Welcome to CodeTrail, ${response.data.user.firstName}!`,
+          duration: 5000,
+        });
         return true;
       } else {
-        dispatch({ type: 'AUTH_ERROR', payload: response.error || 'Registration failed' });
+        const errorMessage = response.error || 'Registration failed';
+        dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+        toast({
+          variant: "destructive",
+          title: "Registration Failed",
+          description: errorMessage,
+          duration: 5000,
+        });
         return false;
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+      toast({
+        variant: "destructive",
+        title: "Registration Error",
+        description: errorMessage,
+        duration: 5000,
+      });
       return false;
     }
   };
@@ -159,8 +199,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async (): Promise<void> => {
     try {
       await authService.logout();
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out",
+        duration: 3000,
+      });
     } catch (error) {
       console.error('Logout error:', error);
+      toast({
+        variant: "destructive",
+        title: "Logout Error",
+        description: "There was an issue logging you out",
+        duration: 3000,
+      });
     } finally {
       dispatch({ type: 'AUTH_LOGOUT' });
     }
