@@ -37,12 +37,12 @@ const validateUserRegistration = (data) => {
             .min(2)
             .max(50)
             .pattern(/^[a-zA-Z\s]+$/)
-            .required()
+            .optional()
+            .allow('')
             .messages({
             'string.min': 'Last name must be at least 2 characters long',
             'string.max': 'Last name cannot exceed 50 characters',
             'string.pattern.base': 'Last name can only contain letters and spaces',
-            'any.required': 'Last name is required',
         }),
     });
     return schema.validate(data, { abortEarly: false });

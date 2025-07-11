@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import authRoutes from './auth';
+import leetcodeRoutes from './leetcode';
 
 const router = Router();
 
 // API routes
 router.use('/auth', authRoutes);
+router.use('/leetcode', leetcodeRoutes);
 
 // Health check for the entire API
 router.get('/health', (req: any, res: any) => {

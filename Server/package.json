@@ -17,6 +17,8 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.11.1",
+    "apicache": "^1.6.3",
+    "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -32,6 +34,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/apicache": "^1.6.7",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.4",
     "@types/cors": "^2.8.13",

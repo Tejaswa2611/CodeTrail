@@ -12,7 +12,7 @@ class UserModel {
                 email: userData.email.toLowerCase(),
                 password: userData.password,
                 firstName: userData.firstName,
-                lastName: userData.lastName,
+                lastName: userData.lastName || null,
                 isEmailVerified: false,
             },
         });

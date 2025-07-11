@@ -7,7 +7,7 @@ exports.config = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 exports.config = {
-    port: process.env.PORT || 3001,
+    port: process.env.PORT || 3000,
     nodeEnv: process.env.NODE_ENV || 'development',
     jwt: {
         secret: process.env.JWT_SECRET || 'fallback-secret-key',
@@ -16,7 +16,7 @@ exports.config = {
         refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
     },
     cors: {
-        origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+        origin: process.env.CORS_ORIGIN || 'http://localhost:8080',
     },
     security: {
         bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '12'),
