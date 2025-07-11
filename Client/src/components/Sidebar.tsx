@@ -12,10 +12,11 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 const navigationItems = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Practice", href: "/practice", icon: Target },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "AI Coach", href: "/ai-coach", icon: Brain },
@@ -29,6 +30,21 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { user } = useAuth();
+
+  // Get user's initials for avatar
+  const getUserInitials = () => {
+    if (!user) return "U";
+    const firstInitial = user.firstName?.charAt(0).toUpperCase() || "";
+    const lastInitial = user.lastName?.charAt(0).toUpperCase() || "";
+    return firstInitial + lastInitial;
+  };
+
+  // Get user's full name
+  const getUserName = () => {
+    if (!user) return "User";
+    return `${user.firstName || ""} ${user.lastName || ""}`.trim();
+  };
 
   return (
     <div className={cn(
@@ -89,12 +105,12 @@ export function Sidebar({ className }: SidebarProps) {
           isCollapsed && "justify-center"
         )}>
           <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold text-sm">JD</span>
+            <span className="text-white font-semibold text-sm">{getUserInitials()}</span>
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">John Doe</p>
-              <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+              <p className="text-sm font-medium text-foreground truncate">{getUserName()}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email || "user@example.com"}</p>
             </div>
           )}
         </div>

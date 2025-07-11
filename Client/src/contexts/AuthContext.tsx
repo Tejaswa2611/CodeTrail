@@ -18,7 +18,7 @@ type AuthAction =
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true, // Start as true so we don't redirect before checking auth
   error: null,
 };
 
@@ -91,18 +91,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check if user is already authenticated on app start
     const checkAuth = async () => {
-      if (authService.isAuthenticated()) {
-        dispatch({ type: 'AUTH_START' });
-        try {
-          const response = await authService.getProfile();
-          if (response.success && response.data) {
-            dispatch({ type: 'AUTH_SUCCESS', payload: response.data.user });
-          } else {
-            dispatch({ type: 'AUTH_LOGOUT' });
-          }
-        } catch (error) {
+      console.log('🔍 AuthContext: Checking authentication on app start...');
+      dispatch({ type: 'AUTH_START' });
+      try {
+        // Since we're using cookies, try to get the profile directly
+        console.log('🔍 AuthContext: Calling authService.getProfile()...');
+        const response = await authService.getProfile();
+        console.log('🔍 AuthContext: Profile response:', response);
+        
+        if (response.success && response.data) {
+          console.log('✅ AuthContext: Authentication successful, user found:', response.data.user);
+          dispatch({ type: 'AUTH_SUCCESS', payload: response.data.user });
+        } else {
+          console.log('❌ AuthContext: Authentication failed - no user data');
           dispatch({ type: 'AUTH_LOGOUT' });
         }
+      } catch (error) {
+        console.log('❌ AuthContext: Authentication error:', error);
+        dispatch({ type: 'AUTH_LOGOUT' });
       }
     };
 

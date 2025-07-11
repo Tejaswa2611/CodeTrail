@@ -5,17 +5,25 @@ import { AuthenticatedRequest, JwtPayload } from '../types';
 
 export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = AuthUtils.extractTokenFromHeader(authHeader);
+    console.log('🍪 All cookies received:', req.cookies);
+    
+    // Try to get token from cookie first, then fallback to Authorization header
+    const token = req.cookies?.accessToken || AuthUtils.extractTokenFromHeader(req.headers.authorization);
+    
+    console.log('🎫 Access token found:', token ? 'YES' : 'NO');
+    console.log('🎫 Token preview:', token ? token.substring(0, 20) + '...' : 'None');
 
     if (!token) {
+      console.log('❌ No access token provided');
       res.status(401).json(ResponseUtils.error('Access token required'));
       return;
     }
 
     const decoded = AuthUtils.verifyAccessToken(token) as JwtPayload;
+    console.log('✅ Token decoded successfully:', { userId: decoded.userId, email: decoded.email });
 
     if (decoded.type !== 'access') {
+      console.log('❌ Invalid token type:', decoded.type);
       res.status(401).json(ResponseUtils.error('Invalid token type'));
       return;
     }
@@ -25,14 +33,18 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
       email: decoded.email,
     };
 
+    console.log('✅ Authentication successful for user:', decoded.userId);
     next();
   } catch (error) {
+    console.log('❌ Authentication error:', error);
     if (error instanceof Error) {
       if (error.name === 'TokenExpiredError') {
+        console.log('❌ Token expired');
         res.status(401).json(ResponseUtils.error('Token expired'));
         return;
       }
       if (error.name === 'JsonWebTokenError') {
+        console.log('❌ Invalid token format');
         res.status(401).json(ResponseUtils.error('Invalid token'));
         return;
       }

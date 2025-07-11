@@ -21,17 +21,23 @@ export class AuthController {
             // Register user
             const result = await AuthService.register(value);
 
-            // Set refresh token as httpOnly cookie
+            // Set both tokens as httpOnly cookies
+            res.cookie('accessToken', result.tokens.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 15 * 60 * 1000, // 15 minutes
+            });
+
             res.cookie('refreshToken', result.tokens.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
+                sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
 
             res.status(201).json(ResponseUtils.success('User registered successfully', {
                 user: result.user,
-                accessToken: result.tokens.accessToken,
             }));
         } catch (error) {
             if (error instanceof Error) {
@@ -58,17 +64,23 @@ export class AuthController {
             // Login user
             const result = await AuthService.login(value);
 
-            // Set refresh token as httpOnly cookie
+            // Set both tokens as httpOnly cookies
+            res.cookie('accessToken', result.tokens.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 15 * 60 * 1000, // 15 minutes
+            });
+
             res.cookie('refreshToken', result.tokens.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
+                sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
 
             res.status(200).json(ResponseUtils.success('Login successful', {
                 user: result.user,
-                accessToken: result.tokens.accessToken,
             }));
         } catch (error) {
             if (error instanceof Error) {
@@ -103,17 +115,23 @@ export class AuthController {
             // Refresh tokens
             const newTokens = await AuthService.refreshToken(refreshToken);
 
+            // Set new access token as httpOnly cookie
+            res.cookie('accessToken', newTokens.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 15 * 60 * 1000, // 15 minutes
+            });
+
             // Set new refresh token as httpOnly cookie
             res.cookie('refreshToken', newTokens.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
+                sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
 
-            res.status(200).json(ResponseUtils.success('Token refreshed successfully', {
-                accessToken: newTokens.accessToken,
-            }));
+            res.status(200).json(ResponseUtils.success('Token refreshed successfully'));
         } catch (error) {
             if (error instanceof Error) {
                 res.status(401).json(ResponseUtils.error(error.message));
@@ -134,7 +152,8 @@ export class AuthController {
                 await AuthService.logout(refreshToken);
             }
 
-            // Clear refresh token cookie
+            // Clear both cookies
+            res.clearCookie('accessToken');
             res.clearCookie('refreshToken');
 
             res.status(200).json(ResponseUtils.success('Logout successful'));

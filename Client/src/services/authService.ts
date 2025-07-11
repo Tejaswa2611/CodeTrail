@@ -27,7 +27,6 @@ export interface AuthResponse {
     message: string;
     data?: {
         user: User;
-        accessToken: string;
     };
     error?: string;
 }
@@ -40,13 +39,6 @@ export interface ApiResponse<T = unknown> {
 }
 
 class AuthService {
-    private accessToken: string | null = null;
-
-    constructor() {
-        // Load token from localStorage on initialization
-        this.accessToken = localStorage.getItem('accessToken');
-    }
-
     private async request<T>(
         endpoint: string,
         options: RequestInit = {}
@@ -58,21 +50,14 @@ class AuthService {
                 'Content-Type': 'application/json',
                 ...options.headers,
             },
-            credentials: 'include', // Include cookies for refresh token
+            credentials: 'include', // This is the key - includes cookies automatically
             ...options,
         };
-
-        // Add authorization header if token exists
-        if (this.accessToken) {
-            config.headers = {
-                ...config.headers,
-                Authorization: `Bearer ${this.accessToken}`,
-            };
-        }
 
         try {
             console.log('Making API request to:', url);
             console.log('Request config:', config);
+            console.log('Document cookies:', document.cookie); // Debug: Check if cookies exist
             
             const response = await fetch(url, config);
             
@@ -88,22 +73,9 @@ class AuthService {
             const data = await response.json();
             console.log('Response data:', data);
 
-            // Handle token expiration
-            if (response.status === 401 && data.message === 'Token expired') {
-                const refreshed = await this.refreshToken();
-                if (refreshed) {
-                    // Retry the original request with new token
-                    config.headers = {
-                        ...config.headers,
-                        Authorization: `Bearer ${this.accessToken}`,
-                    };
-                    const retryResponse = await fetch(url, config);
-                    return retryResponse.json();
-                } else {
-                    // Refresh failed, logout user
-                    this.logout();
-                    throw new Error('Session expired. Please login again.');
-                }
+            // Handle token expiration - server will handle this with cookies
+            if (response.status === 401) {
+                throw new Error('Authentication required. Please login again.');
             }
 
             return data;
@@ -123,10 +95,7 @@ class AuthService {
             body: JSON.stringify(userData),
         });
 
-        if (response.success && response.data) {
-            this.setAccessToken(response.data.accessToken);
-        }
-
+        // No need to handle tokens - cookies are set automatically by the server
         return response as AuthResponse;
     }
 
@@ -136,10 +105,7 @@ class AuthService {
             body: JSON.stringify(credentials),
         });
 
-        if (response.success && response.data) {
-            this.setAccessToken(response.data.accessToken);
-        }
-
+        // No need to handle tokens - cookies are set automatically by the server
         return response as AuthResponse;
     }
 
@@ -150,48 +116,31 @@ class AuthService {
             });
         } catch (error) {
             console.error('Logout error:', error);
-        } finally {
-            this.clearTokens();
         }
-    }
-
-    async refreshToken(): Promise<boolean> {
-        try {
-            const response = await this.request<{ accessToken: string }>('/auth/refresh-token', {
-                method: 'POST',
-            });
-
-            if (response.success && response.data) {
-                this.setAccessToken(response.data.accessToken);
-                return true;
-            }
-        } catch (error) {
-            console.error('Token refresh failed:', error);
-        }
-
-        return false;
+        // Cookies are cleared by the server, no need to manage tokens
     }
 
     async getProfile(): Promise<ApiResponse<{ user: User }>> {
-        return this.request<{ user: User }>('/auth/profile');
+        console.log('🔍 Getting user profile...');
+        try {
+            const result = await this.request<{ user: User }>('/auth/profile');
+            console.log('✅ Profile request successful:', result);
+            return result;
+        } catch (error) {
+            console.log('❌ Profile request failed:', error);
+            throw error;
+        }
     }
 
-    private setAccessToken(token: string): void {
-        this.accessToken = token;
-        localStorage.setItem('accessToken', token);
-    }
-
-    private clearTokens(): void {
-        this.accessToken = null;
-        localStorage.removeItem('accessToken');
-    }
-
-    isAuthenticated(): boolean {
-        return !!this.accessToken;
-    }
-
-    getAccessToken(): string | null {
-        return this.accessToken;
+    // Check authentication by trying to get profile
+    // This works because cookies are automatically sent
+    async isAuthenticated(): Promise<boolean> {
+        try {
+            const response = await this.getProfile();
+            return response.success;
+        } catch (error) {
+            return false;
+        }
     }
 }
 

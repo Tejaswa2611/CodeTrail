@@ -99,24 +99,15 @@ export default function Signup() {
     };
 
     return (
-        <div
-            className="min-h-screen relative overflow-hidden page-enter"
-            style={{
-                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)), url(${heroBackground})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-            }}
-        >
+        <div className="min-h-screen bg-background page-enter">
             <Navbar minimal={true} />
 
             <div className="flex items-center justify-center p-4 min-h-[calc(100vh-100px)] sm:min-h-[calc(100vh-80px)]">
-                <div className="absolute inset-0 bg-gradient-primary opacity-10 animate-pulse-glow"></div>
                 <div className="w-full max-w-md space-y-8 animate-slide-down relative z-10">
                     <div className="text-center animate-scale-in animate-delay-200">
                         <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow animate-floating">
-                                <span className="text-white font-bold text-2xl">C</span>
+                            <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center shadow-lg animate-floating">
+                                <span className="text-primary-foreground font-bold text-2xl">C</span>
                             </div>
                         </div>
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 animate-fade-in-up animate-delay-300">
