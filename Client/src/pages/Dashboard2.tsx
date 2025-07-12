@@ -395,6 +395,7 @@ const Dashboard2 = () => {
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
     const [showAllTopics, setShowAllTopics] = useState(false);
+    const [selectedContestPlatform, setSelectedContestPlatform] = useState<'all' | 'leetcode' | 'codeforces'>('all');
     const maxRetries = 3;
     const { toast } = useToast();
 
@@ -465,6 +466,39 @@ const Dashboard2 = () => {
     }, [fetchData, toast, error]); // Now fetchData is properly memoized
 
     // Helper functions for data extraction with error handling
+    const getConnectedPlatforms = () => {
+        try {
+            const platforms = data?.userInfo?.connectedPlatforms || {};
+            return {
+                leetcode: platforms.leetcode ? true : false,
+                codeforces: platforms.codeforces ? true : false
+            };
+        } catch (error) {
+            logError(error, 'getConnectedPlatforms');
+            return { leetcode: false, codeforces: false };
+        }
+    };
+
+    const getSelectedContestData = () => {
+        try {
+            const leetcodeContests = data?.totalContests?.leetcode || 0;
+            const codeforcesContests = data?.totalContests?.codeforces || 0;
+            
+            switch (selectedContestPlatform) {
+                case 'leetcode':
+                    return { total: leetcodeContests, platform: 'LeetCode' };
+                case 'codeforces':
+                    return { total: codeforcesContests, platform: 'Codeforces' };
+                case 'all':
+                default:
+                    return { total: leetcodeContests + codeforcesContests, platform: 'All Platforms' };
+            }
+        } catch (error) {
+            logError(error, 'getSelectedContestData');
+            return { total: 0, platform: 'All Platforms' };
+        }
+    };
+
     const getTotalQuestions = (): number => {
         try {
             return data?.totalQuestions?.total || 0; // Show 0 for new users instead of demo data
@@ -891,49 +925,96 @@ const Dashboard2 = () => {
                     {/* Column 1: 4 stacked blocks */}
                     <div className="xl:col-span-7 flex flex-col gap-4 lg:gap-6">
                         {/* Total Contests */}
-                        <div className="bg-card rounded-xl p-4 lg:p-6 flex flex-col gap-4 min-h-[90px]">
-                            <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-2">
-                                <span className="text-lg font-semibold">Total Contests</span>
-                                {!isLoading && (
-                                    <>
-                                        <span className="bg-gray-700 px-2 py-1 rounded text-xs flex items-center gap-1">
-                                            <span>🏆</span> LeetCode <span className="ml-1">
-                                                {(() => {
-                                                    try {
-                                                        return data?.totalContests?.leetcode || 0;
-                                                    } catch (error) {
-                                                        console.warn('Error getting LeetCode contest count:', error);
-                                                        return 0;
-                                                    }
-                                                })()}
-                                            </span>
-                                        </span>
-                                        <span className="bg-gray-700 px-2 py-1 rounded text-xs flex items-center gap-1">
-                                            <span>🏅</span> Codeforces <span className="ml-1">
-                                                {(() => {
-                                                    try {
-                                                        return data?.totalContests?.codeforces || 0;
-                                                    } catch (error) {
-                                                        console.warn('Error getting Codeforces contest count:', error);
-                                                        return 0;
-                                                    }
-                                                })()}
-                                            </span>
-                                        </span>
-                                    </>
-                                )}
-                            </div>
-                            <div className="text-3xl lg:text-4xl font-bold">
-                                {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : (() => {
-                                    try {
-                                        const leetcodeContests = data?.totalContests?.leetcode || 0;
-                                        const codeforcesContests = data?.totalContests?.codeforces || 0;
-                                        return leetcodeContests + codeforcesContests || 0;
-                                    } catch (error) {
-                                        console.warn('Error calculating total contests:', error);
-                                        return 10; // fallback
-                                    }
-                                })()}
+                        <div className="bg-card rounded-xl p-4 lg:p-6 flex flex-col gap-4 min-h-[120px]">
+                            {/* Main Content Area */}
+                            <div className="flex items-center justify-between gap-6">
+                                {/* Left Side - Total Number */}
+                                <div className="flex flex-col items-center justify-center">
+                                    <div className="text-lg font-semibold mb-2">Total Contests</div>
+                                    <div className="text-4xl lg:text-5xl font-bold text-white">
+                                        {isLoading ? (
+                                            <Loader2 className="w-12 h-12 animate-spin" />
+                                        ) : (
+                                            (() => {
+                                                try {
+                                                    const leetcodeContests = data?.totalContests?.leetcode || 0;
+                                                    const codeforcesContests = data?.totalContests?.codeforces || 0;
+                                                    return leetcodeContests + codeforcesContests;
+                                                } catch (error) {
+                                                    console.warn('Error calculating total contests:', error);
+                                                    return 0;
+                                                }
+                                            })()
+                                        )}
+                                    </div>
+                                    {!isLoading && (
+                                        <div className="text-xs text-muted-foreground text-center mt-1">
+                                            Total
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {/* Right Side - Clickable Platform Cards */}
+                                <div className="flex flex-col gap-3 flex-1">
+                                    {!isLoading && (() => {
+                                        const platforms = getConnectedPlatforms();
+                                        return (
+                                            <>
+                                                {platforms.leetcode && (
+                                                    <button 
+                                                        onClick={() => setSelectedContestPlatform('leetcode')}
+                                                        className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer ${
+                                                            selectedContestPlatform === 'leetcode' 
+                                                                ? 'bg-orange-600 ring-2 ring-orange-400' 
+                                                                : 'bg-gray-800 hover:bg-gray-700'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-orange-400">�</span>
+                                                            <span className="text-sm font-bold text-gray-300">LeetCode</span>
+                                                        </div>
+                                                        <span className="text-base font-bold text-white">
+                                                            {(() => {
+                                                                try {
+                                                                    return data?.totalContests?.leetcode || 0;
+                                                                } catch (error) {
+                                                                    console.warn('Error getting LeetCode contest count:', error);
+                                                                    return 0;
+                                                                }
+                                                            })()}
+                                                        </span>
+                                                    </button>
+                                                )}
+                                                
+                                                {platforms.codeforces && (
+                                                    <button 
+                                                        onClick={() => setSelectedContestPlatform('codeforces')}
+                                                        className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer ${
+                                                            selectedContestPlatform === 'codeforces' 
+                                                                ? 'bg-blue-600 ring-2 ring-blue-400' 
+                                                                : 'bg-gray-800 hover:bg-gray-700'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-blue-400">🏅</span>
+                                                            <span className="text-sm font-bold text-gray-300">CodeForces</span>
+                                                        </div>
+                                                        <span className="text-base font-bold text-white">
+                                                            {(() => {
+                                                                try {
+                                                                    return data?.totalContests?.codeforces || 0;
+                                                                } catch (error) {
+                                                                    console.warn('Error getting Codeforces contest count:', error);
+                                                                    return 0;
+                                                                }
+                                                            })()}
+                                                        </span>
+                                                    </button>
+                                                )}
+                                            </>
+                                        );
+                                    })()}
+                                </div>
                             </div>
                         </div>
                         
@@ -942,6 +1023,7 @@ const Dashboard2 = () => {
                             <ContestRatingGraph 
                                 contestHistory={data?.contestHistory || { leetcode: [], codeforces: [], combined: [] }}
                                 isLoading={isLoading}
+                                selectedPlatform={selectedContestPlatform}
                             />
                         </div>
                         

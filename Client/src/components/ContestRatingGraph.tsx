@@ -21,9 +21,14 @@ interface ContestHistory {
 interface ContestRatingGraphProps {
     contestHistory: ContestHistory;
     isLoading?: boolean;
+    selectedPlatform?: 'all' | 'leetcode' | 'codeforces';
 }
 
-const ContestRatingGraph: React.FC<ContestRatingGraphProps> = ({ contestHistory, isLoading }) => {
+const ContestRatingGraph: React.FC<ContestRatingGraphProps> = ({ 
+    contestHistory, 
+    isLoading, 
+    selectedPlatform = 'all' 
+}) => {
     if (isLoading) {
         return (
             <div className="bg-card rounded-xl p-4 lg:p-6">
@@ -39,21 +44,29 @@ const ContestRatingGraph: React.FC<ContestRatingGraphProps> = ({ contestHistory,
 
     // Prepare data for the chart
     const prepareChartData = () => {
-        const leetcodeData = contestHistory.leetcode.map(contest => ({
-            date: new Date(contest.timestamp).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
-            timestamp: new Date(contest.timestamp).getTime(),
-            leetcodeRating: contest.rating,
-            contestId: contest.contestId,
-            platform: 'LeetCode' as const
-        }));
+        // Filter data based on selected platform
+        let leetcodeData = [];
+        let codeforcesData = [];
 
-        const codeforcesData = contestHistory.codeforces.map(contest => ({
-            date: new Date(contest.timestamp).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
-            timestamp: new Date(contest.timestamp).getTime(),
-            codeforcesRating: contest.rating,
-            contestId: contest.contestId,
-            platform: 'Codeforces' as const
-        }));
+        if (selectedPlatform === 'all' || selectedPlatform === 'leetcode') {
+            leetcodeData = contestHistory.leetcode.map(contest => ({
+                date: new Date(contest.timestamp).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+                timestamp: new Date(contest.timestamp).getTime(),
+                leetcodeRating: contest.rating,
+                contestId: contest.contestId,
+                platform: 'LeetCode' as const
+            }));
+        }
+
+        if (selectedPlatform === 'all' || selectedPlatform === 'codeforces') {
+            codeforcesData = contestHistory.codeforces.map(contest => ({
+                date: new Date(contest.timestamp).toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+                timestamp: new Date(contest.timestamp).getTime(),
+                codeforcesRating: contest.rating,
+                contestId: contest.contestId,
+                platform: 'Codeforces' as const
+            }));
+        }
 
         // Combine and sort by timestamp
         const allData = [...leetcodeData, ...codeforcesData].sort((a, b) => a.timestamp - b.timestamp);
@@ -82,17 +95,24 @@ const ContestRatingGraph: React.FC<ContestRatingGraphProps> = ({ contestHistory,
     };
 
     const chartData = prepareChartData();
-    const hasLeetCodeData = contestHistory.leetcode.length > 0;
-    const hasCodeforcesData = contestHistory.codeforces.length > 0;
+    
+    // Update data visibility based on selected platform
+    const hasLeetCodeData = (selectedPlatform === 'all' || selectedPlatform === 'leetcode') && contestHistory.leetcode.length > 0;
+    const hasCodeforcesData = (selectedPlatform === 'all' || selectedPlatform === 'codeforces') && contestHistory.codeforces.length > 0;
 
+    // Show no data message if no relevant data for selected platform
     if (!hasLeetCodeData && !hasCodeforcesData) {
+        const noDataMessage = selectedPlatform === 'all' 
+            ? "No contest data available" 
+            : `No ${selectedPlatform === 'leetcode' ? 'LeetCode' : 'Codeforces'} contest data available`;
+            
         return (
             <div className="bg-card rounded-xl p-4 lg:p-6">
                 <div className="flex items-center gap-2 mb-4">
                     <h3 className="text-lg font-semibold">Contest Rating Progress</h3>
                 </div>
                 <div className="h-64 flex items-center justify-center">
-                    <div className="text-muted-foreground">No contest data available</div>
+                    <div className="text-muted-foreground">{noDataMessage}</div>
                 </div>
             </div>
         );
@@ -137,6 +157,11 @@ const ContestRatingGraph: React.FC<ContestRatingGraphProps> = ({ contestHistory,
                         <div className="flex items-center gap-2">
                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                             <span>Codeforces ({contestHistory.codeforces.length})</span>
+                        </div>
+                    )}
+                    {selectedPlatform !== 'all' && (
+                        <div className="text-xs text-muted-foreground/70 ml-2">
+                            Showing {selectedPlatform === 'leetcode' ? 'LeetCode' : 'Codeforces'} only
                         </div>
                     )}
                 </div>
@@ -186,7 +211,7 @@ const ContestRatingGraph: React.FC<ContestRatingGraphProps> = ({ contestHistory,
             </div>
 
             {/* Stats below chart */}
-            <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+            <div className={`mt-4 gap-4 text-sm ${hasLeetCodeData && hasCodeforcesData ? 'grid grid-cols-2' : 'flex justify-center'}`}>
                 {hasLeetCodeData && (
                     <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg">
                         <div className="font-medium text-orange-600 dark:text-orange-400">LeetCode</div>
