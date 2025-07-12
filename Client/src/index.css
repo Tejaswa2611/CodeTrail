@@ -8,106 +8,117 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 240 4% 97%; /* Light grey background #F1F0EF inspired */
+    --foreground: 220 9% 14%; /* Dark text similar to #202226 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 240 4% 95%; /* Slightly darker than background for cards */
+    --card-foreground: 220 9% 14%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 240 4% 96%;
+    --popover-foreground: 220 9% 14%;
 
     --primary: 250 84% 54%;
     --primary-foreground: 0 0% 98%;
     --primary-glow: 250 100% 75%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 8% 90%; /* Soft grey inspired by palette */
+    --secondary-foreground: 220 9% 14%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 6% 88%; /* Muted grey similar to #949CA0 */
+    --muted-foreground: 220 8% 46%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 8% 92%;
+    --accent-foreground: 220 9% 14%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 220 8% 85%; /* Subtle border color */
+    --input: 220 6% 88%;
     --ring: 250 84% 54%;
 
-    /* CodeTrail specific colors - Original purple theme */
+    /* CodeTrail specific colors - keeping original theme colors */
     --codetrail-blue: 250 84% 54%;
     --codetrail-purple: 280 80% 60%;
     --codetrail-green: 142 76% 36%;
     --codetrail-orange: 25 95% 53%;
     --codetrail-red: 0 84% 60%;
 
-    /* Original gradients */
+    /* Custom palette additions */
+    --custom-dark: 220 9% 14%; /* #202226 equivalent */
+    --custom-light: 240 4% 97%; /* #F1F0EF equivalent */
+    --custom-muted: 220 8% 60%; /* #949CA0 equivalent */
+
+    /* Enhanced gradients for sophisticated look */
     --gradient-primary: linear-gradient(135deg, hsl(var(--codetrail-blue)), hsl(var(--codetrail-purple)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
     --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
 
-    /* Original shadows */
-    --shadow-soft: 0 4px 20px hsl(var(--primary) / 0.1);
-    --shadow-card: 0 1px 3px hsl(var(--foreground) / 0.1);
+    /* Enhanced shadows with custom colors */
+    --shadow-soft: 0 4px 20px hsl(var(--custom-dark) / 0.08);
+    --shadow-card: 0 2px 8px hsl(var(--custom-dark) / 0.06);
     --shadow-glow: 0 0 40px hsl(var(--primary) / 0.15);
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
+    --sidebar-background: 240 4% 96%;
+    --sidebar-foreground: 220 9% 14%;
+    --sidebar-primary: 220 9% 14%;
+    --sidebar-primary-foreground: 240 4% 97%;
+    --sidebar-accent: 220 8% 92%;
+    --sidebar-accent-foreground: 220 9% 14%;
+    --sidebar-border: 220 8% 85%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 220 26% 6%;
-    --foreground: 210 40% 98%;
+    --background: 220 9% 14%; /* Using #202226 for dark background */
+    --foreground: 240 4% 97%; /* Using #F1F0EF for dark mode text */
 
-    --card: 222.2 25% 8%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 8% 16%; /* Slightly lighter than background */
+    --card-foreground: 240 4% 97%;
 
-    --popover: 222.2 25% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 8% 16%;
+    --popover-foreground: 240 4% 97%;
 
     --primary: 250 84% 54%;
     --primary-foreground: 0 0% 98%;
     --primary-glow: 250 100% 75%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 8% 20%;
+    --secondary-foreground: 240 4% 97%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 8% 20%;
+    --muted-foreground: 220 8% 60%; /* Using #949CA0 equivalent for muted text */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 220 8% 20%;
+    --accent-foreground: 240 4% 97%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 240 4% 97%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 220 8% 22%;
+    --input: 220 8% 20%;
     --ring: 250 84% 54%;
+
+    /* Dark mode custom palette */
+    --custom-dark: 240 4% 97%; /* Inverted for dark mode */
+    --custom-light: 220 9% 14%; /* Inverted for dark mode */
+    --custom-muted: 220 8% 60%; /* Keep muted color consistent */
 
     /* Dark mode gradients */
     --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%);
     --shadow-soft: 0 4px 20px hsl(0 0% 0% / 0.3);
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.2);
+    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.2);
     --shadow-glow: 0 0 40px hsl(var(--primary) / 0.25);
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
+    
+    --sidebar-background: 220 8% 16%;
+    --sidebar-foreground: 240 4% 97%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-accent: 220 8% 18%;
+    --sidebar-accent-foreground: 240 4% 97%;
+    --sidebar-border: 220 8% 22%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -125,6 +136,44 @@ All colors MUST be HSL.
 
   .font-mono {
     font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  /* Enhanced card hover effects */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Custom color utilities */
+  .bg-custom-dark {
+    background-color: hsl(var(--custom-dark));
+  }
+  
+  .bg-custom-light {
+    background-color: hsl(var(--custom-light));
+  }
+  
+  .bg-custom-muted {
+    background-color: hsl(var(--custom-muted));
+  }
+  
+  .text-custom-dark {
+    color: hsl(var(--custom-dark));
+  }
+  
+  .text-custom-light {
+    color: hsl(var(--custom-light));
+  }
+  
+  .text-custom-muted {
+    color: hsl(var(--custom-muted));
+  }
+  
+  .border-custom-muted {
+    border-color: hsl(var(--custom-muted) / 0.3);
   }
 }
 

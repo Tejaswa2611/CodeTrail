@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -59,6 +60,11 @@ export default {
 					green: 'hsl(var(--codetrail-green))',
 					orange: 'hsl(var(--codetrail-orange))',
 					red: 'hsl(var(--codetrail-red))'
+				},
+				custom: {
+					dark: 'hsl(var(--custom-dark))', /* #202226 equivalent */
+					light: 'hsl(var(--custom-light))', /* #F1F0EF equivalent */
+					muted: 'hsl(var(--custom-muted))' /* #949CA0 equivalent */
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -141,5 +147,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

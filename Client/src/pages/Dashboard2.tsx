@@ -213,7 +213,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
     const codeforcesProfile = getCodeforcesProfile();
 
     return (
-        <aside className="w-full lg:w-80 bg-card rounded-2xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh]">
+        <aside className="w-full lg:w-80 bg-card/80 backdrop-blur-sm border border-custom-muted/20 rounded-2xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh] shadow-card">
             {/* User Profile Section */}
             <div className="flex flex-col items-center gap-2">
                 <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2 text-white">
@@ -243,7 +243,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                 <h3 className="text-sm font-semibold mb-3">Connected Platforms</h3>
                 <div className="space-y-3">
                     {/* LeetCode */}
-                    <div className="p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="p-3 rounded-lg hover:bg-accent/50 transition-colors border border-transparent hover:border-border">
                         <div className="flex items-center gap-3 mb-2">
                             <img src={getPlatformLogo('leetcode', actualTheme)} alt="LeetCode" className="w-6 h-6" />
 
@@ -295,7 +295,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                     </div>
 
                     {/* Codeforces */}
-                    <div className="p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="p-3 rounded-lg hover:bg-accent/50 transition-colors border border-transparent hover:border-border">
                         <div className="flex items-center gap-3 mb-2">
                             <img src={getPlatformLogo('codeforces', actualTheme)} alt="CodeForces" className="w-6 h-6" />
 
@@ -715,8 +715,8 @@ const Dashboard2 = () => {
                     }))
                     .sort((a, b) => b.count - a.count);
 
-                // Only slice if we're not showing all topics
-                const topicsToShow = showAllTopics ? processedTopics : processedTopics.slice(0, 10);
+                // Only slice if we're not showing all topics - show more initially for better space utilization
+                const topicsToShow = showAllTopics ? processedTopics : processedTopics.slice(0, 20);
 
                 if (topicsToShow.length > 0) {
                     return { topics: topicsToShow, totalCount: processedTopics.length };
@@ -787,7 +787,7 @@ const Dashboard2 = () => {
     const topicAnalysis = getTopicAnalysis();
 
     return (
-        <div className="flex flex-col lg:flex-row bg-background min-h-screen p-3 lg:p-6 gap-4 lg:gap-6">
+        <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen p-3 lg:p-6 gap-4 lg:gap-6">
             {/* Sidebar */}
             <Sidebar data={data} isLoading={isLoading} refreshData={fetchData} />
             {/* Main Content */}
@@ -795,21 +795,21 @@ const Dashboard2 = () => {
                 {/* Row 1: 2 squares + 1 rectangle */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6">
                     {/* Total Questions */}
-                    <div className="lg:col-span-2 bg-card rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px]">
+                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover">
                         <div className="text-sm text-muted-foreground mb-2">Total Questions</div>
                         <div className="text-3xl lg:text-4xl font-bold">
                             {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : formatNumber(getTotalQuestions())}
                         </div>
                     </div>
                     {/* Total Active Days */}
-                    <div className="lg:col-span-2 bg-card rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px]">
+                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover">
                         <div className="text-sm text-muted-foreground mb-2">Total Active Days</div>
                         <div className="text-3xl lg:text-4xl font-bold">
                             {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : formatNumber(getTotalActiveDays())}
                         </div>
                     </div>
                     {/* Heatmap */}
-                    <div className="md:col-span-2 lg:col-span-8 bg-card rounded-xl p-4 lg:p-6 flex flex-col min-h-[110px]">
+                    <div className="md:col-span-2 lg:col-span-8 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300">
                         <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-2 text-xs">
                             <span className="text-muted-foreground">
                                 {isLoading ? 'Loading...' : 'Activity Overview (All Platforms)'}
@@ -939,13 +939,13 @@ const Dashboard2 = () => {
                     {/* Column 1: 4 stacked blocks */}
                     <div className="xl:col-span-7 flex flex-col gap-4 lg:gap-6">
                         {/* Total Contests */}
-                        <div className="bg-card rounded-xl p-4 lg:p-6 flex flex-col gap-4 min-h-[120px]">
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col gap-4 min-h-[120px] shadow-card hover:shadow-soft transition-shadow duration-300">
                             {/* Main Content Area */}
                             <div className="flex items-center justify-between gap-6">
                                 {/* Left Side - Total Number */}
                                 <div className="flex flex-col items-center justify-center">
                                     <div className="text-lg font-semibold mb-2">Total Contests</div>
-                                    <div className="text-4xl lg:text-5xl font-bold text-white">
+                                    <div className="text-4xl lg:text-5xl font-bold text-foreground">
                                         {isLoading ? (
                                             <Loader2 className="w-12 h-12 animate-spin" />
                                         ) : (
@@ -977,10 +977,10 @@ const Dashboard2 = () => {
                                                 {platforms.leetcode && (
                                                     <button 
                                                         onClick={() => setSelectedContestPlatform('leetcode')}
-                                                        className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer ${
+                                                        className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer border ${
                                                             selectedContestPlatform === 'leetcode' 
-                                                                ? 'bg-orange-600 ring-2 ring-orange-400' 
-                                                                : 'bg-muted hover:bg-muted/80'
+                                                                ? 'bg-orange-600 ring-2 ring-orange-400 border-orange-500' 
+                                                                : 'bg-muted/70 hover:bg-muted border-border hover:border-orange-300'
                                                         }`}
                                                     >
                                                         <div className="flex items-center gap-2">
@@ -1003,10 +1003,10 @@ const Dashboard2 = () => {
                                                 {platforms.codeforces && (
                                                     <button 
                                                         onClick={() => setSelectedContestPlatform('codeforces')}
-                                                        className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer ${
+                                                        className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer border ${
                                                             selectedContestPlatform === 'codeforces' 
-                                                                ? 'bg-blue-600 ring-2 ring-blue-400' 
-                                                                : 'bg-muted hover:bg-muted/80'
+                                                                ? 'bg-blue-600 ring-2 ring-blue-400 border-blue-500' 
+                                                                : 'bg-muted/70 hover:bg-muted border-border hover:border-blue-300'
                                                         }`}
                                                     >
                                                         <div className="flex items-center gap-2">
@@ -1041,93 +1041,92 @@ const Dashboard2 = () => {
                             />
                         </div>
                         
-                        {/* DSA Topic Analysis */}
-                        <div className="bg-card rounded-xl p-4 lg:p-6 flex flex-col min-h-[180px]">
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-lg font-semibold">DSA Topic Analysis</span>
-                                {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                            </div>
-                            {/* Topic bar chart */}
-                            <div className="space-y-1">
-                                {(() => {
-                                    try {
-                                        const analysisResult = topicAnalysis;
-                                        const topics = analysisResult.topics;
-                                        
-                                        return topics.map((topic, idx) => {
-                                            const maxCount = topics[0]?.count || 1;
-                                            const count = Number(topic.count) || 0;
-                                            const name = String(topic.name) || 'Unknown';
-                                            const category = topic.category || 'intermediate';
-
-                                            // Category color coding
-                                            const getCategoryColor = (cat: string) => {
-                                                switch (cat) {
-                                                    case 'fundamental': return 'bg-green-500';
-                                                    case 'intermediate': return 'bg-blue-500';
-                                                    case 'advanced': return 'bg-purple-500';
-                                                    default: return 'bg-blue-500';
-                                                }
-                                            };
-
-                                            return (
-                                                <div key={idx} className="flex items-center gap-2">
-                                                    <span className="w-24 lg:w-32 text-xs text-muted-foreground truncate" title={`${name} (${category})`}>
-                                                        {name}
-                                                    </span>
-                                                    <div className="flex-1 bg-gray-700 rounded-full h-2">
-                                                        <div
-                                                            className={`h-2 rounded-full transition-all duration-300 ${getCategoryColor(category)}`}
-                                                            style={{ width: `${Math.min((count / maxCount) * 100, 100)}%` }}
-                                                        ></div>
-                                                    </div>
-                                                    <span className="text-xs text-white w-6 lg:w-8 text-right">{count}</span>
+                        {/* Contest Rankings */}
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[260px] max-h-[360px] shadow-card hover:shadow-soft transition-shadow duration-300">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-4 text-center">Contest Rankings</h3>
+                                {isLoading ? (
+                                    <div className="flex items-center justify-center h-32">
+                                        <Loader2 className="w-8 h-8 animate-spin" />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="mb-6 lg:mb-8">
+                                            <div className="text-xs text-muted-foreground mb-1 text-center">LEETCODE</div>
+                                            <div className="flex flex-col items-center mb-2">
+                                                <div className="flex gap-1 mb-1">
+                                                    <span className="text-blue-400 text-xl">🏆</span>
                                                 </div>
-                                            );
-                                        });
-                                    } catch (error) {
-                                        console.warn('Error rendering topic analysis:', error);
-                                        return (
-                                            <div className="text-sm text-muted-foreground text-center py-4">
-                                                Unable to load topic analysis
+                                                <div className="text-2xl lg:text-3xl font-bold">
+                                                    {(() => {
+                                                        try {
+                                                            const rating = contestRankings.leetcode;
+                                                            return rating ? Number(rating) : 'N/A';
+                                                        } catch (error) {
+                                                            console.warn('Error displaying LeetCode ranking:', error);
+                                                            return 'N/A';
+                                                        }
+                                                    })()}
+                                                </div>
                                             </div>
-                                        );
-                                    }
-                                })()}
+                                            <div className="text-xs text-muted-foreground text-center">
+                                                (contests: {(() => {
+                                                    try {
+                                                        return data?.totalContests?.leetcode || 0;
+                                                    } catch (error) {
+                                                        console.warn('Error getting LeetCode contest count:', error);
+                                                        return 0;
+                                                    }
+                                                })()})
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xs text-muted-foreground mb-1 text-center">CODEFORCES</div>
+                                            <div className="flex flex-col items-center mb-2">
+                                                <div className="text-lg lg:text-xl font-bold text-muted-foreground capitalize">
+                                                    {(() => {
+                                                        try {
+                                                            return String(contestRankings.codeforcesRank);
+                                                        } catch (error) {
+                                                            console.warn('Error getting Codeforces rank:', error);
+                                                            return 'unrated';
+                                                        }
+                                                    })()}
+                                                </div>
+                                                <div className="text-2xl lg:text-3xl font-bold">
+                                                    {(() => {
+                                                        try {
+                                                            const rating = contestRankings.codeforces;
+                                                            return rating ? Number(rating) : 'N/A';
+                                                        } catch (error) {
+                                                            console.warn('Error displaying Codeforces rating:', error);
+                                                            return 'N/A';
+                                                        }
+                                                    })()}
+                                                </div>
+                                            </div>
+                                            <div className="text-xs text-muted-foreground text-center">
+                                                (max: {(() => {
+                                                    try {
+                                                        const maxRating = data?.userInfo?.connectedPlatforms?.codeforces?.maxRating;
+                                                        const currentRating = contestRankings.codeforces;
+                                                        return maxRating || currentRating || 'N/A';
+                                                    } catch (error) {
+                                                        console.warn('Error getting max rating:', error);
+                                                        return 'N/A';
+                                                    }
+                                                })()})
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
-                            {/* Show more/less button with topic count info */}
-                            {(() => {
-                                try {
-                                    const analysisResult = topicAnalysis;
-                                    const hasMoreTopics = analysisResult.totalCount > 10;
-                                    
-                                    if (hasMoreTopics) {
-                                        return (
-                                            <div className="flex items-center justify-between mt-2">
-                                                <button 
-                                                    className="text-blue-400 text-sm underline hover:text-blue-300 transition-colors"
-                                                    onClick={() => setShowAllTopics(!showAllTopics)}
-                                                >
-                                                    {showAllTopics ? `show less` : `show more (${analysisResult.totalCount - 10} more topics)`}
-                                                </button>
-                                                <span className="text-xs text-muted-foreground">
-                                                    Showing {analysisResult.topics.length} of {analysisResult.totalCount}
-                                                </span>
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                } catch (error) {
-                                    console.warn('Error rendering show more button:', error);
-                                    return null;
-                                }
-                            })()}
                         </div>
                     </div>
                     {/* Column 2: 2 stacked blocks */}
                     <div className="xl:col-span-5 flex flex-col gap-4 lg:gap-6">
                         {/* Problems Solved + Competitive Programming Donut */}
-                        <div className="bg-card rounded-xl p-4 lg:p-6 h-auto lg:h-60 flex flex-col gap-4 lg:gap-6">
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 h-auto lg:h-60 flex flex-col gap-4 lg:gap-6 shadow-card hover:shadow-soft transition-shadow duration-300">
                             <div>
                                 <div className="text-lg font-semibold mb-2">Problems Solved</div>
                                 {isLoading ? (
@@ -1218,86 +1217,129 @@ const Dashboard2 = () => {
                                 )}
                             </div>
                         </div>
-                        {/* Contest Rankings */}
-                        <div className="bg-card rounded-xl p-4 lg:p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-lg font-semibold mb-4 text-center">Contest Rankings</h3>
-                                {isLoading ? (
-                                    <div className="flex items-center justify-center h-32">
-                                        <Loader2 className="w-8 h-8 animate-spin" />
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="mb-6 lg:mb-8">
-                                            <div className="text-xs text-muted-foreground mb-1 text-center">LEETCODE</div>
-                                            <div className="flex flex-col items-center mb-2">
-                                                <div className="flex gap-1 mb-1">
-                                                    <span className="text-blue-400 text-xl">🏆</span>
-                                                </div>
-                                                <div className="text-2xl lg:text-3xl font-bold">
-                                                    {(() => {
-                                                        try {
-                                                            const rating = contestRankings.leetcode;
-                                                            return rating ? Number(rating) : 'N/A';
-                                                        } catch (error) {
-                                                            console.warn('Error displaying LeetCode ranking:', error);
-                                                            return 'N/A';
-                                                        }
-                                                    })()}
-                                                </div>
-                                            </div>
-                                            <div className="text-xs text-muted-foreground text-center">
-                                                (contests: {(() => {
-                                                    try {
-                                                        return data?.totalContests?.leetcode || 0;
-                                                    } catch (error) {
-                                                        console.warn('Error getting LeetCode contest count:', error);
-                                                        return 0;
-                                                    }
-                                                })()})
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="text-xs text-muted-foreground mb-1 text-center">CODEFORCES</div>
-                                            <div className="flex flex-col items-center mb-2">
-                                                <div className="text-lg lg:text-xl font-bold text-muted-foreground capitalize">
-                                                    {(() => {
-                                                        try {
-                                                            return String(contestRankings.codeforcesRank);
-                                                        } catch (error) {
-                                                            console.warn('Error getting Codeforces rank:', error);
-                                                            return 'unrated';
-                                                        }
-                                                    })()}
-                                                </div>
-                                                <div className="text-2xl lg:text-3xl font-bold">
-                                                    {(() => {
-                                                        try {
-                                                            const rating = contestRankings.codeforces;
-                                                            return rating ? Number(rating) : 'N/A';
-                                                        } catch (error) {
-                                                            console.warn('Error displaying Codeforces rating:', error);
-                                                            return 'N/A';
-                                                        }
-                                                    })()}
-                                                </div>
-                                            </div>
-                                            <div className="text-xs text-muted-foreground text-center">
-                                                (max: {(() => {
-                                                    try {
-                                                        const maxRating = data?.userInfo?.connectedPlatforms?.codeforces?.maxRating;
-                                                        const currentRating = contestRankings.codeforces;
-                                                        return maxRating || currentRating || 'N/A';
-                                                    } catch (error) {
-                                                        console.warn('Error getting max rating:', error);
-                                                        return 'N/A';
-                                                    }
-                                                })()})
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
+                        {/* DSA Topic Analysis */}
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 min-h-[540px] max-h-[758px]">
+                            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                                <span className="text-lg font-semibold">DSA Topic Analysis</span>
+                                <div className="flex items-center gap-2">
+                                    {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    {(() => {
+                                        try {
+                                            const analysisResult = topicAnalysis;
+                                            return (
+                                                <span className="text-xs text-muted-foreground">
+                                                    {analysisResult.topics.length} topics
+                                                </span>
+                                            );
+                                        } catch (error) {
+                                            return null;
+                                        }
+                                    })()}
+                                </div>
                             </div>
+                            {/* Topic bar chart with constrained height */}
+                            <div className="space-y-2 flex-1 overflow-y-auto pr-2 -mr-2">
+                                {(() => {
+                                    try {
+                                        const analysisResult = topicAnalysis;
+                                        const topics = analysisResult.topics;
+                                        
+                                        return topics.map((topic, idx) => {
+                                            const maxCount = topics[0]?.count || 1;
+                                            const count = Number(topic.count) || 0;
+                                            const name = String(topic.name) || 'Unknown';
+                                            const category = topic.category || 'intermediate';
+
+                                            // Category color coding
+                                            const getCategoryColor = (cat: string) => {
+                                                switch (cat) {
+                                                    case 'fundamental': return 'bg-green-500';
+                                                    case 'intermediate': return 'bg-blue-500';
+                                                    case 'advanced': return 'bg-purple-500';
+                                                    default: return 'bg-blue-500';
+                                                }
+                                            };
+
+                                            // Category badge color
+                                            const getCategoryBadgeColor = (cat: string) => {
+                                                switch (cat) {
+                                                    case 'fundamental': return 'bg-green-500/20 text-green-400 border-green-500/30';
+                                                    case 'intermediate': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+                                                    case 'advanced': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+                                                    default: return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+                                                }
+                                            };
+
+                                            return (
+                                                <div key={idx} className="group hover:bg-muted/30 rounded-lg p-2 transition-colors duration-200 border border-transparent hover:border-border/50">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                            <span className="text-sm font-medium truncate" title={name}>
+                                                                {name}
+                                                            </span>
+                                                            <span className={`text-xs px-1.5 py-0.5 rounded-full border text-nowrap ${getCategoryBadgeColor(category)}`}>
+                                                                {category}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-sm font-semibold text-custom-muted ml-2">{count}</span>
+                                                    </div>
+                                                    <div className="bg-muted/60 rounded-full h-2.5 border border-border/30">
+                                                        <div
+                                                            className={`h-2.5 rounded-full transition-all duration-500 ease-out ${getCategoryColor(category)} group-hover:shadow-sm`}
+                                                            style={{ width: `${Math.min((count / maxCount) * 100, 100)}%` }}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        });
+                                    } catch (error) {
+                                        console.warn('Error rendering topic analysis:', error);
+                                        return (
+                                            <div className="text-sm text-muted-foreground text-center py-8 bg-muted/30 rounded-lg flex-1 flex flex-col items-center justify-center">
+                                                <div className="text-2xl mb-3">📊</div>
+                                                <div>Unable to load topic analysis</div>
+                                            </div>
+                                        );
+                                    }
+                                })()}
+                            </div>
+                            {/* Show more/less button with topic count info */}
+                            {(() => {
+                                try {
+                                    const analysisResult = topicAnalysis;
+                                    const hasMoreTopics = analysisResult.totalCount > 20;
+                                    
+                                    if (hasMoreTopics) {
+                                        return (
+                                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50 flex-shrink-0">
+                                                <button 
+                                                    className="text-blue-400 text-sm font-medium hover:text-blue-300 hover:underline transition-all duration-200 flex items-center gap-1"
+                                                    onClick={() => setShowAllTopics(!showAllTopics)}
+                                                >
+                                                    {showAllTopics ? (
+                                                        <>
+                                                            Show Less
+                                                            <span className="text-xs">↑</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            Show {analysisResult.totalCount - 20} More
+                                                            <span className="text-xs">↓</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                                <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-full">
+                                                    {analysisResult.topics.length} of {analysisResult.totalCount}
+                                                </span>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                } catch (error) {
+                                    console.warn('Error rendering show more button:', error);
+                                    return null;
+                                }
+                            })()}
                         </div>
                     </div>
                 </div>
