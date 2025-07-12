@@ -1,442 +1,614 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, Loader2 } from 'lucide-react';
-import { fetchDashboardData, DashboardData } from '../services/apiService';
+import { fetchDashboardData, DashboardStats, dashboardApi } from '../services/apiService';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorToastConfig, logError, safeAsync } from '@/utils/errorHandling';
 
-// Default usernames - these should come from user settings/profile in a real app
-const DEFAULT_LEETCODE_USERNAME = 'Himfakeishe'; // Replace with actual username
-const DEFAULT_CODEFORCES_HANDLE = 'Yash_ktii'; // Replace with actual handle
-
 // Helper function to get difficulty colors
 const getDifficultyColor = (difficulty: string) => {
-  switch (difficulty.toLowerCase()) {
-    case 'easy': return 'text-green-400';
-    case 'medium': return 'text-yellow-400';
-    case 'hard': return 'text-red-400';
-    default: return 'text-gray-400';
-  }
+    switch (difficulty.toLowerCase()) {
+        case 'easy': return 'text-green-400';
+        case 'medium': return 'text-yellow-400';
+        case 'hard': return 'text-red-400';
+        default: return 'text-gray-400';
+    }
 };
 
 // Helper function to format numbers
 const formatNumber = (num: number | undefined) => {
-  if (num === undefined || num === null) return '0';
-  return num.toLocaleString();
+    if (num === undefined || num === null) return '0';
+    return num.toLocaleString();
 };
 
 // Helper function to generate heatmap data from calendar
 const generateHeatmapFromCalendar = (submissionCalendar: string) => {
-  try {
-    if (!submissionCalendar || typeof submissionCalendar !== 'string') {
-      throw new Error('Invalid submission calendar data: Data is not a string');
-    }
-    
-    const calendar = JSON.parse(submissionCalendar);
-    
-    if (!calendar || typeof calendar !== 'object') {
-      throw new Error('Invalid calendar format: Parsed data is not an object');
-    }
-    
-    const weeks = [];
-    const today = new Date();
-    const startDate = new Date(today.getTime() - (52 * 7 * 24 * 60 * 60 * 1000)); // 52 weeks ago
-    
-    // Validate date calculations
-    if (isNaN(startDate.getTime())) {
-      throw new Error('Invalid date calculation');
-    }
-    
-    for (let week = 0; week < 52; week++) {
-      const weekData = [];
-      for (let day = 0; day < 7; day++) {
-        const currentDate = new Date(startDate.getTime() + ((week * 7 + day) * 24 * 60 * 60 * 1000));
-        
-        if (isNaN(currentDate.getTime())) {
-          console.warn(`Invalid date calculation for week ${week}, day ${day}`);
-          weekData.push(0);
-          continue;
+    try {
+        if (!submissionCalendar || typeof submissionCalendar !== 'string') {
+            throw new Error('Invalid submission calendar data: Data is not a string');
         }
-        
-        const timestamp = Math.floor(currentDate.getTime() / 1000).toString();
-        const submissions = Number(calendar[timestamp]) || 0;
-        
-        // Ensure submissions is a valid number
-        if (isNaN(submissions) || submissions < 0) {
-          weekData.push(0);
-        } else {
-          weekData.push(Math.min(submissions, 50)); // Cap at 50 to prevent UI issues
+
+        const calendar = JSON.parse(submissionCalendar);
+
+        if (!calendar || typeof calendar !== 'object') {
+            throw new Error('Invalid calendar format: Parsed data is not an object');
         }
-      }
-      weeks.push(weekData);
+
+        const weeks = [];
+        const today = new Date();
+        const startDate = new Date(today.getTime() - (52 * 7 * 24 * 60 * 60 * 1000)); // 52 weeks ago
+
+        // Validate date calculations
+        if (isNaN(startDate.getTime())) {
+            throw new Error('Invalid date calculation');
+        }
+
+        for (let week = 0; week < 52; week++) {
+            const weekData = [];
+            for (let day = 0; day < 7; day++) {
+                const currentDate = new Date(startDate.getTime() + ((week * 7 + day) * 24 * 60 * 60 * 1000));
+
+                if (isNaN(currentDate.getTime())) {
+                    console.warn(`Invalid date calculation for week ${week}, day ${day}`);
+                    weekData.push(0);
+                    continue;
+                }
+
+                const timestamp = Math.floor(currentDate.getTime() / 1000).toString();
+                const submissions = Number(calendar[timestamp]) || 0;
+
+                // Ensure submissions is a valid number
+                if (isNaN(submissions) || submissions < 0) {
+                    weekData.push(0);
+                } else {
+                    weekData.push(Math.min(submissions, 50)); // Cap at 50 to prevent UI issues
+                }
+            }
+            weeks.push(weekData);
+        }
+
+        return weeks;
+    } catch (error) {
+        console.warn('Error parsing submission calendar:', error);
+        // Fallback to dummy data if parsing fails
+        return Array(52).fill(0).map(() => Array(7).fill(0).map(() => Math.random() > 0.7 ? Math.floor(Math.random() * 10) : 0));
     }
-    
-    return weeks;
-  } catch (error) {
-    console.warn('Error parsing submission calendar:', error);
-    // Fallback to dummy data if parsing fails
-    return Array(52).fill(0).map(() => Array(7).fill(0).map(() => Math.random() > 0.7 ? Math.floor(Math.random() * 10) : 0));
-  }
 };
 
-const Sidebar = ({ data, isLoading }: { data: DashboardData | null; isLoading: boolean }) => {
-  const { toast } = useToast();
-  
-  // Safe data extraction with error handling
-  const getLeetcodeProfile = () => {
-    try {
-      return data?.leetcode?.profile?.matchedUser || null;
-    } catch (error) {
-      console.warn('Error accessing LeetCode profile:', error);
-      toast({
-        variant: "destructive",
-        title: "Profile Access Error",
-        description: "Unable to access LeetCode profile data",
-        duration: 3000,
-      });
-      return null;
-    }
-  };
+const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null; isLoading: boolean; refreshData: () => Promise<void> }) => {
+    const [editingPlatform, setEditingPlatform] = useState<string | null>(null);
+    const [platformHandle, setPlatformHandle] = useState<string>('');
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const getCodeforcesUser = () => {
-    try {
-      return data?.codeforces?.userInfo?.result?.[0] || null;
-    } catch (error) {
-      console.warn('Error accessing Codeforces user:', error);
-      toast({
-        variant: "destructive",
-        title: "Profile Access Error",
-        description: "Unable to access Codeforces profile data",
-        duration: 3000,
-      });
-      return null;
-    }
-  };
+    // Get user profile data
+    const getUserProfile = () => {
+        try {
+            return data?.userInfo?.profile || null;
+        } catch (error) {
+            console.warn('Error accessing user profile:', error);
+            return null;
+        }
+    };
 
-  const getUserDisplayName = () => {
-    try {
-      const leetcodeProfile = getLeetcodeProfile();
-      const codeforcesUser = getCodeforcesUser();
-      
-      return (
-        leetcodeProfile?.profile?.realName || 
-        `${codeforcesUser?.firstName || ''} ${codeforcesUser?.lastName || ''}`.trim() || 
-        'User'
-      );
-    } catch (error) {
-      console.warn('Error getting user display name:', error);
-      return 'User';
-    }
-  };
+    // Safe data extraction with error handling
+    const getLeetcodeProfile = () => {
+        try {
+            return data?.userInfo?.connectedPlatforms?.leetcode || null;
+        } catch (error) {
+            console.warn('Error accessing LeetCode profile:', error);
+            return null;
+        }
+    };
 
-  const getUserInitial = () => {
-    try {
-      const leetcodeProfile = getLeetcodeProfile();
-      const codeforcesUser = getCodeforcesUser();
-      
-      return (
-        leetcodeProfile?.profile?.realName?.[0] || 
-        codeforcesUser?.firstName?.[0] || 
-        'U'
-      );
-    } catch (error) {
-      console.warn('Error getting user initial:', error);
-      return 'U';
-    }
-  };
+    const getCodeforcesProfile = () => {
+        try {
+            return data?.userInfo?.connectedPlatforms?.codeforces || null;
+        } catch (error) {
+            console.warn('Error accessing Codeforces profile:', error);
+            return null;
+        }
+    };
 
-  const getUsername = () => {
-    try {
-      const leetcodeProfile = getLeetcodeProfile();
-      const codeforcesUser = getCodeforcesUser();
-      
-      return leetcodeProfile?.username || codeforcesUser?.handle || 'user';
-    } catch (error) {
-      console.warn('Error getting username:', error);
-      return 'user';
-    }
-  };
+    const handlePlatformEdit = (platform: string) => {
+        const currentHandle = platform === 'leetcode'
+            ? getLeetcodeProfile()?.handle || ''
+            : getCodeforcesProfile()?.handle || '';
 
-  const getUserLocation = () => {
-    try {
-      const leetcodeProfile = getLeetcodeProfile();
-      const codeforcesUser = getCodeforcesUser();
-      
-      return (
-        leetcodeProfile?.profile?.location || 
-        codeforcesUser?.city || 
-        codeforcesUser?.country || 
-        'Unknown'
-      );
-    } catch (error) {
-      console.warn('Error getting user location:', error);
-      return 'Unknown';
-    }
-  };
+        setPlatformHandle(currentHandle);
+        setEditingPlatform(platform);
+    };
 
-  const getUserOrganization = () => {
-    try {
-      const codeforcesUser = getCodeforcesUser();
-      return codeforcesUser?.organization || 'Not specified';
-    } catch (error) {
-      console.warn('Error getting user organization:', error);
-      return 'Not specified';
-    }
-  };
+    const { toast } = useToast();
 
-  return (
-    <aside className="w-full lg:w-80 bg-card rounded-2xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh]">
-        {/* Profile */}
-        <div className="flex flex-col items-center gap-2">
-            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-pink-600 rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2">
-              {isLoading ? (
-                <Loader2 className="w-8 h-8 animate-spin" />
-              ) : (
-                getUserInitial()
-              )}
-            </div>
-            <h2 className="text-lg lg:text-xl font-semibold">
-              {isLoading ? 'Loading...' : getUserDisplayName()}
-            </h2>
-            <p className="text-primary text-sm">
-              @{isLoading ? '...' : getUsername()}
-            </p>
-            <button className="bg-orange-500 text-white px-3 py-2 lg:px-4 lg:py-2 rounded-lg text-sm font-medium mt-2">
-                <Lock className="inline w-4 h-4 mr-2" /> Get your Codolio Card
-            </button>
-        </div>
-        {/* Socials */}
-        <div className="flex gap-3 justify-center">
-            <Mail className="w-5 h-5 text-muted-foreground cursor-pointer" />
-            <Linkedin className="w-5 h-5 text-muted-foreground cursor-pointer" />
-            <Twitter className="w-5 h-5 text-muted-foreground cursor-pointer" />
-            <Globe className="w-5 h-5 text-muted-foreground cursor-pointer" />
-            <Calendar className="w-5 h-5 text-muted-foreground cursor-pointer" />
-        </div>
-        {/* Location/Institution */}
-        <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>📍</span> 
-              <span>{isLoading ? 'Loading...' : getUserLocation()}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>🎓</span> 
-              <span>{isLoading ? 'Loading...' : getUserOrganization()}</span>
-            </div>
-        </div>
-        {/* About/Stats */}
-        <div>
-            <h3 className="text-sm font-semibold mb-3">About</h3>
-            <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm">Problem Solving Stats</span>
-                    <span className="text-xs text-muted-foreground">^</span>
+    const handlePlatformSave = async () => {
+        console.log('🎯 handlePlatformSave called with:', { editingPlatform, platformHandle: platformHandle.trim() });
+
+        if (!editingPlatform || !platformHandle.trim()) {
+            console.log('❌ Missing editingPlatform or platformHandle');
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Please enter a valid handle",
+                duration: 3000,
+            });
+            return;
+        }
+
+        setIsSaving(true);
+
+        try {
+            // Show loading toast
+            toast({
+                title: "Updating Platform Handle",
+                description: `Validating and syncing ${editingPlatform} data...`,
+                duration: 5000,
+            });
+
+            console.log('🔄 Calling dashboardApi.updatePlatformHandle...');
+            // Make API call to update platform handle
+            const response = await dashboardApi.updatePlatformHandle(editingPlatform, platformHandle.trim());
+            console.log('📥 API response:', response);
+
+            if (response?.success) {
+                console.log('✅ Update successful');
+                toast({
+                    title: "Success",
+                    description: `${editingPlatform} handle updated and data synced successfully`,
+                    duration: 4000,
+                });
+
+                // Reset editing state
+                setEditingPlatform(null);
+                setPlatformHandle('');
+
+                // Refresh dashboard data to show updated platform details
+                console.log('🔄 Refreshing dashboard data after platform handle update...');
+                await refreshData();
+
+                toast({
+                    title: "Dashboard Updated",
+                    description: "Your profile and statistics have been refreshed with the latest data",
+                    duration: 3000,
+                });
+            } else {
+                console.log('❌ Update failed:', response?.message);
+                throw new Error(response?.message || 'Failed to update handle');
+            }
+        } catch (error) {
+            console.error('Error in handlePlatformSave:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update platform handle';
+
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: errorMessage,
+                duration: 5000,
+            });
+
+            // Don't reset editing state on error so user can try again
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const userProfile = getUserProfile();
+    const leetcodeProfile = getLeetcodeProfile();
+    const codeforcesProfile = getCodeforcesProfile();
+
+    return (
+        <aside className="w-full lg:w-80 bg-card rounded-2xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh]">
+            {/* User Profile Section */}
+            <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2 text-white">
+                    {isLoading ? (
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                    ) : (
+                        userProfile?.firstName?.[0]?.toUpperCase() || 'U'
+                    )}
                 </div>
+                <h2 className="text-lg lg:text-xl font-semibold text-center">
+                    {isLoading ? 'Loading...' : (
+                        userProfile ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim() : 'User'
+                    )}
+                </h2>
+                <p className="text-primary text-sm">
+                    {isLoading ? '...' : userProfile?.email || 'No email'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    Joined: {isLoading ? '...' : (
+                        userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Unknown'
+                    )}
+                </p>
+            </div>
+
+            {/* Platform Profiles Section */}
+            <div>
+                <h3 className="text-sm font-semibold mb-3">Connected Platforms</h3>
                 <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center"><span className="text-xs">LC</span></div>
-                        <span className="text-sm">LeetCode</span>
-                        <div className={`w-2 h-2 rounded-full ml-auto ${data?.leetcode?.profile ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                    {/* LeetCode */}
+                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">LC</span>
+                        </div>
+
+                        {editingPlatform === 'leetcode' ? (
+                            <div className="flex-1 flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    value={platformHandle}
+                                    onChange={(e) => setPlatformHandle(e.target.value)}
+                                    className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    placeholder="Enter LeetCode handle"
+                                    autoFocus
+                                />
+                                <button
+                                    onClick={handlePlatformSave}
+                                    disabled={isSaving}
+                                    className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                >
+                                    {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                    {isSaving ? 'Saving...' : 'Save'}
+                                </button>
+                                <button
+                                    onClick={() => setEditingPlatform(null)}
+                                    className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => handlePlatformEdit('leetcode')}
+                                    className="flex-1 text-left text-sm hover:text-orange-500 transition-colors"
+                                >
+                                    LeetCode {leetcodeProfile?.handle ? `(@${leetcodeProfile.handle})` : ''}
+                                </button>
+                                <div className={`w-2 h-2 rounded-full ${leetcodeProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            </>
+                        )}
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 bg-yellow-500 rounded flex items-center justify-center"><span className="text-xs">CC</span></div>
-                        <span className="text-sm">CodeChef</span>
-                        <AlertTriangle className="w-4 h-4 text-yellow-500 ml-auto" />
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
+
+                    {/* Codeforces */}
+                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">CF</span>
+                        </div>
+
+                        {editingPlatform === 'codeforces' ? (
+                            <div className="flex-1 flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    value={platformHandle}
+                                    onChange={(e) => setPlatformHandle(e.target.value)}
+                                    className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter Codeforces handle"
+                                    autoFocus
+                                />
+                                <button
+                                    onClick={handlePlatformSave}
+                                    disabled={isSaving}
+                                    className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                >
+                                    {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                    {isSaving ? 'Saving...' : 'Save'}
+                                </button>
+                                <button
+                                    onClick={() => setEditingPlatform(null)}
+                                    className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => handlePlatformEdit('codeforces')}
+                                    className="flex-1 text-left text-sm hover:text-blue-500 transition-colors"
+                                >
+                                    Codeforces {codeforcesProfile?.handle ? `(@${codeforcesProfile.handle})` : ''}
+                                </button>
+                                <div className={`w-2 h-2 rounded-full ${codeforcesProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            </>
+                        )}
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center"><span className="text-xs">CF</span></div>
-                        <span className="text-sm">Codeforces</span>
-                        <div className={`w-2 h-2 rounded-full ml-auto ${data?.codeforces?.userInfo ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground" />
+
+                    {/* Rating info for Codeforces if available */}
+                    {codeforcesProfile && codeforcesProfile.currentRating && (
+                        <div className="text-xs text-muted-foreground pl-9">
+                            Rating: {codeforcesProfile.currentRating} ({codeforcesProfile.rank || 'Unrated'})
+                            {codeforcesProfile.maxRating && (
+                                <span> • Max: {codeforcesProfile.maxRating}</span>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div>
+                <h3 className="text-sm font-semibold mb-3">Quick Stats</h3>
+                <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Problems Solved:</span>
+                        <span className="font-medium">
+                            {isLoading ? '...' : (data?.totalQuestions?.total || 0)}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Active Days:</span>
+                        <span className="font-medium">
+                            {isLoading ? '...' : (data?.totalActiveDays?.total || 0)}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Contests:</span>
+                        <span className="font-medium">
+                            {isLoading ? '...' : (data?.totalContests?.total || 0)}
+                        </span>
                     </div>
                 </div>
-                <button className="flex items-center gap-2 text-orange-500 text-sm mt-3"><Plus className="w-4 h-4" /> Add Platform</button>
             </div>
-        </div>
-        {/* Development Stats */}
-        <div>
-            <h3 className="text-sm font-semibold mb-3">Development Stats</h3>
-            <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2"><span className="text-sm">Leaderboard</span><span className="text-primary text-xs">How it works ?</span></div>
-                <div className="bg-muted rounded-lg p-3">
-                    <div className="text-sm text-muted-foreground mb-1">Global Rank</div>
-                    <div className="text-xs text-muted-foreground">Based on C Score</div>
-                    <div className="flex items-center gap-2 mt-2"><BarChart3 className="w-4 h-4" /><Lock className="w-4 h-4" /></div>
+
+            {/* Footer */}
+            <div className="text-xs text-muted-foreground space-y-1 mt-auto">
+                <div className="flex justify-between">
+                    <span>Profile Views:</span>
+                    <span>0</span>
+                </div>
+                <div className="flex justify-between">
+                    <span>Last Refresh:</span>
+                    <span>{new Date().toLocaleDateString()}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span>Profile Visibility:</span>
+                    <span>Public</span>
                 </div>
             </div>
-            <button className="w-full bg-orange-500 text-white py-2 rounded-lg text-sm font-medium">View Leaderboard</button>
-        </div>
-        {/* Footer */}
-        <div className="text-xs text-muted-foreground space-y-1 mt-auto">
-            <div className="flex justify-between"><span>Profile Views:</span><span>0</span></div>
-            <div className="flex justify-between"><span>Last Refresh:</span><span>{new Date().toLocaleDateString()}</span></div>
-            <div className="flex justify-between"><span>Profile Visibility:</span><span>Public</span></div>
-        </div>
-    </aside>
-  );
+        </aside>
+    );
 };
 
 const Dashboard2 = () => {
-    const [data, setData] = useState<DashboardData | null>(null);
+    const [data, setData] = useState<DashboardStats | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
+    const [showAllTopics, setShowAllTopics] = useState(false);
     const maxRetries = 3;
     const { toast } = useToast();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-                
+    // Extract fetchData function to be reusable with useCallback
+    const fetchData = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+
+            const dashboardData = await fetchDashboardData();
+            setData(dashboardData);
+            setRetryCount(0); // Reset retry count on success
+
+        } catch (err) {
+            logError(err, 'Dashboard data fetch');
+            const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data';
+            setError(errorMessage);
+
+            // Show error toast using utility
+            toast(getErrorToastConfig(err));
+
+            // Auto-retry logic
+            if (retryCount < maxRetries) {
+                console.log(`Retrying... Attempt ${retryCount + 1}/${maxRetries}`);
+
                 toast({
-                    title: "Loading Dashboard",
-                    description: "Fetching your coding statistics...",
+                    title: "Retrying...",
+                    description: `Attempt ${retryCount + 1} of ${maxRetries}`,
                     duration: 2000,
                 });
 
-                const dashboardData = await fetchDashboardData(DEFAULT_LEETCODE_USERNAME, DEFAULT_CODEFORCES_HANDLE);
-                setData(dashboardData);
-                setRetryCount(0); // Reset retry count on success
-                
+                setTimeout(() => {
+                    setRetryCount(prev => prev + 1);
+                }, 2000 * (retryCount + 1)); // Exponential backoff
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Failed to Load Dashboard",
+                    description: `Failed after ${maxRetries} attempts. Please try again later.`,
+                    duration: 10000,
+                });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [toast, retryCount, maxRetries]);
+
+    useEffect(() => {
+        const initialFetch = async () => {
+            toast({
+                title: "Loading Dashboard",
+                description: "Fetching your coding statistics...",
+                duration: 2000,
+            });
+
+            await fetchData();
+
+            if (!error) {
                 toast({
                     title: "Dashboard Loaded Successfully",
                     description: "Your coding statistics have been updated.",
                     duration: 3000,
                 });
-                
-            } catch (err) {
-                logError(err, 'Dashboard data fetch');
-                const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data';
-                setError(errorMessage);
-                
-                // Show error toast using utility
-                toast(getErrorToastConfig(err));
-                
-                // Auto-retry logic
-                if (retryCount < maxRetries) {
-                    console.log(`Retrying... Attempt ${retryCount + 1}/${maxRetries}`);
-                    
-                    toast({
-                        title: "Retrying...",
-                        description: `Attempt ${retryCount + 1} of ${maxRetries}`,
-                        duration: 2000,
-                    });
-                    
-                    setTimeout(() => {
-                        setRetryCount(prev => prev + 1);
-                    }, 2000 * (retryCount + 1)); // Exponential backoff
-                } else {
-                    toast({
-                        variant: "destructive",
-                        title: "Failed to Load Dashboard",
-                        description: `Failed after ${maxRetries} attempts. Please try again later.`,
-                        duration: 10000,
-                    });
-                }
-            } finally {
-                setIsLoading(false);
             }
         };
 
-        fetchData();
-    }, [retryCount, toast]);
+        initialFetch();
+    }, [fetchData, toast, error]); // Now fetchData is properly memoized
 
     // Helper functions for data extraction with error handling
     const getTotalQuestions = (): number => {
         try {
-            if (data?.leetcode?.profile?.matchedUser?.submitStats?.acSubmissionNum) {
-                const submissions = data.leetcode.profile.matchedUser.submitStats.acSubmissionNum;
-                if (Array.isArray(submissions)) {
-                    const total = submissions.reduce((sum, item) => {
-                        const count = Number(item?.count) || 0;
-                        return sum + count;
-                    }, 0);
-                    return total;
-                }
-            }
-            if (data?.codeforces?.solvedStats?.totalSolved) {
-                return Number(data.codeforces.solvedStats.totalSolved) || 0;
-            }
-            return 297; // fallback
+            return data?.totalQuestions?.total || 0; // Show 0 for new users instead of demo data
         } catch (error) {
             logError(error, 'getTotalQuestions');
-            return 297; // fallback
+            return 0; // Show 0 for new users instead of demo data
         }
     };
 
     const getTotalActiveDays = (): number => {
         try {
-            if (data?.codeforces?.activeDays?.activeDays) {
-                return Number(data.codeforces.activeDays.activeDays) || 0;
-            }
-            if (data?.leetcode?.calendar?.data?.matchedUser?.userCalendar?.submissionCalendar) {
-                const calendar = JSON.parse(data.leetcode.calendar.data.matchedUser.userCalendar.submissionCalendar);
-                if (calendar && typeof calendar === 'object') {
-                    return Object.keys(calendar).filter(date => Number(calendar[date]) > 0).length;
-                }
-            }
-            return 114; // fallback
+            return data?.totalActiveDays?.total || 0; // Show 0 for new users instead of demo data
         } catch (error) {
             logError(error, 'getTotalActiveDays');
-            return 114; // fallback
+            return 0; // Show 0 for new users instead of demo data
         }
     };
 
     const getHeatmapData = () => {
         try {
-            if (data?.leetcode?.calendar?.data?.matchedUser?.userCalendar?.submissionCalendar) {
-                return generateHeatmapFromCalendar(data.leetcode.calendar.data.matchedUser.userCalendar.submissionCalendar);
+            // Use combined heatmap data to show activity from all platforms
+            const combinedData = data?.heatmapData?.combined || {};
+            const leetcodeData = data?.heatmapData?.leetcode || {};
+            const codeforcesData = data?.heatmapData?.codeforces || {};
+            
+            console.log('🔍 Debug heatmap data:', {
+                combinedKeys: Object.keys(combinedData).slice(0, 5),
+                leetcodeKeys: Object.keys(leetcodeData).slice(0, 5),
+                codeforcesKeys: Object.keys(codeforcesData).slice(0, 5),
+                sampleCombined: Object.entries(combinedData).slice(0, 3),
+                sampleLeetcode: Object.entries(leetcodeData).slice(0, 3),
+                sampleCodeforces: Object.entries(codeforcesData).slice(0, 3)
+            });
+
+            // Convert to months with weeks/days format for better organization
+            const months = [];
+            const today = new Date();
+            const startDate = new Date(today.getFullYear() - 1, today.getMonth(), 1); // Start from 12 months ago
+
+            // Process data month by month for the last 12 months
+            for (let monthOffset = 0; monthOffset < 12; monthOffset++) {
+                const currentMonth = new Date(startDate.getFullYear(), startDate.getMonth() + monthOffset, 1);
+                const monthName = currentMonth.toLocaleDateString('en-US', { month: 'short' });
+                const year = currentMonth.getFullYear();
+                
+                // Get number of days in this month
+                const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+                
+                // Create weeks for this month
+                const monthWeeks = [];
+                let currentWeek = [];
+                
+                // Add padding for the first week if month doesn't start on Sunday
+                const firstDayOfWeek = currentMonth.getDay(); // 0 = Sunday
+                for (let i = 0; i < firstDayOfWeek; i++) {
+                    currentWeek.push(null); // Empty padding
+                }
+                
+                // Add all days of the month
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+                    const dateKey = currentDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+                    
+                    // Get submission counts from all platforms
+                    const combinedSubmissions = combinedData[dateKey] || 0;
+                    const leetcodeSubmissions = leetcodeData[dateKey] || 0;
+                    const codeforcesSubmissions = codeforcesData[dateKey] || 0;
+                    
+                    currentWeek.push({
+                        count: combinedSubmissions, // Use combined count for total activity
+                        leetcodeCount: leetcodeSubmissions,
+                        codeforcesCount: codeforcesSubmissions,
+                        date: currentDate,
+                        dateString: dateKey,
+                        formattedDate: currentDate.toLocaleDateString('en-US', { 
+                            weekday: 'short', 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                        })
+                    });
+                    
+                    // If week is complete (7 days) or it's the last day of month, start a new week
+                    if (currentWeek.length === 7) {
+                        monthWeeks.push([...currentWeek]);
+                        currentWeek = [];
+                    }
+                }
+                
+                // Add remaining days to the last week with padding if needed
+                if (currentWeek.length > 0) {
+                    while (currentWeek.length < 7) {
+                        currentWeek.push(null); // Empty padding
+                    }
+                    monthWeeks.push(currentWeek);
+                }
+                
+                months.push({
+                    name: monthName,
+                    year: year,
+                    weeks: monthWeeks
+                });
             }
+
+            // Count statistics for debugging
+            const allDays = months.flatMap(month => 
+                month.weeks.flatMap(week => 
+                    week.filter(day => day !== null)
+                )
+            );
+            const activeDaysCount = allDays.filter(day => day && day.count > 0).length;
+            const totalSubmissions = allDays.reduce((sum, day) => sum + (day ? day.count : 0), 0);
+            
+            console.log('📊 Monthly heatmap processed:', {
+                totalMonths: months.length,
+                activeDays: activeDaysCount,
+                totalSubmissions: totalSubmissions,
+                sampleMonth: months[months.length - 1]?.name + ' ' + months[months.length - 1]?.year
+            });
+
+            return months.length > 0 ? months : [];
         } catch (error) {
             logError(error, 'getHeatmapData');
         }
-        // Fallback dummy data
-        return Array(52).fill(0).map(() => Array(7).fill(0).map(() => Math.random() > 0.7 ? Math.floor(Math.random() * 10) : 0));
+        // Fallback - return empty months array
+        return [];
     };
 
     const getLeetCodeStats = () => {
         try {
-            if (data?.leetcode?.profile?.matchedUser?.submitStats?.acSubmissionNum && Array.isArray(data.leetcode.profile.matchedUser.submitStats.acSubmissionNum)) {
-                const stats = data.leetcode.profile.matchedUser.submitStats.acSubmissionNum;
-                const easy = Number(stats.find(s => s?.difficulty === 'Easy')?.count) || 0;
-                const medium = Number(stats.find(s => s?.difficulty === 'Medium')?.count) || 0;
-                const hard = Number(stats.find(s => s?.difficulty === 'Hard')?.count) || 0;
+            const difficultyStats = data?.totalQuestions?.byDifficulty;
+            if (difficultyStats) {
                 return {
-                    easy,
-                    medium,
-                    hard,
-                    total: easy + medium + hard
+                    easy: difficultyStats.easy,
+                    medium: difficultyStats.medium,
+                    hard: difficultyStats.hard,
+                    total: difficultyStats.easy + difficultyStats.medium + difficultyStats.hard
                 };
             }
         } catch (error) {
             logError(error, 'getLeetCodeStats');
         }
-        return { easy: 75, medium: 142, hard: 35, total: 252 }; // fallback
+        return { easy: 0, medium: 0, hard: 0, total: 0 }; // Show zeros for new users
     };
 
     const getCodeforcesStats = () => {
         try {
-            const totalSolved = Number(data?.codeforces?.solvedStats?.totalSolved) || 0;
-            const totalContests = Number(data?.codeforces?.contests?.totalContests) || 0;
+            const totalSolved = data?.totalQuestions?.codeforces || 0;
+            const totalContests = data?.totalContests?.codeforces || 0;
             return {
                 total: totalSolved,
                 contests: totalContests
             };
         } catch (error) {
             logError(error, 'getCodeforcesStats');
-            return { total: 45, contests: 8 }; // fallback
+            return { total: 0, contests: 0 }; // Show zeros for new users
         }
     };
 
     const getContestRankings = () => {
         try {
-            const leetcodeRating = Number(data?.leetcode?.contest?.data?.userContestRanking?.rating) || 1548;
-            const codeforcesRating = Number(data?.codeforces?.userInfo?.result?.[0]?.rating) || 849;
-            const codeforcesRank = data?.codeforces?.userInfo?.result?.[0]?.rank || 'newbie';
-            
+            const leetcodeRating = data?.contestRankings?.latest?.leetcode?.rank || 1548;
+            const codeforcesRating = data?.userInfo?.connectedPlatforms?.codeforces?.currentRating || 849;
+            const codeforcesRank = data?.userInfo?.connectedPlatforms?.codeforces?.rank || 'newbie';
+
             return {
                 leetcode: leetcodeRating,
                 codeforces: codeforcesRating,
@@ -445,52 +617,36 @@ const Dashboard2 = () => {
         } catch (error) {
             logError(error, 'getContestRankings');
             return {
-                leetcode: 1548,
-                codeforces: 849,
-                codeforcesRank: 'newbie'
+                leetcode: 0,
+                codeforces: 0,
+                codeforcesRank: 'unrated'
             };
         }
     };
 
     const getTopicAnalysis = () => {
         try {
-            if (data?.leetcode?.skills?.data?.matchedUser?.tagProblemCounts) {
-                const skillData = data.leetcode.skills.data.matchedUser.tagProblemCounts;
-                const allTopics = [
-                    ...(Array.isArray(skillData.fundamental) ? skillData.fundamental : []),
-                    ...(Array.isArray(skillData.intermediate) ? skillData.intermediate : []),
-                    ...(Array.isArray(skillData.advanced) ? skillData.advanced : [])
-                ];
-                
-                const processedTopics = allTopics
-                    .filter(topic => topic && typeof topic === 'object' && topic.tagName && typeof topic.problemsSolved === 'number')
-                    .sort((a, b) => Number(b.problemsSolved) - Number(a.problemsSolved))
-                    .slice(0, 10)
-                    .map(topic => ({
-                        name: String(topic.tagName),
-                        count: Number(topic.problemsSolved)
-                    }));
-                
-                if (processedTopics.length > 0) {
-                    return processedTopics;
+            if (data?.dsaTopicAnalysis) {
+                const processedTopics = Object.entries(data.dsaTopicAnalysis)
+                    .map(([topicName, stats]) => ({
+                        name: topicName,
+                        count: stats.total,
+                        category: stats.category || 'intermediate'
+                    }))
+                    .sort((a, b) => b.count - a.count);
+
+                // Only slice if we're not showing all topics
+                const topicsToShow = showAllTopics ? processedTopics : processedTopics.slice(0, 10);
+
+                if (topicsToShow.length > 0) {
+                    return { topics: topicsToShow, totalCount: processedTopics.length };
                 }
             }
         } catch (error) {
             logError(error, 'getTopicAnalysis');
         }
-        // Fallback data
-        return [
-            { name: 'Arrays', count: 130 },
-            { name: 'Dynamic Programming', count: 61 },
-            { name: 'HashMap and Set', count: 45 },
-            { name: 'String', count: 41 },
-            { name: 'Sorting', count: 31 },
-            { name: 'DFS', count: 30 },
-            { name: 'Two Pointers', count: 26 },
-            { name: 'Greedy Algorithms', count: 24 },
-            { name: 'BFS', count: 23 },
-            { name: 'Trees', count: 22 }
-        ];
+        // Fallback data - empty for new users
+        return { topics: [{ name: 'No topics yet', count: 0, category: 'intermediate' }], totalCount: 0 };
     };
 
     const handleRetry = () => {
@@ -525,13 +681,13 @@ const Dashboard2 = () => {
                             <p className="text-sm text-muted-foreground">
                                 Failed after {maxRetries} attempts
                             </p>
-                            <button 
+                            <button
                                 onClick={handleRetry}
                                 className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                             >
                                 Try Again
                             </button>
-                            <button 
+                            <button
                                 onClick={() => window.location.reload()}
                                 className="block w-full px-4 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors"
                             >
@@ -553,7 +709,7 @@ const Dashboard2 = () => {
     return (
         <div className="flex flex-col lg:flex-row bg-background min-h-screen p-3 lg:p-6 gap-4 lg:gap-6">
             {/* Sidebar */}
-            <Sidebar data={data} isLoading={isLoading} />
+            <Sidebar data={data} isLoading={isLoading} refreshData={fetchData} />
             {/* Main Content */}
             <main className="flex-1 flex flex-col gap-4 lg:gap-6">
                 {/* Row 1: 2 squares + 1 rectangle */}
@@ -576,33 +732,125 @@ const Dashboard2 = () => {
                     <div className="md:col-span-2 lg:col-span-8 bg-card rounded-xl p-4 lg:p-6 flex flex-col min-h-[110px]">
                         <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-2 text-xs">
                             <span className="text-muted-foreground">
-                                {isLoading ? 'Loading...' : 'Activity Overview'}
+                                {isLoading ? 'Loading...' : 'Activity Overview (All Platforms)'}
+                            </span>
+                            <span className="text-muted-foreground">
+                                {(() => {
+                                    try {
+                                        const monthsData = getHeatmapData();
+                                        const activeDays = monthsData.reduce((total, month) => 
+                                            total + month.weeks.flat().filter(day => day && day.count > 0).length, 0
+                                        );
+                                        return `${activeDays} active days in the past year`;
+                                    } catch (error) {
+                                        return 'No activity data';
+                                    }
+                                })()}
                             </span>
                         </div>
-                        {/* Heatmap grid */}
+                        
+                        {/* Monthly Heatmap */}
                         {isLoading ? (
                             <div className="flex items-center justify-center h-24">
                                 <Loader2 className="w-6 h-6 animate-spin" />
                             </div>
                         ) : (
-                            <div className="flex items-end gap-1 overflow-x-auto pb-1">
-                                {heatmapData.map((week, weekIdx) => (
-                                    <div key={weekIdx} className="flex flex-col gap-1">
-                                        {week.map((day, dayIdx) => (
-                                            <div 
-                                                key={dayIdx} 
-                                                className={`w-2 h-2 lg:w-3 lg:h-3 rounded ${
-                                                    day > 0 ? 'bg-green-500' : 'bg-muted'
-                                                }`}
-                                                title={`${day} submissions`}
-                                            ></div>
+                            <div className="space-y-1">
+                                {/* Single continuous heatmap grid - GitHub style with horizontal scrolling */}
+                                <div className="overflow-x-auto pb-2">
+                                    <div className="flex gap-2 min-w-max">
+                                        {getHeatmapData().map((month, monthIndex) => (
+                                            <div key={`${month.year}-${month.name}`} className="flex flex-col">
+                                                {/* Month label */}
+                                                <div className="text-xs text-muted-foreground mb-1 text-center min-w-[50px]">
+                                                    {month.name}
+                                                </div>
+                                                
+                                                {/* Days grid in vertical columns */}
+                                                <div className="flex gap-[2px]">
+                                                    {month.weeks.map((week, weekIndex) => (
+                                                        <div key={weekIndex} className="flex flex-col gap-[2px]">
+                                                            {week.map((day, dayIndex) => {
+                                                                if (!day) {
+                                                                    // Empty padding days
+                                                                    return <div key={`empty-${dayIndex}`} className="w-[11px] h-[11px]"></div>;
+                                                                }
+
+                                                                // Dynamic color intensity based on submission count
+                                                                let bgColor = 'bg-gray-200 dark:bg-gray-800'; // Default for 0 submissions
+                                                                if (day.count > 0) {
+                                                                    if (day.count >= 10) bgColor = 'bg-green-800'; // Very active - darkest green
+                                                                    else if (day.count >= 5) bgColor = 'bg-green-700'; // Highly active - dark green
+                                                                    else if (day.count >= 3) bgColor = 'bg-green-600'; // Moderately active - medium green
+                                                                    else if (day.count >= 2) bgColor = 'bg-green-400'; // Lightly active - light green
+                                                                    else bgColor = 'bg-green-300'; // Minimal activity - very light green
+                                                                }
+
+                                                                const tooltipText = day.count > 0 
+                                                                    ? (() => {
+                                                                        const parts = [];
+                                                                        if (day.count === 1) {
+                                                                            parts.push(`${day.count} submission`);
+                                                                        } else {
+                                                                            parts.push(`${day.count} submissions`);
+                                                                        }
+                                                                        
+                                                                        // Add platform breakdown if available
+                                                                        const breakdown = [];
+                                                                        if (day.leetcodeCount > 0) breakdown.push(`LeetCode: ${day.leetcodeCount}`);
+                                                                        if (day.codeforcesCount > 0) breakdown.push(`Codeforces: ${day.codeforcesCount}`);
+                                                                        
+                                                                        if (breakdown.length > 0) {
+                                                                            parts.push(`(${breakdown.join(', ')})`);
+                                                                        }
+                                                                        
+                                                                        parts.push(`on ${day.formattedDate}`);
+                                                                        return parts.join(' ');
+                                                                    })()
+                                                                    : `No submissions on ${day.formattedDate}`;
+
+                                                                return (
+                                                                    <div
+                                                                        key={day.dateString}
+                                                                        className={`w-[11px] h-[11px] rounded-[2px] cursor-pointer transition-all duration-200 hover:ring-1 hover:ring-blue-400 ${bgColor}`}
+                                                                        title={tooltipText}
+                                                                    />
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         ))}
                                     </div>
-                                ))}
+                                </div>
+                                
+                                {/* Day labels at the bottom */}
+                                <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+                                    <div className="flex items-center gap-6">
+                                        <span>Mon</span>
+                                        <span>Wed</span>
+                                        <span>Fri</span>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground opacity-70">
+                                        ← Scroll to see full year →
+                                    </div>
+                                </div>
                             </div>
                         )}
-                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+                        
+                        {/* Activity level legend */}
+                        <div className="flex justify-end items-center gap-1 text-xs mt-1">
+                            <span className="text-muted-foreground">Less</span>
+                            <div className="flex gap-[2px]">
+                                <div className="w-[11px] h-[11px] rounded-[2px] bg-gray-200 dark:bg-gray-800" title="No activity"></div>
+                                <div className="w-[11px] h-[11px] rounded-[2px] bg-green-300" title="1 submission"></div>
+                                <div className="w-[11px] h-[11px] rounded-[2px] bg-green-400" title="2 submissions"></div>
+                                <div className="w-[11px] h-[11px] rounded-[2px] bg-green-600" title="3-4 submissions"></div>
+                                <div className="w-[11px] h-[11px] rounded-[2px] bg-green-700" title="5-9 submissions"></div>
+                                <div className="w-[11px] h-[11px] rounded-[2px] bg-green-800" title="10+ submissions"></div>
+                            </div>
+                            <span className="text-muted-foreground">More</span>
                         </div>
                     </div>
                 </div>
@@ -620,7 +868,7 @@ const Dashboard2 = () => {
                                             <span>🏆</span> LeetCode <span className="ml-1">
                                                 {(() => {
                                                     try {
-                                                        return Number(data?.leetcode?.contest?.data?.userContestRanking?.attendedContestsCount) || 0;
+                                                        return data?.totalContests?.leetcode || 0;
                                                     } catch (error) {
                                                         console.warn('Error getting LeetCode contest count:', error);
                                                         return 0;
@@ -632,7 +880,7 @@ const Dashboard2 = () => {
                                             <span>🏅</span> Codeforces <span className="ml-1">
                                                 {(() => {
                                                     try {
-                                                        return Number(data?.codeforces?.contests?.totalContests) || 0;
+                                                        return data?.totalContests?.codeforces || 0;
                                                     } catch (error) {
                                                         console.warn('Error getting Codeforces contest count:', error);
                                                         return 0;
@@ -646,9 +894,9 @@ const Dashboard2 = () => {
                             <div className="text-3xl lg:text-4xl font-bold">
                                 {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : (() => {
                                     try {
-                                        const leetcodeContests = Number(data?.leetcode?.contest?.data?.userContestRanking?.attendedContestsCount) || 0;
-                                        const codeforcesContests = Number(data?.codeforces?.contests?.totalContests) || 0;
-                                        return leetcodeContests + codeforcesContests || 10;
+                                        const leetcodeContests = data?.totalContests?.leetcode || 0;
+                                        const codeforcesContests = data?.totalContests?.codeforces || 0;
+                                        return leetcodeContests + codeforcesContests || 0;
                                     } catch (error) {
                                         console.warn('Error calculating total contests:', error);
                                         return 10; // fallback
@@ -679,7 +927,7 @@ const Dashboard2 = () => {
                                     <div className="text-xs text-muted-foreground mb-2">
                                         Global Ranking: {(() => {
                                             try {
-                                                return data?.leetcode?.contest?.data?.userContestRanking?.globalRanking || 'N/A';
+                                                return data?.contestRankings?.latest?.leetcode?.rank || 'N/A';
                                             } catch (error) {
                                                 console.warn('Error getting global ranking:', error);
                                                 return 'N/A';
@@ -689,7 +937,7 @@ const Dashboard2 = () => {
                                     <div className="text-xs text-muted-foreground mb-2">
                                         Contests Attended: {(() => {
                                             try {
-                                                return Number(data?.leetcode?.contest?.data?.userContestRanking?.attendedContestsCount) || 0;
+                                                return data?.totalContests?.leetcode || 0;
                                             } catch (error) {
                                                 console.warn('Error getting attended contests:', error);
                                                 return 0;
@@ -725,19 +973,33 @@ const Dashboard2 = () => {
                             <div className="space-y-1">
                                 {(() => {
                                     try {
-                                        return topicAnalysis.map((topic, idx) => {
-                                            const maxCount = topicAnalysis[0]?.count || 1;
+                                        const analysisResult = topicAnalysis;
+                                        const topics = analysisResult.topics;
+                                        
+                                        return topics.map((topic, idx) => {
+                                            const maxCount = topics[0]?.count || 1;
                                             const count = Number(topic.count) || 0;
                                             const name = String(topic.name) || 'Unknown';
-                                            
+                                            const category = topic.category || 'intermediate';
+
+                                            // Category color coding
+                                            const getCategoryColor = (cat: string) => {
+                                                switch (cat) {
+                                                    case 'fundamental': return 'bg-green-500';
+                                                    case 'intermediate': return 'bg-blue-500';
+                                                    case 'advanced': return 'bg-purple-500';
+                                                    default: return 'bg-blue-500';
+                                                }
+                                            };
+
                                             return (
                                                 <div key={idx} className="flex items-center gap-2">
-                                                    <span className="w-24 lg:w-32 text-xs text-muted-foreground truncate" title={name}>
+                                                    <span className="w-24 lg:w-32 text-xs text-muted-foreground truncate" title={`${name} (${category})`}>
                                                         {name}
                                                     </span>
                                                     <div className="flex-1 bg-gray-700 rounded-full h-2">
-                                                        <div 
-                                                            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                                                        <div
+                                                            className={`h-2 rounded-full transition-all duration-300 ${getCategoryColor(category)}`}
                                                             style={{ width: `${Math.min((count / maxCount) * 100, 100)}%` }}
                                                         ></div>
                                                     </div>
@@ -755,7 +1017,33 @@ const Dashboard2 = () => {
                                     }
                                 })()}
                             </div>
-                            <button className="text-blue-400 text-sm underline mt-2 w-fit">show more</button>
+                            {/* Show more/less button with topic count info */}
+                            {(() => {
+                                try {
+                                    const analysisResult = topicAnalysis;
+                                    const hasMoreTopics = analysisResult.totalCount > 10;
+                                    
+                                    if (hasMoreTopics) {
+                                        return (
+                                            <div className="flex items-center justify-between mt-2">
+                                                <button 
+                                                    className="text-blue-400 text-sm underline hover:text-blue-300 transition-colors"
+                                                    onClick={() => setShowAllTopics(!showAllTopics)}
+                                                >
+                                                    {showAllTopics ? `show less` : `show more (${analysisResult.totalCount - 10} more topics)`}
+                                                </button>
+                                                <span className="text-xs text-muted-foreground">
+                                                    Showing {analysisResult.topics.length} of {analysisResult.totalCount}
+                                                </span>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                } catch (error) {
+                                    console.warn('Error rendering show more button:', error);
+                                    return null;
+                                }
+                            })()}
                         </div>
                     </div>
                     {/* Column 2: 2 stacked blocks */}
@@ -882,7 +1170,7 @@ const Dashboard2 = () => {
                                             <div className="text-xs text-muted-foreground text-center">
                                                 (contests: {(() => {
                                                     try {
-                                                        return Number(data?.leetcode?.contest?.data?.userContestRanking?.attendedContestsCount) || 0;
+                                                        return data?.totalContests?.leetcode || 0;
                                                     } catch (error) {
                                                         console.warn('Error getting LeetCode contest count:', error);
                                                         return 0;
@@ -917,7 +1205,7 @@ const Dashboard2 = () => {
                                             <div className="text-xs text-muted-foreground text-center">
                                                 (max: {(() => {
                                                     try {
-                                                        return Number(data?.codeforces?.userInfo?.result?.[0]?.maxRating) || Number(contestRankings.codeforces) || 0;
+                                                        return data?.userInfo?.connectedPlatforms?.codeforces?.maxRating || Number(contestRankings.codeforces) || 0;
                                                     } catch (error) {
                                                         console.warn('Error getting max rating:', error);
                                                         return 0;

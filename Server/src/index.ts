@@ -30,6 +30,12 @@ app.use(cookieParser());
 // Logging middleware
 app.use(morgan('combined'));
 
+// Custom request logging middleware
+app.use((req, res, next) => {
+    console.log(`📥 ${req.method} ${req.path} - Body:`, req.body);
+    next();
+});
+
 // Rate limiting middleware
 app.use(generalLimiter);
 

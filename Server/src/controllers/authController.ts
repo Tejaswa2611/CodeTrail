@@ -38,6 +38,8 @@ export class AuthController {
 
             res.status(201).json(ResponseUtils.success('User registered successfully', {
                 user: result.user,
+                accessToken: result.tokens.accessToken,
+                refreshToken: result.tokens.refreshToken,
             }));
         } catch (error) {
             if (error instanceof Error) {
@@ -81,6 +83,8 @@ export class AuthController {
 
             res.status(200).json(ResponseUtils.success('Login successful', {
                 user: result.user,
+                accessToken: result.tokens.accessToken,
+                refreshToken: result.tokens.refreshToken,
             }));
         } catch (error) {
             if (error instanceof Error) {

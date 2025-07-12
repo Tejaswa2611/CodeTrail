@@ -29,6 +29,11 @@ app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
 app.use((0, cookie_parser_1.default)());
 // Logging middleware
 app.use((0, morgan_1.default)('combined'));
+// Custom request logging middleware
+app.use((req, res, next) => {
+    console.log(`📥 ${req.method} ${req.path} - Body:`, req.body);
+    next();
+});
 // Rate limiting middleware
 app.use(rateLimiter_1.generalLimiter);
 // API routes

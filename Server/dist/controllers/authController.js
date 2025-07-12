@@ -34,6 +34,8 @@ class AuthController {
             });
             res.status(201).json(response_1.ResponseUtils.success('User registered successfully', {
                 user: result.user,
+                accessToken: result.tokens.accessToken,
+                refreshToken: result.tokens.refreshToken,
             }));
         }
         catch (error) {
@@ -74,6 +76,8 @@ class AuthController {
             });
             res.status(200).json(response_1.ResponseUtils.success('Login successful', {
                 user: result.user,
+                accessToken: result.tokens.accessToken,
+                refreshToken: result.tokens.refreshToken,
             }));
         }
         catch (error) {

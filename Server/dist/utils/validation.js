@@ -16,10 +16,8 @@ const validateUserRegistration = (data) => {
             'any.required': 'Email is required',
         }),
         password: joi_1.default.string()
-            .min(5)
             .required()
             .messages({
-            'string.min': 'Password must be at least 5 characters long',
             'any.required': 'Password is required',
         }),
         firstName: joi_1.default.string()

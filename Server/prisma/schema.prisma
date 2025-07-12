@@ -17,12 +17,14 @@ model User {
   password        String
   firstName       String
   lastName        String?
-  isEmailVerified Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   // Relations
-  refreshTokens RefreshToken[]
+  refreshTokens        RefreshToken[]
+  platformProfiles     PlatformProfile[]
+  submissions          Submission[]
+  contestParticipation ContestParticipation[]
 
   @@map("users")
 }
@@ -39,4 +41,106 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+// 2️⃣ Platform Profiles - Up to 2 entries per user: Codeforces & LeetCode
+model PlatformProfile {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  platform      Platform
+  handle        String
+  currentRating Int?      @map("current_rating")
+  maxRating     Int?      @map("max_rating")
+  rank          String?   // Optional for CF only
+  syncedAt      DateTime? @map("synced_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@map("platform_profiles")
+}
+
+// 3️⃣ Problems - Problem metadata across both platforms
+model Problem {
+  id         String   @id @default(cuid())
+  platform   Platform
+  externalId String   @map("external_id") // e.g., slug for LC, contestId-index for CF
+  name       String
+  difficulty String?  // easy, medium, hard
+  rating     Int?     // For Codeforces; nullable for LC
+  tags       String[] // Array of DSA tags
+  url        String?  // Link to problem
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  submissions Submission[]
+
+  @@unique([platform, externalId])
+  @@map("problems")
+}
+
+// 4️⃣ Submissions - User submissions (AC, WA, etc.)
+model Submission {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  platform  Platform
+  handle    String
+  problemId String   @map("problem_id")
+  verdict   String   // e.g., AC, WA, TLE
+  language  String?  // e.g., Python, C++
+  timestamp DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@map("submissions")
+}
+
+// 5️⃣ Contests - Contest metadata across platforms
+model Contest {
+  id        String   @id @default(cuid())
+  platform  Platform
+  contestId String   @map("contest_id") // e.g., LC slug or CF ID
+  name      String
+  startTime DateTime @map("start_time")
+  duration  Int      // In seconds
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([platform, contestId])
+  @@map("contests")
+}
+
+// 6️⃣ Contest Participation - User contest history (for rating graphs)
+model ContestParticipation {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  platform  Platform
+  handle    String
+  contestId String   @map("contest_id")
+  rank      Int?
+  oldRating Int?     @map("old_rating") // null for LeetCode if N/A
+  newRating Int?     @map("new_rating") // null for LeetCode if N/A
+  timestamp DateTime // Contest date
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform, contestId])
+  @@map("contest_participation")
+}
+
+// Enums
+enum Platform {
+  leetcode
+  codeforces
+
+  @@map("platform")
 }
