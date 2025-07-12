@@ -246,7 +246,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                                     className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                                 >
                                     {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
-                                    {isSaving ? 'Saving...' : 'Save'}
+                                    {isSaving ? 'Syncing...' : 'Save & Sync'}
                                 </button>
                                 <button
                                     onClick={() => setEditingPlatform(null)}
@@ -473,38 +473,48 @@ const Dashboard2 = () => {
                 combinedKeys: Object.keys(combinedData).slice(0, 5),
                 leetcodeKeys: Object.keys(leetcodeData).slice(0, 5),
                 codeforcesKeys: Object.keys(codeforcesData).slice(0, 5),
-                sampleCombined: Object.entries(combinedData).slice(0, 3),
-                sampleLeetcode: Object.entries(leetcodeData).slice(0, 3),
-                sampleCodeforces: Object.entries(codeforcesData).slice(0, 3)
+                sampleCombined: Object.entries(combinedData).slice(0, 10),
+                sampleLeetcode: Object.entries(leetcodeData).slice(0, 10),
+                sampleCodeforces: Object.entries(codeforcesData).slice(0, 10),
+                todayString: new Date().toISOString().split('T')[0],
+                july2025Data: {
+                    '2025-07-04': combinedData['2025-07-04'],
+                    '2025-07-05': combinedData['2025-07-05'],
+                    '2025-07-06': combinedData['2025-07-06'],
+                    '2025-07-07': combinedData['2025-07-07']
+                }
             });
 
             // Convert to months with weeks/days format for better organization
             const months = [];
             const today = new Date();
-            const startDate = new Date(today.getFullYear() - 1, today.getMonth(), 1); // Start from 12 months ago
+            
+            // Include current month and show 12 months total (past + current + some future if data exists)
+            // Start from 11 months ago to show a full year including current month
+            const startDate = new Date(today.getFullYear() - 1, today.getMonth() + 1, 1);
 
-            // Process data month by month for the last 12 months
+            // Process data month by month for 12 months (this will include current month and future if data exists)
             for (let monthOffset = 0; monthOffset < 12; monthOffset++) {
-                const currentMonth = new Date(startDate.getFullYear(), startDate.getMonth() + monthOffset, 1);
-                const monthName = currentMonth.toLocaleDateString('en-US', { month: 'short' });
-                const year = currentMonth.getFullYear();
+                const monthDate = new Date(startDate.getFullYear(), startDate.getMonth() + monthOffset, 1);
+                const monthName = monthDate.toLocaleDateString('en-US', { month: 'short' });
+                const year = monthDate.getFullYear();
                 
                 // Get number of days in this month
-                const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+                const daysInMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate();
                 
                 // Create weeks for this month
                 const monthWeeks = [];
                 let currentWeek = [];
                 
                 // Add padding for the first week if month doesn't start on Sunday
-                const firstDayOfWeek = currentMonth.getDay(); // 0 = Sunday
+                const firstDayOfWeek = monthDate.getDay(); // 0 = Sunday
                 for (let i = 0; i < firstDayOfWeek; i++) {
                     currentWeek.push(null); // Empty padding
                 }
                 
                 // Add all days of the month
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+                    const currentDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
                     const dateKey = currentDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
                     
                     // Get submission counts from all platforms

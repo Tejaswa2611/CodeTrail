@@ -6,7 +6,6 @@ export interface User {
   password: string;
   firstName: string;
   lastName: string | null;
-  isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -25,6 +25,7 @@ model User {
   platformProfiles     PlatformProfile[]
   submissions          Submission[]
   contestParticipation ContestParticipation[]
+  calendarCache        CalendarCache[]
 
   @@map("users")
 }
@@ -135,6 +136,24 @@ model ContestParticipation {
 
   @@unique([userId, platform, contestId])
   @@map("contest_participation")
+}
+
+// 7️⃣ Calendar Cache - Cache platform calendar/activity data to reduce API calls
+model CalendarCache {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  platform  Platform
+  handle    String
+  date      String   // YYYY-MM-DD format
+  count     Int      // Number of submissions on this date
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform, date])
+  @@map("calendar_cache")
 }
 
 // Enums

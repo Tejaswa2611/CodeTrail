@@ -179,8 +179,8 @@ export class DashboardService {
         const totalActiveDays = this.calculateActiveDays(submissions);
         console.log(`📅 Calculated active days:`, totalActiveDays);
 
-        // Generate heatmap data
-        const heatmapData = this.generateHeatmapData(submissions);
+        // Generate heatmap data with real calendar data if available
+        const heatmapData = await this.generateHeatmapDataWithCalendar(submissions, platformProfiles, userId);
         console.log('📊 Generated heatmap data sample:', {
             totalDates: Object.keys(heatmapData.combined).length,
             sampleCombined: Object.entries(heatmapData.combined).slice(0, 5),
@@ -302,6 +302,144 @@ export class DashboardService {
         };
     }
 
+    private async generateHeatmapDataWithCalendar(submissions: any[], platformProfiles: any[], userId: string) {
+        console.log('�️ Generating heatmap with FRESH calendar data (ignoring database submissions)...');
+        
+        // Initialize empty heatmap - we'll populate it ONLY with fresh API data
+        const heatmapData = {
+            leetcode: {} as { [date: string]: number },
+            codeforces: {} as { [date: string]: number },
+            combined: {} as { [date: string]: number }
+        };
+        
+        // Get LeetCode calendar data FRESH from API (ignore database completely)
+        const leetcodeProfile = platformProfiles.find(p => p.platform === 'leetcode');
+        if (leetcodeProfile?.handle) {
+            try {
+                console.log(`� Fetching FRESH LeetCode calendar for: ${leetcodeProfile.handle}`);
+                const { LeetCodeService } = await import('./leetcodeService');
+                const leetcodeService = new LeetCodeService();
+                
+                const profile = await leetcodeService.getUserProfile(leetcodeProfile.handle);
+                
+                if (profile?.matchedUser?.submissionCalendar) {
+                    console.log('🎯 Processing FRESH calendar data (ignoring all database submissions)...');
+                    
+                    const submissionCalendar = JSON.parse(profile.matchedUser.submissionCalendar);
+                    
+                    console.log('📊 Raw calendar data sample:', 
+                        Object.entries(submissionCalendar).slice(0, 10).map(([ts, count]) => {
+                            const originalDate = new Date(parseInt(ts) * 1000);
+                            const shiftedDate = new Date(parseInt(ts) * 1000);
+                            shiftedDate.setDate(shiftedDate.getDate() - 1);
+                            
+                            const year = shiftedDate.getFullYear();
+                            const month = String(shiftedDate.getMonth() + 1).padStart(2, '0');
+                            const day = String(shiftedDate.getDate()).padStart(2, '0');
+                            return {
+                                timestamp: ts,
+                                count,
+                                originalDate: originalDate.toDateString(),
+                                shiftedDate: `${year}-${month}-${day}`,
+                                finalDate: `${year}-${month}-${day}`
+                            };
+                        })
+                    );
+                    
+                    // Convert calendar timestamps to date strings and populate LeetCode heatmap
+                    Object.entries(submissionCalendar).forEach(([timestamp, count]) => {
+                        const date = new Date(parseInt(timestamp) * 1000);
+                        // Subtract 1 day to fix the date shifting issue
+                        date.setDate(date.getDate() - 1);
+                        // Use local timezone to format the date
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const dateKey = `${year}-${month}-${day}`; // YYYY-MM-DD format in local timezone
+                        heatmapData.leetcode[dateKey] = count as number;
+                    });
+                    
+                    console.log(`✅ LeetCode calendar processed: ${Object.keys(heatmapData.leetcode).length} active days`);
+                    console.log('📅 July 2025 LeetCode data:', 
+                        Object.entries(heatmapData.leetcode)
+                            .filter(([date]) => date.startsWith('2025-07'))
+                            .map(([date, count]) => `${date}: ${count}`)
+                    );
+                    
+                    // Cache this fresh data for future requests
+                    try {
+                        console.log(`💾 Caching calendar data for future requests...`);
+                        
+                        // Clear old cache for this user/platform
+                        await prisma.calendarCache.deleteMany({
+                            where: {
+                                userId: userId,
+                                platform: 'leetcode'
+                            }
+                        });
+                        
+                        // Prepare cache entries
+                        const cacheEntries = Object.entries(heatmapData.leetcode).map(([date, count]) => ({
+                            userId: userId,
+                            platform: 'leetcode' as const,
+                            handle: leetcodeProfile.handle,
+                            date: date,
+                            count: count
+                        }));
+                        
+                        // Insert fresh cache data
+                        await prisma.calendarCache.createMany({
+                            data: cacheEntries
+                        });
+                        
+                        console.log(`✅ Successfully cached ${cacheEntries.length} calendar entries`);
+                    } catch (cacheError) {
+                        console.error('❌ Failed to cache calendar data:', cacheError);
+                    }
+                } else {
+                    console.log('⚠️ No submission calendar found in LeetCode profile');
+                }
+            } catch (error) {
+                console.error('❌ Error fetching LeetCode calendar:', error);
+            }
+        }
+        
+        // For Codeforces, use database submissions (since no calendar API available)
+        const codeforcesSubmissions = submissions.filter(sub => 
+            sub.platform === 'codeforces' && 
+            sub.verdict === 'AC' &&
+            !sub.problem.tags?.includes('daily-activity') // Exclude synthetic data
+        );
+        
+        codeforcesSubmissions.forEach(submission => {
+            const dateKey = submission.timestamp.toISOString().split('T')[0];
+            heatmapData.codeforces[dateKey] = (heatmapData.codeforces[dateKey] || 0) + 1;
+        });
+        
+        // Combine LeetCode (from calendar) + Codeforces (from database)
+        const allDates = new Set([
+            ...Object.keys(heatmapData.leetcode),
+            ...Object.keys(heatmapData.codeforces)
+        ]);
+        
+        allDates.forEach(date => {
+            const leetcodeCount = heatmapData.leetcode[date] || 0;
+            const codeforcesCount = heatmapData.codeforces[date] || 0;
+            heatmapData.combined[date] = leetcodeCount + codeforcesCount;
+        });
+        
+        console.log('📊 Final heatmap summary:', {
+            leetcodeDays: Object.keys(heatmapData.leetcode).length,
+            codeforcesDays: Object.keys(heatmapData.codeforces).length,
+            combinedDays: Object.keys(heatmapData.combined).length,
+            july2025Sample: Object.entries(heatmapData.combined)
+                .filter(([date]) => date.startsWith('2025-07'))
+                .slice(0, 10)
+        });
+        
+        return heatmapData;
+    }
+
     private generateHeatmapData(submissions: any[]) {
         const leetcodeHeatmap: { [date: string]: number } = {};
         const codeforcesHeatmap: { [date: string]: number } = {};
@@ -309,7 +447,14 @@ export class DashboardService {
 
         console.log(`🔍 Processing ${submissions.length} submissions for heatmap...`);
         
-        submissions.forEach(submission => {
+        // Separate real submissions from daily-activity synthetic ones
+        const realSubmissions = submissions.filter(sub => !sub.problem.tags?.includes('daily-activity'));
+        const dailyActivitySubmissions = submissions.filter(sub => sub.problem.tags?.includes('daily-activity'));
+        
+        console.log(`📊 Submission breakdown: Real: ${realSubmissions.length}, Daily Activity: ${dailyActivitySubmissions.length}`);
+        
+        // Process real submissions first (exclude daily activity)
+        realSubmissions.forEach(submission => {
             const dateKey = submission.timestamp.toISOString().split('T')[0];
 
             // Combined heatmap
@@ -323,9 +468,16 @@ export class DashboardService {
             }
         });
 
+        // For LeetCode, prioritize calendar data if available
+        // This will override the counts from summary problems with real calendar data
+        console.log('🔍 Checking for calendar data to override LeetCode heatmap...');
+        
+        // TODO: Get calendar data from latest sync and apply it here
+        // For now, just process daily activity to maintain the 1-per-day pattern from calendar
+
         // Log some sample data to verify counts
         const sampleDates = Object.keys(combinedHeatmap).slice(0, 10);
-        console.log('📈 Sample heatmap data:', sampleDates.map(date => ({
+        console.log('📈 Sample heatmap data (real submissions only):', sampleDates.map(date => ({
             date,
             combined: combinedHeatmap[date],
             leetcode: leetcodeHeatmap[date] || 0,
@@ -838,6 +990,25 @@ export class DashboardService {
                 // Calendar contains daily submission counts - create synthetic submissions for active days
                 const submissionCalendar = JSON.parse(data.profile.matchedUser.submissionCalendar);
                 
+                console.log('📊 Calendar data analysis:', {
+                    totalDates: Object.keys(submissionCalendar).length,
+                    sampleEntries: Object.entries(submissionCalendar).slice(0, 10).map(([ts, count]) => ({
+                        timestamp: ts,
+                        count: count,
+                        date: new Date(parseInt(ts) * 1000).toDateString()
+                    })),
+                    july2025Entries: Object.entries(submissionCalendar)
+                        .filter(([ts]) => {
+                            const date = new Date(parseInt(ts) * 1000);
+                            return date.getFullYear() === 2025 && date.getMonth() === 6; // July = month 6
+                        })
+                        .map(([ts, count]) => ({
+                            timestamp: ts,
+                            count: count,
+                            date: new Date(parseInt(ts) * 1000).toDateString()
+                        }))
+                });
+                
                 let totalSubmissions = 0;
                 let activeDays = 0;
                 
@@ -859,6 +1030,11 @@ export class DashboardService {
                                     timestamp: {
                                         gte: new Date(activityDate.getFullYear(), activityDate.getMonth(), activityDate.getDate()),
                                         lt: new Date(activityDate.getFullYear(), activityDate.getMonth(), activityDate.getDate() + 1)
+                                    },
+                                    problem: {
+                                        tags: {
+                                            has: 'daily-activity'
+                                        }
                                     }
                                 }
                             });

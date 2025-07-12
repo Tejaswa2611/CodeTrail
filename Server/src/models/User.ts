@@ -12,7 +12,6 @@ export class UserModel {
         password: userData.password,
         firstName: userData.firstName,
         lastName: userData.lastName || null,
-        isEmailVerified: false,
       },
     });
 
@@ -22,7 +21,6 @@ export class UserModel {
       password: user.password,
       firstName: user.firstName,
       lastName: user.lastName,
-      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -44,7 +42,6 @@ export class UserModel {
       password: user.password,
       firstName: user.firstName,
       lastName: user.lastName,
-      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -66,7 +63,6 @@ export class UserModel {
       password: user.password,
       firstName: user.firstName,
       lastName: user.lastName,
-      isEmailVerified: user.isEmailVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -91,7 +87,6 @@ export class UserModel {
         password: user.password,
         firstName: user.firstName,
         lastName: user.lastName,
-        isEmailVerified: user.isEmailVerified,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       };

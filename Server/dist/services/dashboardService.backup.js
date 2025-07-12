@@ -237,33 +237,6 @@ class DashboardService {
                     console.log('📅 July 2025 LeetCode data:', Object.entries(heatmapData.leetcode)
                         .filter(([date]) => date.startsWith('2025-07'))
                         .map(([date, count]) => `${date}: ${count}`));
-                    // Cache this fresh data for future requests
-                    try {
-                        console.log(`💾 Caching calendar data for future requests...`);
-                        // Clear old cache for this user/platform
-                        await prisma.calendarCache.deleteMany({
-                            where: {
-                                userId: userId,
-                                platform: 'leetcode'
-                            }
-                        });
-                        // Prepare cache entries
-                        const cacheEntries = Object.entries(heatmapData.leetcode).map(([date, count]) => ({
-                            userId: userId,
-                            platform: 'leetcode',
-                            handle: leetcodeProfile.handle,
-                            date: date,
-                            count: count
-                        }));
-                        // Insert fresh cache data
-                        await prisma.calendarCache.createMany({
-                            data: cacheEntries
-                        });
-                        console.log(`✅ Successfully cached ${cacheEntries.length} calendar entries`);
-                    }
-                    catch (cacheError) {
-                        console.error('❌ Failed to cache calendar data:', cacheError);
-                    }
                 }
                 else {
                     console.log('⚠️ No submission calendar found in LeetCode profile');
