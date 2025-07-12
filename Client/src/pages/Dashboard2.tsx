@@ -3,6 +3,7 @@ import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTria
 import { fetchDashboardData, DashboardStats, dashboardApi } from '../services/apiService';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorToastConfig, logError, safeAsync } from '@/utils/errorHandling';
+import ContestRatingGraph from '../components/ContestRatingGraph';
 
 // Helper function to get difficulty colors
 const getDifficultyColor = (difficulty: string) => {
@@ -225,90 +226,110 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                 <h3 className="text-sm font-semibold mb-3">Connected Platforms</h3>
                 <div className="space-y-3">
                     {/* LeetCode */}
-                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">LC</span>
+                    <div className="p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
+                                <span className="text-xs font-bold text-white">LC</span>
+                            </div>
+
+                            {editingPlatform === 'leetcode' ? (
+                                <div className="flex-1 text-sm font-medium text-orange-500">
+                                    Edit LeetCode Handle
+                                </div>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => handlePlatformEdit('leetcode')}
+                                        className="flex-1 text-left text-sm hover:text-orange-500 transition-colors"
+                                    >
+                                        LeetCode {leetcodeProfile?.handle ? `(@${leetcodeProfile.handle})` : ''}
+                                    </button>
+                                    <div className={`w-2 h-2 rounded-full ${leetcodeProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                </>
+                            )}
                         </div>
 
-                        {editingPlatform === 'leetcode' ? (
-                            <div className="flex-1 flex items-center gap-2">
+                        {editingPlatform === 'leetcode' && (
+                            <div className="space-y-2 pl-9">
                                 <input
                                     type="text"
                                     value={platformHandle}
                                     onChange={(e) => setPlatformHandle(e.target.value)}
-                                    className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-foreground placeholder-muted-foreground"
                                     placeholder="Enter LeetCode handle"
                                     autoFocus
                                 />
-                                <button
-                                    onClick={handlePlatformSave}
-                                    disabled={isSaving}
-                                    className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                                >
-                                    {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
-                                    {isSaving ? 'Syncing...' : 'Save & Sync'}
-                                </button>
-                                <button
-                                    onClick={() => setEditingPlatform(null)}
-                                    className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
-                                >
-                                    Cancel
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handlePlatformSave}
+                                        disabled={isSaving}
+                                        className="flex-1 px-3 py-2 bg-green-500 text-white text-xs rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium"
+                                    >
+                                        {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                        {isSaving ? 'Syncing...' : 'Save & Sync'}
+                                    </button>
+                                    <button
+                                        onClick={() => setEditingPlatform(null)}
+                                        className="flex-1 px-3 py-2 bg-muted text-muted-foreground text-xs rounded-md hover:bg-muted/80 font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
-                        ) : (
-                            <>
-                                <button
-                                    onClick={() => handlePlatformEdit('leetcode')}
-                                    className="flex-1 text-left text-sm hover:text-orange-500 transition-colors"
-                                >
-                                    LeetCode {leetcodeProfile?.handle ? `(@${leetcodeProfile.handle})` : ''}
-                                </button>
-                                <div className={`w-2 h-2 rounded-full ${leetcodeProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                            </>
                         )}
                     </div>
 
                     {/* Codeforces */}
-                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
-                            <span className="text-xs font-bold text-white">CF</span>
+                    <div className="p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
+                                <span className="text-xs font-bold text-white">CF</span>
+                            </div>
+
+                            {editingPlatform === 'codeforces' ? (
+                                <div className="flex-1 text-sm font-medium text-blue-500">
+                                    Edit Codeforces Handle
+                                </div>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => handlePlatformEdit('codeforces')}
+                                        className="flex-1 text-left text-sm hover:text-blue-500 transition-colors"
+                                    >
+                                        Codeforces {codeforcesProfile?.handle ? `(@${codeforcesProfile.handle})` : ''}
+                                    </button>
+                                    <div className={`w-2 h-2 rounded-full ${codeforcesProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                </>
+                            )}
                         </div>
 
-                        {editingPlatform === 'codeforces' ? (
-                            <div className="flex-1 flex items-center gap-2">
+                        {editingPlatform === 'codeforces' && (
+                            <div className="space-y-2 pl-9">
                                 <input
                                     type="text"
                                     value={platformHandle}
                                     onChange={(e) => setPlatformHandle(e.target.value)}
-                                    className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-foreground placeholder-muted-foreground"
                                     placeholder="Enter Codeforces handle"
                                     autoFocus
                                 />
-                                <button
-                                    onClick={handlePlatformSave}
-                                    disabled={isSaving}
-                                    className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                                >
-                                    {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
-                                    {isSaving ? 'Saving...' : 'Save'}
-                                </button>
-                                <button
-                                    onClick={() => setEditingPlatform(null)}
-                                    className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
-                                >
-                                    Cancel
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handlePlatformSave}
+                                        disabled={isSaving}
+                                        className="flex-1 px-3 py-2 bg-green-500 text-white text-xs rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium"
+                                    >
+                                        {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                        {isSaving ? 'Saving...' : 'Save'}
+                                    </button>
+                                    <button
+                                        onClick={() => setEditingPlatform(null)}
+                                        className="flex-1 px-3 py-2 bg-muted text-muted-foreground text-xs rounded-md hover:bg-muted/80 font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
-                        ) : (
-                            <>
-                                <button
-                                    onClick={() => handlePlatformEdit('codeforces')}
-                                    className="flex-1 text-left text-sm hover:text-blue-500 transition-colors"
-                                >
-                                    Codeforces {codeforcesProfile?.handle ? `(@${codeforcesProfile.handle})` : ''}
-                                </button>
-                                <div className={`w-2 h-2 rounded-full ${codeforcesProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                            </>
                         )}
                     </div>
 
@@ -615,9 +636,10 @@ const Dashboard2 = () => {
 
     const getContestRankings = () => {
         try {
-            const leetcodeRating = data?.contestRankings?.latest?.leetcode?.rank || 1548;
-            const codeforcesRating = data?.userInfo?.connectedPlatforms?.codeforces?.currentRating || 849;
-            const codeforcesRank = data?.userInfo?.connectedPlatforms?.codeforces?.rank || 'newbie';
+            // Use actual contest ranking data without hardcoded fallbacks
+            const leetcodeRating = data?.contestRankings?.latest?.leetcode?.rank || null;
+            const codeforcesRating = data?.userInfo?.connectedPlatforms?.codeforces?.currentRating || null;
+            const codeforcesRank = data?.userInfo?.connectedPlatforms?.codeforces?.rank || 'unrated';
 
             return {
                 leetcode: leetcodeRating,
@@ -627,8 +649,8 @@ const Dashboard2 = () => {
         } catch (error) {
             logError(error, 'getContestRankings');
             return {
-                leetcode: 0,
-                codeforces: 0,
+                leetcode: null,
+                codeforces: null,
                 codeforcesRank: 'unrated'
             };
         }
@@ -914,65 +936,15 @@ const Dashboard2 = () => {
                                 })()}
                             </div>
                         </div>
-                        {/* Rating Chart */}
-                        <div className="bg-card rounded-xl p-4 lg:p-6 flex flex-col min-h-[180px]">
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm text-muted-foreground">
-                                    {isLoading ? 'Loading...' : 'Latest Contest Rating'}
-                                </span>
-                                <span className="text-lg font-bold ml-auto">
-                                    {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : (() => {
-                                        try {
-                                            return Number(contestRankings.leetcode) || 0;
-                                        } catch (error) {
-                                            console.warn('Error displaying contest rating:', error);
-                                            return 0;
-                                        }
-                                    })()}
-                                </span>
-                            </div>
-                            {!isLoading && (
-                                <>
-                                    <div className="text-xs text-muted-foreground mb-1">LeetCode Contest Rating</div>
-                                    <div className="text-xs text-muted-foreground mb-2">
-                                        Global Ranking: {(() => {
-                                            try {
-                                                return data?.contestRankings?.latest?.leetcode?.rank || 'N/A';
-                                            } catch (error) {
-                                                console.warn('Error getting global ranking:', error);
-                                                return 'N/A';
-                                            }
-                                        })()}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground mb-2">
-                                        Contests Attended: {(() => {
-                                            try {
-                                                return data?.totalContests?.leetcode || 0;
-                                            } catch (error) {
-                                                console.warn('Error getting attended contests:', error);
-                                                return 0;
-                                            }
-                                        })()}
-                                    </div>
-                                </>
-                            )}
-                            {/* Rating visualization */}
-                            <div className="w-full h-16 lg:h-24 bg-gradient-to-t from-blue-700/30 to-blue-400/60 rounded mt-2 flex items-end">
-                                <div className="w-full h-3/4 bg-gradient-to-r from-blue-400/80 to-blue-700/40 rounded-b-full"></div>
-                            </div>
+                        
+                        {/* Contest Rating Graph - Full Width */}
+                        <div className="col-span-1 lg:col-span-2">
+                            <ContestRatingGraph 
+                                contestHistory={data?.contestHistory || { leetcode: [], codeforces: [], combined: [] }}
+                                isLoading={isLoading}
+                            />
                         </div>
-                        {/* Awards */}
-                        <div className="bg-card rounded-xl p-4 lg:p-6 flex flex-col min-h-[90px]">
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-lg font-semibold">Awards</span>
-                                <span className="text-lg font-bold">2</span>
-                            </div>
-                            <div className="flex gap-2 mb-2">
-                                <span className="text-3xl lg:text-4xl">🏅</span>
-                                <span className="text-3xl lg:text-4xl">🛡️</span>
-                            </div>
-                            <button className="text-blue-400 text-sm underline w-fit">show more</button>
-                        </div>
+                        
                         {/* DSA Topic Analysis */}
                         <div className="bg-card rounded-xl p-4 lg:p-6 flex flex-col min-h-[180px]">
                             <div className="flex items-center gap-2 mb-2">
@@ -1169,10 +1141,11 @@ const Dashboard2 = () => {
                                                 <div className="text-2xl lg:text-3xl font-bold">
                                                     {(() => {
                                                         try {
-                                                            return Number(contestRankings.leetcode) || 0;
+                                                            const rating = contestRankings.leetcode;
+                                                            return rating ? Number(rating) : 'N/A';
                                                         } catch (error) {
                                                             console.warn('Error displaying LeetCode ranking:', error);
-                                                            return 0;
+                                                            return 'N/A';
                                                         }
                                                     })()}
                                                 </div>
@@ -1197,17 +1170,18 @@ const Dashboard2 = () => {
                                                             return String(contestRankings.codeforcesRank);
                                                         } catch (error) {
                                                             console.warn('Error getting Codeforces rank:', error);
-                                                            return 'newbie';
+                                                            return 'unrated';
                                                         }
                                                     })()}
                                                 </div>
                                                 <div className="text-2xl lg:text-3xl font-bold">
                                                     {(() => {
                                                         try {
-                                                            return Number(contestRankings.codeforces) || 0;
+                                                            const rating = contestRankings.codeforces;
+                                                            return rating ? Number(rating) : 'N/A';
                                                         } catch (error) {
                                                             console.warn('Error displaying Codeforces rating:', error);
-                                                            return 0;
+                                                            return 'N/A';
                                                         }
                                                     })()}
                                                 </div>
@@ -1215,10 +1189,12 @@ const Dashboard2 = () => {
                                             <div className="text-xs text-muted-foreground text-center">
                                                 (max: {(() => {
                                                     try {
-                                                        return data?.userInfo?.connectedPlatforms?.codeforces?.maxRating || Number(contestRankings.codeforces) || 0;
+                                                        const maxRating = data?.userInfo?.connectedPlatforms?.codeforces?.maxRating;
+                                                        const currentRating = contestRankings.codeforces;
+                                                        return maxRating || currentRating || 'N/A';
                                                     } catch (error) {
                                                         console.warn('Error getting max rating:', error);
-                                                        return 0;
+                                                        return 'N/A';
                                                     }
                                                 })()})
                                             </div>

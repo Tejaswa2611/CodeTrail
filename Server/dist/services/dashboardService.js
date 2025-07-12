@@ -100,6 +100,8 @@ class DashboardService {
         const contestRankings = this.calculateContestRankings(contestParticipations);
         // Analyze DSA topics using both submission data and LeetCode skills API
         const dsaTopicAnalysis = await this.analyzeDSATopics(submissions, platformProfiles);
+        // Get contest history for rating graph
+        const contestHistory = await this.getContestHistory(userId, platformProfiles);
         // Get user info
         const userInfo = this.getUserInfo(userProfile, platformProfiles);
         const result = {
@@ -108,6 +110,7 @@ class DashboardService {
             heatmapData,
             totalContests,
             contestRankings,
+            contestHistory,
             dsaTopicAnalysis,
             userInfo,
         };
@@ -1341,6 +1344,83 @@ class DashboardService {
         }
         catch (error) {
             console.error('❌ Error in Codeforces data sync:', error);
+        }
+    }
+    async getContestHistory(userId, platformProfiles) {
+        try {
+            // Get contest participations from database
+            const contestParticipations = await prisma.contestParticipation.findMany({
+                where: { userId },
+                orderBy: { timestamp: 'asc' }, // Order by time for graph
+            });
+            // Also try to get fresh contest data from LeetCode API
+            const leetcodeProfile = platformProfiles.find(p => p.platform === 'leetcode');
+            let freshLeetCodeContests = [];
+            if (leetcodeProfile?.handle) {
+                try {
+                    const { LeetCodeService } = await Promise.resolve().then(() => __importStar(require('./leetcodeService')));
+                    const leetcodeService = new LeetCodeService();
+                    const contestData = await leetcodeService.getUserContestRanking(leetcodeProfile.handle);
+                    if (contestData?.userContestRankingHistory) {
+                        freshLeetCodeContests = contestData.userContestRankingHistory
+                            .filter((contest) => contest.attended) // Only attended contests
+                            .map((contest) => ({
+                            platform: 'leetcode',
+                            contestId: contest.contest.title,
+                            rating: contest.rating,
+                            rank: contest.ranking,
+                            timestamp: new Date(contest.contest.startTime * 1000),
+                            problemsSolved: contest.problemsSolved,
+                            totalProblems: contest.totalProblems
+                        }));
+                    }
+                }
+                catch (error) {
+                    console.warn('Could not fetch fresh LeetCode contest data:', error);
+                }
+            }
+            // Process database contest participations
+            const processedContests = contestParticipations.map(contest => ({
+                platform: contest.platform,
+                contestId: contest.contestId,
+                rating: contest.newRating,
+                oldRating: contest.oldRating,
+                rank: contest.rank,
+                timestamp: contest.timestamp,
+            }));
+            // Combine and deduplicate (prefer fresh data)
+            const contestMap = new Map();
+            // Add database contests first
+            processedContests.forEach(contest => {
+                const key = `${contest.platform}-${contest.contestId}`;
+                contestMap.set(key, contest);
+            });
+            // Override with fresh LeetCode data if available
+            freshLeetCodeContests.forEach((contest) => {
+                const key = `${contest.platform}-${contest.contestId}`;
+                contestMap.set(key, contest);
+            });
+            const allContests = Array.from(contestMap.values());
+            // Separate by platform and sort by time
+            const leetcodeContests = allContests
+                .filter(c => c.platform === 'leetcode')
+                .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            const codeforcesContests = allContests
+                .filter(c => c.platform === 'codeforces')
+                .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            return {
+                leetcode: leetcodeContests,
+                codeforces: codeforcesContests,
+                combined: allContests.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+            };
+        }
+        catch (error) {
+            console.error('Error fetching contest history:', error);
+            return {
+                leetcode: [],
+                codeforces: [],
+                combined: []
+            };
         }
     }
 }

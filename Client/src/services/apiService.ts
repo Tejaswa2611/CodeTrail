@@ -423,6 +423,35 @@ export interface DashboardStats {
             }>;
         };
     };
+    contestHistory: {
+        leetcode: Array<{
+            platform: string;
+            contestId: string;
+            rating: number;
+            rank: number;
+            timestamp: string;
+            problemsSolved?: number;
+            totalProblems?: number;
+        }>;
+        codeforces: Array<{
+            platform: string;
+            contestId: string;
+            rating: number;
+            oldRating?: number;
+            rank: number;
+            timestamp: string;
+        }>;
+        combined: Array<{
+            platform: string;
+            contestId: string;
+            rating: number;
+            oldRating?: number;
+            rank: number;
+            timestamp: string;
+            problemsSolved?: number;
+            totalProblems?: number;
+        }>;
+    };
     dsaTopicAnalysis: {
         [topic: string]: {
             total: number;
