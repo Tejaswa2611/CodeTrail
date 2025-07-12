@@ -4,6 +4,22 @@ import { fetchDashboardData, DashboardStats, dashboardApi } from '../services/ap
 import { useToast } from '@/hooks/use-toast';
 import { getErrorToastConfig, logError, safeAsync } from '@/utils/errorHandling';
 import ContestRatingGraph from '../components/ContestRatingGraph';
+import { useTheme } from '../contexts/ThemeContext';
+
+// Import platform images
+import codeforcesDarkLogo from '../assets/codeforces_dark.png';
+import codeforcesLightLogo from '../assets/codeforces_light.png';
+import leetcodeDarkLogo from '../assets/leetcode_dark.png';
+import leetcodeLightLogo from '../assets/leetcode_light.png';
+
+// Helper function to get theme-appropriate platform logos
+const getPlatformLogo = (platform: 'leetcode' | 'codeforces', theme: 'light' | 'dark') => {
+    if (platform === 'leetcode') {
+        return theme === 'dark' ? leetcodeDarkLogo : leetcodeLightLogo;
+    } else {
+        return theme === 'dark' ? codeforcesDarkLogo : codeforcesLightLogo;
+    }
+};
 
 // Helper function to get difficulty colors
 const getDifficultyColor = (difficulty: string) => {
@@ -79,6 +95,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
     const [editingPlatform, setEditingPlatform] = useState<string | null>(null);
     const [platformHandle, setPlatformHandle] = useState<string>('');
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const { actualTheme } = useTheme();
 
     // Get user profile data
     const getUserProfile = () => {
@@ -228,9 +245,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                     {/* LeetCode */}
                     <div className="p-2 rounded-lg hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center">
-                                <span className="text-xs font-bold text-white">LC</span>
-                            </div>
+                            <img src={getPlatformLogo('leetcode', actualTheme)} alt="LeetCode" className="w-6 h-6" />
 
                             {editingPlatform === 'leetcode' ? (
                                 <div className="flex-1 text-sm font-medium text-orange-500">
@@ -282,9 +297,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                     {/* Codeforces */}
                     <div className="p-2 rounded-lg hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
-                                <span className="text-xs font-bold text-white">CF</span>
-                            </div>
+                            <img src={getPlatformLogo('codeforces', actualTheme)} alt="CodeForces" className="w-6 h-6" />
 
                             {editingPlatform === 'codeforces' ? (
                                 <div className="flex-1 text-sm font-medium text-blue-500">
@@ -398,6 +411,7 @@ const Dashboard2 = () => {
     const [selectedContestPlatform, setSelectedContestPlatform] = useState<'all' | 'leetcode' | 'codeforces'>('all');
     const maxRetries = 3;
     const { toast } = useToast();
+    const { actualTheme } = useTheme();
 
     // Extract fetchData function to be reusable with useCallback
     const fetchData = useCallback(async () => {
@@ -966,14 +980,14 @@ const Dashboard2 = () => {
                                                         className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer ${
                                                             selectedContestPlatform === 'leetcode' 
                                                                 ? 'bg-orange-600 ring-2 ring-orange-400' 
-                                                                : 'bg-gray-800 hover:bg-gray-700'
+                                                                : 'bg-muted hover:bg-muted/80'
                                                         }`}
                                                     >
                                                         <div className="flex items-center gap-2">
-                                                            <span className="text-orange-400">�</span>
-                                                            <span className="text-sm font-bold text-gray-300">LeetCode</span>
+                                                            <img src={getPlatformLogo('leetcode', actualTheme)} alt="LeetCode" className="w-4 h-4" />
+                                                            <span className="text-sm font-bold text-foreground">LeetCode</span>
                                                         </div>
-                                                        <span className="text-base font-bold text-white">
+                                                        <span className="text-base font-bold text-foreground">
                                                             {(() => {
                                                                 try {
                                                                     return data?.totalContests?.leetcode || 0;
@@ -992,14 +1006,14 @@ const Dashboard2 = () => {
                                                         className={`rounded-lg px-3 py-2 flex items-center justify-between transition-all cursor-pointer ${
                                                             selectedContestPlatform === 'codeforces' 
                                                                 ? 'bg-blue-600 ring-2 ring-blue-400' 
-                                                                : 'bg-gray-800 hover:bg-gray-700'
+                                                                : 'bg-muted hover:bg-muted/80'
                                                         }`}
                                                     >
                                                         <div className="flex items-center gap-2">
-                                                            <span className="text-blue-400">🏅</span>
-                                                            <span className="text-sm font-bold text-gray-300">CodeForces</span>
+                                                            <img src={getPlatformLogo('codeforces', actualTheme)} alt="CodeForces" className="w-4 h-4" />
+                                                            <span className="text-sm font-bold text-foreground">CodeForces</span>
                                                         </div>
-                                                        <span className="text-base font-bold text-white">
+                                                        <span className="text-base font-bold text-foreground">
                                                             {(() => {
                                                                 try {
                                                                     return data?.totalContests?.codeforces || 0;
