@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, Loader2 } from 'lucide-react';
+import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, Loader2, HelpCircle } from 'lucide-react';
 import { fetchDashboardData, DashboardStats, dashboardApi } from '../services/apiService';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorToastConfig, logError, safeAsync } from '@/utils/errorHandling';
@@ -19,6 +19,19 @@ const getPlatformLogo = (platform: 'leetcode' | 'codeforces', theme: 'light' | '
     } else {
         return theme === 'dark' ? codeforcesDarkLogo : codeforcesLightLogo;
     }
+};
+
+// Simple tooltip component
+const InfoTooltip = ({ message }: { message: string }) => {
+    return (
+        <div className="relative group">
+            <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-foreground cursor-help transition-colors" />
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-popover border border-border rounded-lg shadow-lg text-sm text-popover-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+                {message}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-popover"></div>
+            </div>
+        </div>
+    );
 };
 
 // Helper function to get difficulty colors
@@ -515,19 +528,39 @@ const Dashboard2 = () => {
 
     const getTotalQuestions = (): number => {
         try {
-            return data?.totalQuestions?.total || 0; // Show 0 for new users instead of demo data
+            // Always prioritize backend total first, then fallback to manual combination
+            const backendTotal = data?.totalQuestions?.total;
+            if (backendTotal !== undefined && backendTotal !== null) {
+                return backendTotal;
+            }
+            
+            // Fallback: manually combine LeetCode and Codeforces
+            const leetcodeTotal = data?.totalQuestions?.leetcode || 0;
+            const codeforcesTotal = data?.totalQuestions?.codeforces || 0;
+            
+            return leetcodeTotal + codeforcesTotal;
         } catch (error) {
             logError(error, 'getTotalQuestions');
-            return 0; // Show 0 for new users instead of demo data
+            return 0;
         }
     };
 
     const getTotalActiveDays = (): number => {
         try {
-            return data?.totalActiveDays?.total || 0; // Show 0 for new users instead of demo data
+            // Always prioritize backend total first, then fallback to manual combination
+            const backendTotal = data?.totalActiveDays?.total;
+            if (backendTotal !== undefined && backendTotal !== null) {
+                return backendTotal;
+            }
+            
+            // Fallback: manually combine LeetCode and Codeforces
+            const leetcodeActiveDays = data?.totalActiveDays?.leetcode || 0;
+            const codeforcesActiveDays = data?.totalActiveDays?.codeforces || 0;
+            
+            return leetcodeActiveDays + codeforcesActiveDays;
         } catch (error) {
             logError(error, 'getTotalActiveDays');
-            return 0; // Show 0 for new users instead of demo data
+            return 0;
         }
     };
 
@@ -653,15 +686,25 @@ const Dashboard2 = () => {
 
     const getLeetCodeStats = () => {
         try {
-            const difficultyStats = data?.totalQuestions?.byDifficulty;
-            if (difficultyStats) {
+            // Use LeetCode-specific difficulty breakdown, not combined stats
+            const leetcodeBreakdown = data?.totalQuestions?.platformBreakdown?.leetcode;
+            if (leetcodeBreakdown) {
                 return {
-                    easy: difficultyStats.easy,
-                    medium: difficultyStats.medium,
-                    hard: difficultyStats.hard,
-                    total: difficultyStats.easy + difficultyStats.medium + difficultyStats.hard
+                    easy: leetcodeBreakdown.easy,
+                    medium: leetcodeBreakdown.medium,
+                    hard: leetcodeBreakdown.hard,
+                    total: leetcodeBreakdown.easy + leetcodeBreakdown.medium + leetcodeBreakdown.hard
                 };
             }
+            
+            // Fallback: if no platform breakdown, use LeetCode total count
+            const leetcodeTotal = data?.totalQuestions?.leetcode || 0;
+            return {
+                easy: 0,
+                medium: 0,
+                hard: 0,
+                total: leetcodeTotal
+            };
         } catch (error) {
             logError(error, 'getLeetCodeStats');
         }
@@ -795,14 +838,20 @@ const Dashboard2 = () => {
                 {/* Row 1: 2 squares + 1 rectangle */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6">
                     {/* Total Questions */}
-                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover">
+                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover relative">
+                        <div className="absolute top-3 right-3">
+                            <InfoTooltip message="Combined total from all connected platforms" />
+                        </div>
                         <div className="text-sm text-muted-foreground mb-2">Total Questions</div>
                         <div className="text-3xl lg:text-4xl font-bold">
                             {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : formatNumber(getTotalQuestions())}
                         </div>
                     </div>
                     {/* Total Active Days */}
-                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover">
+                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover relative">
+                        <div className="absolute top-3 right-3">
+                            <InfoTooltip message="Combined active days from all connected platforms" />
+                        </div>
                         <div className="text-sm text-muted-foreground mb-2">Total Active Days</div>
                         <div className="text-3xl lg:text-4xl font-bold">
                             {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : formatNumber(getTotalActiveDays())}
@@ -1218,7 +1267,10 @@ const Dashboard2 = () => {
                             </div>
                         </div>
                         {/* DSA Topic Analysis */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 min-h-[540px] max-h-[758px]">
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 min-h-[540px] max-h-[758px] relative">
+                            <div className="absolute top-4 right-4">
+                                <InfoTooltip message="Topic analysis based on problems solved across all platforms" />
+                            </div>
                             <div className="flex items-center justify-between mb-4 flex-shrink-0">
                                 <span className="text-lg font-semibold">DSA Topic Analysis</span>
                                 <div className="flex items-center gap-2">
