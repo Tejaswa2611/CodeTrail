@@ -142,7 +142,16 @@ class DashboardService {
             codeforces: { easy: 0, medium: 0, hard: 0 },
         };
         submissions
-            .filter(sub => sub.verdict === 'AC')
+            .filter(sub => {
+            // Handle different verdict formats for different platforms
+            if (sub.platform === 'leetcode') {
+                return sub.verdict === 'AC' || sub.verdict === 'Accepted';
+            }
+            else if (sub.platform === 'codeforces') {
+                return sub.verdict === 'OK';
+            }
+            return sub.verdict === 'AC' || sub.verdict === 'OK' || sub.verdict === 'Accepted';
+        })
             // Exclude daily activity problems (they're only for tracking active days, not actual solved problems)
             .filter(sub => !sub.problem.tags?.includes('daily-activity'))
             .forEach(submission => {
@@ -636,6 +645,62 @@ class DashboardService {
                 message: `Successfully validated and synchronized ${platform} data for ${handle}`
             }
         };
+    }
+    async getDailySubmissions(userId) {
+        console.log(`🔍 Getting daily submissions for user: ${userId}`);
+        try {
+            // Get calendar cache data for the user
+            const calendarData = await prisma.calendarCache.findMany({
+                where: { userId },
+                orderBy: { date: 'asc' }
+            });
+            console.log(`📊 Found ${calendarData.length} calendar entries`);
+            // Transform data for chart format
+            const chartData = calendarData.map(entry => ({
+                date: entry.date,
+                submissions: entry.count,
+                platform: entry.platform
+            }));
+            // Group by date and combine platforms
+            const dailySubmissions = {};
+            chartData.forEach(entry => {
+                if (!dailySubmissions[entry.date]) {
+                    dailySubmissions[entry.date] = {
+                        date: entry.date,
+                        leetcode: 0,
+                        codeforces: 0,
+                        total: 0
+                    };
+                }
+                if (entry.platform === 'leetcode') {
+                    dailySubmissions[entry.date].leetcode = entry.submissions;
+                }
+                else if (entry.platform === 'codeforces') {
+                    dailySubmissions[entry.date].codeforces = entry.submissions;
+                }
+                dailySubmissions[entry.date].total =
+                    dailySubmissions[entry.date].leetcode + dailySubmissions[entry.date].codeforces;
+            });
+            // Convert to array and sort by date
+            const sortedData = Object.values(dailySubmissions).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            // Get only last 30 days for better visualization
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const recentData = sortedData.filter(entry => new Date(entry.date) >= thirtyDaysAgo);
+            console.log(`✅ Returning ${recentData.length} days of submission data`);
+            return {
+                dailySubmissions: recentData,
+                totalDays: recentData.length,
+                dateRange: {
+                    start: recentData[0]?.date || null,
+                    end: recentData[recentData.length - 1]?.date || null
+                }
+            };
+        }
+        catch (error) {
+            console.error('❌ Error fetching daily submissions:', error);
+            throw new Error('Failed to fetch daily submissions');
+        }
     }
     // Method to sync platform data to database
     async syncPlatformData(userId, platform, handle, platformData) {

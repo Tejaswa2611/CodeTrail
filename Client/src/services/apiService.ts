@@ -501,6 +501,20 @@ export interface UserPlatformProfiles {
     };
 }
 
+export interface DailySubmissionsData {
+    dailySubmissions: {
+        date: string;
+        leetcode: number;
+        codeforces: number;
+        total: number;
+    }[];
+    totalDays: number;
+    dateRange: {
+        start: string | null;
+        end: string | null;
+    };
+}
+
 // Dashboard API functions
 export const dashboardApi = {
     getDashboardStats: (): Promise<DashboardStats | null> =>
@@ -508,6 +522,9 @@ export const dashboardApi = {
 
     getUserPlatformProfiles: (): Promise<UserPlatformProfiles | null> =>
         apiCall<UserPlatformProfiles>('/dashboard/user-profiles'),
+
+    getDailySubmissions: (): Promise<DailySubmissionsData | null> =>
+        apiCall<DailySubmissionsData>('/dashboard/daily-submissions'),
 
     updatePlatformHandle: async (platform: string, handle: string): Promise<{ success: boolean; message: string; data?: unknown } | null> => {
         try {

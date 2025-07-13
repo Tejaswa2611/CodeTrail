@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePlatformHandle = exports.getUserPlatformProfiles = exports.getDashboardStats = void 0;
+exports.getDailySubmissions = exports.updatePlatformHandle = exports.getUserPlatformProfiles = exports.getDashboardStats = void 0;
 const dashboardService_1 = require("../services/dashboardService");
 const response_1 = require("../utils/response");
 const getDashboardStats = async (req, res) => {
@@ -71,3 +71,22 @@ const updatePlatformHandle = async (req, res) => {
     }
 };
 exports.updatePlatformHandle = updatePlatformHandle;
+const getDailySubmissions = async (req, res) => {
+    try {
+        console.log('🎯 Daily submissions controller - req.user:', req.user);
+        const userId = req.user?.userId;
+        if (!userId) {
+            console.log('❌ Daily submissions controller - No userId found, returning 401');
+            return res.status(401).json(response_1.ResponseUtils.error('Unauthorized'));
+        }
+        console.log('🎯 Daily submissions controller - About to call dashboardService');
+        const dailyData = await dashboardService_1.dashboardService.getDailySubmissions(userId);
+        console.log('🎯 Daily submissions controller - Service call completed successfully');
+        return res.status(200).json(response_1.ResponseUtils.success('Daily submissions retrieved successfully', dailyData));
+    }
+    catch (error) {
+        console.error('❌ Daily submissions controller - Error fetching daily submissions:', error);
+        return res.status(500).json(response_1.ResponseUtils.error('Internal server error'));
+    }
+};
+exports.getDailySubmissions = getDailySubmissions;

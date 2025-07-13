@@ -94,6 +94,8 @@ router.get('/debug/users', async (req, res) => {
 router.get('/stats', auth_1.authenticateToken, dashboardController_1.getDashboardStats);
 // Get user platform profiles for sidebar
 router.get('/user-profiles', auth_1.authenticateToken, dashboardController_1.getUserPlatformProfiles);
+// Get daily submissions for chart
+router.get('/daily-submissions', auth_1.authenticateToken, dashboardController_1.getDailySubmissions);
 // Update platform handle
 router.put('/platform-handle', auth_1.authenticateToken, dashboardController_1.updatePlatformHandle);
 console.log('🔧 Dashboard PUT /platform-handle route registered');

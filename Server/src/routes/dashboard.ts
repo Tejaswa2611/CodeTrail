@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDashboardStats, getUserPlatformProfiles, updatePlatformHandle } from '../controllers/dashboardController';
+import { getDashboardStats, getUserPlatformProfiles, updatePlatformHandle, getDailySubmissions } from '../controllers/dashboardController';
 import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
@@ -68,6 +68,9 @@ router.get('/stats', authenticateToken, getDashboardStats);
 
 // Get user platform profiles for sidebar
 router.get('/user-profiles', authenticateToken, getUserPlatformProfiles);
+
+// Get daily submissions for chart
+router.get('/daily-submissions', authenticateToken, getDailySubmissions);
 
 // Update platform handle
 router.put('/platform-handle', authenticateToken, updatePlatformHandle);

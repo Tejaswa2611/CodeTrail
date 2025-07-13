@@ -840,6 +840,77 @@ export class DashboardService {
         };
     }
 
+    async getDailySubmissions(userId: string) {
+        console.log(`🔍 Getting daily submissions for user: ${userId}`);
+
+        try {
+            // Get calendar cache data for the user
+            const calendarData = await prisma.calendarCache.findMany({
+                where: { userId },
+                orderBy: { date: 'asc' }
+            });
+
+            console.log(`📊 Found ${calendarData.length} calendar entries`);
+
+            // Transform data for chart format
+            const chartData = calendarData.map(entry => ({
+                date: entry.date,
+                submissions: entry.count,
+                platform: entry.platform
+            }));
+
+            // Group by date and combine platforms
+            const dailySubmissions: { [date: string]: { date: string; leetcode: number; codeforces: number; total: number } } = {};
+
+            chartData.forEach(entry => {
+                if (!dailySubmissions[entry.date]) {
+                    dailySubmissions[entry.date] = {
+                        date: entry.date,
+                        leetcode: 0,
+                        codeforces: 0,
+                        total: 0
+                    };
+                }
+
+                if (entry.platform === 'leetcode') {
+                    dailySubmissions[entry.date].leetcode = entry.submissions;
+                } else if (entry.platform === 'codeforces') {
+                    dailySubmissions[entry.date].codeforces = entry.submissions;
+                }
+
+                dailySubmissions[entry.date].total = 
+                    dailySubmissions[entry.date].leetcode + dailySubmissions[entry.date].codeforces;
+            });
+
+            // Convert to array and sort by date
+            const sortedData = Object.values(dailySubmissions).sort((a, b) => 
+                new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
+
+            // Get only last 30 days for better visualization
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            const recentData = sortedData.filter(entry => 
+                new Date(entry.date) >= thirtyDaysAgo
+            );
+
+            console.log(`✅ Returning ${recentData.length} days of submission data`);
+
+            return {
+                dailySubmissions: recentData,
+                totalDays: recentData.length,
+                dateRange: {
+                    start: recentData[0]?.date || null,
+                    end: recentData[recentData.length - 1]?.date || null
+                }
+            };
+        } catch (error) {
+            console.error('❌ Error fetching daily submissions:', error);
+            throw new Error('Failed to fetch daily submissions');
+        }
+    }
+
     // Method to sync platform data to database
     private async syncPlatformData(userId: string, platform: string, handle: string, platformData: any) {
         console.log(`🔄 Syncing ${platform} data for user ${userId}...`);

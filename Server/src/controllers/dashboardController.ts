@@ -78,3 +78,24 @@ export const updatePlatformHandle = async (req: Request, res: Response) => {
     return res.status(500).json(ResponseUtils.error('Internal server error'));
   }
 };
+
+export const getDailySubmissions = async (req: Request, res: Response) => {
+  try {
+    console.log('🎯 Daily submissions controller - req.user:', (req as any).user);
+    const userId = (req as any).user?.userId;
+    
+    if (!userId) {
+      console.log('❌ Daily submissions controller - No userId found, returning 401');
+      return res.status(401).json(ResponseUtils.error('Unauthorized'));
+    }
+
+    console.log('🎯 Daily submissions controller - About to call dashboardService');
+    const dailyData = await dashboardService.getDailySubmissions(userId);
+    console.log('🎯 Daily submissions controller - Service call completed successfully');
+    
+    return res.status(200).json(ResponseUtils.success('Daily submissions retrieved successfully', dailyData));
+  } catch (error) {
+    console.error('❌ Daily submissions controller - Error fetching daily submissions:', error);
+    return res.status(500).json(ResponseUtils.error('Internal server error'));
+  }
+};
