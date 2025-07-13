@@ -49,6 +49,65 @@ All colors MUST be HSL.
     --custom-light: 240 4% 97%; /* #F1F0EF equivalent */
     --custom-muted: 220 8% 60%; /* #949CA0 equivalent */
 
+@layer components {
+  /* Custom markdown styling for chatbot */
+  .chatbot-markdown {
+    @apply text-sm leading-relaxed;
+  }
+  
+  .chatbot-markdown p {
+    @apply mb-2 last:mb-0;
+  }
+  
+  .chatbot-markdown ul {
+    @apply mb-2 last:mb-0 pl-4 list-disc;
+  }
+  
+  .chatbot-markdown ol {
+    @apply mb-2 last:mb-0 pl-4 list-decimal;
+  }
+  
+  .chatbot-markdown li {
+    @apply mb-1;
+  }
+  
+  .chatbot-markdown strong {
+    @apply font-semibold text-gray-900;
+  }
+  
+  .chatbot-markdown em {
+    @apply italic;
+  }
+  
+  .chatbot-markdown h1, .chatbot-markdown h2, .chatbot-markdown h3 {
+    @apply font-semibold text-gray-900 mb-2 mt-3 first:mt-0;
+  }
+  
+  .chatbot-markdown h1 {
+    @apply text-base;
+  }
+  
+  .chatbot-markdown h2 {
+    @apply text-sm;
+  }
+  
+  .chatbot-markdown h3 {
+    @apply text-sm;
+  }
+  
+  .chatbot-markdown code {
+    @apply bg-gray-200 px-1 py-0.5 rounded text-xs font-mono;
+  }
+  
+  .chatbot-markdown pre {
+    @apply bg-gray-100 p-2 rounded mt-2 mb-2 overflow-x-auto;
+  }
+  
+  .chatbot-markdown pre code {
+    @apply bg-transparent p-0;
+  }
+}
+
     /* Enhanced gradients for sophisticated look */
     --gradient-primary: linear-gradient(135deg, hsl(var(--codetrail-blue)), hsl(var(--codetrail-purple)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);

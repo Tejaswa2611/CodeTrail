@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Send, Bot, User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
     id: string;
@@ -191,7 +192,29 @@ export default function AIChatbot({ suggestedQuestions = [] }: AIChatbotProps) {
                                         className={`max-w-[70%] rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'
                                             }`}
                                     >
-                                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                                        {message.role === 'assistant' ? (
+                                            <div className="chatbot-markdown">
+                                                <ReactMarkdown 
+                                                    components={{
+                                                        p: ({ children }) => <p>{children}</p>,
+                                                        ul: ({ children }) => <ul>{children}</ul>,
+                                                        ol: ({ children }) => <ol>{children}</ol>,
+                                                        li: ({ children }) => <li>{children}</li>,
+                                                        strong: ({ children }) => <strong>{children}</strong>,
+                                                        em: ({ children }) => <em>{children}</em>,
+                                                        h1: ({ children }) => <h1>{children}</h1>,
+                                                        h2: ({ children }) => <h2>{children}</h2>,
+                                                        h3: ({ children }) => <h3>{children}</h3>,
+                                                        code: ({ children }) => <code>{children}</code>,
+                                                        pre: ({ children }) => <pre>{children}</pre>,
+                                                    }}
+                                                >
+                                                    {message.content}
+                                                </ReactMarkdown>
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                                        )}
                                     </div>
 
                                     {message.role === 'user' && (
