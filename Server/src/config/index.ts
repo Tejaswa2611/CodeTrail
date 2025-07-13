@@ -21,6 +21,9 @@ export const config = {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
   },
+  ai: {
+    openRouterApiKey: process.env.OPENROUTER_API_KEY,
+  },
 };
 
 export default config;

@@ -3,6 +3,7 @@ import authRoutes from './auth';
 import leetcodeRoutes from './leetcode';
 import codeforcesRoutes from './codeforces';
 import dashboardRoutes from './dashboard';
+import chatbotRoutes from './chatbot';
 
 const router = Router();
 
@@ -11,6 +12,7 @@ router.use('/auth', authRoutes);
 router.use('/leetcode', leetcodeRoutes);
 router.use('/codeforces', codeforcesRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/chatbot', chatbotRoutes);
 
 // Health check for the entire API
 router.get('/health', (req: any, res: any) => {

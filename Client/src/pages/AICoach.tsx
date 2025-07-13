@@ -3,6 +3,7 @@ import { Brain, Target, Lightbulb, BookOpen, Clock, Star, ChevronRight, Play, Ex
 import { useTheme } from '../contexts/ThemeContext';
 import TopicAnalysisCard from '../components/TopicAnalysisCard';
 import SuggestedQuestionCard from '../components/SuggestedQuestionCard';
+import AIChatbot from '../components/AIChatbotNew';
 
 // Mock data - will be replaced with real API data later
 const mockAnalysis = {
@@ -354,33 +355,14 @@ const AICoach = () => {
                                 </h2>
                             </div>
 
-                            {/* Coming Soon Message */}
-                            <div className="flex flex-col items-center justify-center py-12">
-                                <div className="p-4 bg-primary/10 rounded-full mb-4">
-                                    <Brain className="w-12 h-12 text-primary" />
-                                </div>
-                                <h3 className="text-xl font-semibold mb-2">Coming Soon</h3>
-                                <p className="text-muted-foreground text-center max-w-md">
-                                    AI Mentor is being developed to provide personalized guidance, 
-                                    coding advice, and interactive mentoring sessions.
-                                </p>
-                                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
-                                    <div className="text-center p-4 bg-secondary/20 rounded-lg">
-                                        <Target className="w-6 h-6 text-primary mx-auto mb-2" />
-                                        <h4 className="font-medium mb-1">Personalized Goals</h4>
-                                        <p className="text-sm text-muted-foreground">Set and track coding goals</p>
-                                    </div>
-                                    <div className="text-center p-4 bg-secondary/20 rounded-lg">
-                                        <Lightbulb className="w-6 h-6 text-primary mx-auto mb-2" />
-                                        <h4 className="font-medium mb-1">Smart Insights</h4>
-                                        <p className="text-sm text-muted-foreground">AI-powered learning insights</p>
-                                    </div>
-                                    <div className="text-center p-4 bg-secondary/20 rounded-lg">
-                                        <Users className="w-6 h-6 text-primary mx-auto mb-2" />
-                                        <h4 className="font-medium mb-1">Interactive Chat</h4>
-                                        <p className="text-sm text-muted-foreground">Chat with your AI mentor</p>
-                                    </div>
-                                </div>
+                            {/* AI Chatbot Component */}
+                            <div className="h-[600px] flex justify-center">
+                                <AIChatbot suggestedQuestions={[
+                                    "How can I improve my problem-solving speed?",
+                                    "What topics should I focus on next?",
+                                    "Can you analyze my recent progress?",
+                                    "What's the best practice routine for competitive programming?"
+                                ]} />
                             </div>
                         </div>
                     </div>

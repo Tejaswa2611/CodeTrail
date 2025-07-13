@@ -568,6 +568,30 @@ export const dashboardApi = {
     },
 };
 
+// Chatbot API interfaces
+export interface ChatMessage {
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: string;
+}
+
+export interface ChatbotResponse {
+    message: string;
+    timestamp: string;
+}
+
+// Chatbot API functions
+export const chatbotApi = {
+    sendMessage: async (message: string, chatHistory: ChatMessage[] = []): Promise<ChatbotResponse | null> =>
+        apiCall<ChatbotResponse>('/chatbot/message', {
+            method: 'POST',
+            body: JSON.stringify({ message, chatHistory }),
+        }),
+
+    getSuggestedQuestions: (): Promise<{ suggestions: string[] } | null> =>
+        apiCall<{ suggestions: string[] }>('/chatbot/suggestions'),
+};
+
 // Function to fetch all dashboard data
 export async function fetchDashboardData(): Promise<DashboardStats | null> {
     console.log('Fetching comprehensive dashboard data...');
