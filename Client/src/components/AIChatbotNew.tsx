@@ -65,7 +65,18 @@ export default function AIChatbot({ suggestedQuestions = [] }: AIChatbotProps) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to get response');
+                // Try to get the error message from the response
+                let errorMessage = 'Failed to get response';
+                try {
+                    const errorData = await response.json();
+                    console.error('Server error response:', errorData);
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                } catch (e) {
+                    console.error('Could not parse error response:', e);
+                }
+                throw new Error(errorMessage);
             }
 
             const reader = response.body?.getReader();
@@ -115,13 +126,22 @@ export default function AIChatbot({ suggestedQuestions = [] }: AIChatbotProps) {
                 }
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Chatbot Error Details:', error);
+            
+            let errorMessage = 'Sorry, I encountered an error. Please try again.';
+            
+            // Try to extract specific error message from response
+            if (error instanceof Error) {
+                console.error('Error message:', error.message);
+                errorMessage = error.message || errorMessage;
+            }
+            
             setMessages((prev) => [
                 ...prev,
                 {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',
-                    content: 'Sorry, I encountered an error. Please try again.',
+                    content: errorMessage,
                 },
             ]);
         } finally {
@@ -160,7 +180,18 @@ export default function AIChatbot({ suggestedQuestions = [] }: AIChatbotProps) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to send message');
+                // Try to get the error message from the response
+                let errorMessage = 'Failed to send message';
+                try {
+                    const errorData = await response.json();
+                    console.error('Server error response:', errorData);
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                } catch (e) {
+                    console.error('Could not parse error response:', e);
+                }
+                throw new Error(errorMessage);
             }
 
             const assistantMessage: Message = {
@@ -206,13 +237,22 @@ export default function AIChatbot({ suggestedQuestions = [] }: AIChatbotProps) {
                 }
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Suggested Question Error Details:', error);
+            
+            let errorMessage = 'Sorry, I encountered an error. Please try again.';
+            
+            // Try to extract specific error message from response
+            if (error instanceof Error) {
+                console.error('Error message:', error.message);
+                errorMessage = error.message || errorMessage;
+            }
+            
             setMessages((prev) => [
                 ...prev,
                 {
                     id: (Date.now() + 1).toString(),
                     role: 'assistant',
-                    content: 'Sorry, I encountered an error. Please try again.',
+                    content: errorMessage,
                 },
             ]);
         } finally {

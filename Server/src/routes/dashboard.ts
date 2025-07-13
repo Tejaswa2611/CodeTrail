@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDashboardStats, getUserPlatformProfiles, updatePlatformHandle, getDailySubmissions } from '../controllers/dashboardController';
+import { getDashboardStats, getUserPlatformProfiles, updatePlatformHandle, getDailySubmissions, getAICoachTopicAnalysis } from '../controllers/dashboardController';
 import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
@@ -105,5 +105,8 @@ router.post('/test-sync/:platform/:handle', authenticateToken, async (req, res) 
         });
     }
 });
+
+// AI Coach Topic Analysis
+router.get('/ai-coach-analysis', authenticateToken, getAICoachTopicAnalysis);
 
 export default router;

@@ -18,7 +18,16 @@ export interface ChatbotResponse {
 export class ChatbotService {
     private static readonly OPENROUTER_API_KEY = config.ai.openRouterApiKey;
     private static readonly OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-    private static readonly MODEL = 'openai/gpt-3.5-turbo'; // Using a known working model
+    private static readonly MODEL = 'deepseek/deepseek-chat'; // Updated to match actual usage
+
+    static {
+        // Debug API key on service initialization
+        console.log('🔑 ChatbotService initialized with API key:', 
+            ChatbotService.OPENROUTER_API_KEY ? 
+            `${ChatbotService.OPENROUTER_API_KEY.substring(0, 10)}...` : 
+            'NOT SET'
+        );
+    }
 
     /**
      * Get user's DSA topic distribution for personalized recommendations
@@ -531,7 +540,7 @@ Remember: You're a specialized coding mentor who MUST analyze the user's actual 
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    model: 'deepseek/deepseek-chat-v3-0324',
+                    model: ChatbotService.MODEL,
                     messages: messages,
                     max_tokens: 500,
                     temperature: 0.7,
@@ -674,7 +683,7 @@ Remember: You're a specialized coding mentor who MUST analyze the user's actual 
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: 'deepseek/deepseek-chat-v3-0324',
+                    model: ChatbotService.MODEL,
                     messages: messages,
                     max_tokens: 500,
                     temperature: 0.7,

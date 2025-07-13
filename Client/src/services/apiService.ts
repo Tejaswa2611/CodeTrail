@@ -515,6 +515,70 @@ export interface DailySubmissionsData {
     };
 }
 
+// AI Coach Analysis interface
+export interface AICoachAnalysis {
+    overallProgress: {
+        score: number;
+        level: string;
+        strongAreas: string[];
+        weakAreas: string[];
+        improvementTrend: string;
+        recentProgress: {
+            lastWeekSolved: number;
+            lastMonthSolved: number;
+            averageWeeklySolved: number;
+            consistencyScore: number;
+            difficultyProgression: string;
+            ratingTrend: {
+                codeforces: {
+                    current: number | null;
+                    change: number;
+                    trend: string;
+                };
+                leetcode: {
+                    current: number | null;
+                    change: number;
+                    trend: string;
+                };
+            };
+        };
+    };
+    topicAnalysis: Array<{
+        topic: string;
+        proficiency: number;
+        problemsSolved: number;
+        totalProblems: number;
+        trend: string;
+        importance: string;
+        companyFrequency: number;
+        recommendation: string;
+        nextSteps: Array<{
+            text: string;
+            url: string | null;
+            type: 'link' | 'text';
+        }>;
+        category: string;
+        platformBreakdown: {
+            leetcode: number;
+            codeforces: number;
+        };
+    }>;
+    suggestedQuestions: Array<{
+        id: number;
+        title: string;
+        difficulty: string;
+        topic: string;
+        platform: string;
+        url: string;
+        reason: string;
+        estimatedTime: string;
+        companies: string[];
+        priority: string;
+    }>;
+    totalTopics: number;
+    lastUpdated: string;
+}
+
 // Dashboard API functions
 export const dashboardApi = {
     getDashboardStats: (): Promise<DashboardStats | null> =>
@@ -525,6 +589,9 @@ export const dashboardApi = {
 
     getDailySubmissions: (): Promise<DailySubmissionsData | null> =>
         apiCall<DailySubmissionsData>('/dashboard/daily-submissions'),
+
+    getAICoachTopicAnalysis: (): Promise<AICoachAnalysis | null> =>
+        apiCall<AICoachAnalysis>('/dashboard/ai-coach-analysis'),
 
     updatePlatformHandle: async (platform: string, handle: string): Promise<{ success: boolean; message: string; data?: unknown } | null> => {
         try {

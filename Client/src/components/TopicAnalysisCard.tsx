@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, Star, ChevronRight, Target, CheckCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, ChevronRight, Target, CheckCircle, ExternalLink } from 'lucide-react';
 
 interface TopicAnalysisProps {
     topic: {
@@ -11,7 +11,11 @@ interface TopicAnalysisProps {
         importance: string;
         companyFrequency: number;
         recommendation: string;
-        nextSteps: string[];
+        nextSteps: Array<{
+            text: string;
+            url: string | null;
+            type: 'link' | 'text';
+        }>;
     };
 }
 
@@ -108,12 +112,33 @@ const TopicAnalysisCard: React.FC<TopicAnalysisProps> = ({ topic }) => {
                     </div>
 
                     <div>
-                        <div className="text-sm text-muted-foreground mb-2">Next Steps</div>
+                        <div className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                            Next Steps
+                            {topic.nextSteps.some(step => step.type === 'link') && (
+                                <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">
+                                    ✓ Links Active
+                                </span>
+                            )}
+                        </div>
                         <ul className="space-y-2">
                             {topic.nextSteps.map((step, stepIdx) => (
                                 <li key={stepIdx} className="flex items-start gap-2 text-sm group">
                                     <ChevronRight className="w-3 h-3 text-primary mt-0.5 group-hover:translate-x-1 transition-transform" />
-                                    <span className="flex-1">{step}</span>
+                                    <div className="flex-1">
+                                        {step.type === 'link' && step.url ? (
+                                            <a 
+                                                href={step.url} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="text-primary hover:text-primary/80 underline underline-offset-2 flex items-center gap-1 group/link"
+                                            >
+                                                <span>{step.text}</span>
+                                                <ExternalLink className="w-3 h-3 opacity-60 group-hover/link:opacity-100 transition-opacity" />
+                                            </a>
+                                        ) : (
+                                            <span>{step.text}</span>
+                                        )}
+                                    </div>
                                     <CheckCircle className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </li>
                             ))}

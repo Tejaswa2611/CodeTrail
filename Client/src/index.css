@@ -17,9 +17,9 @@ All colors MUST be HSL.
     --popover: 240 4% 96%;
     --popover-foreground: 220 9% 14%;
 
-    --primary: 250 84% 54%;
+    --primary: 199 89% 48%; /* Beautiful cyan-blue that works well on dark backgrounds */
     --primary-foreground: 0 0% 98%;
-    --primary-glow: 250 100% 75%;
+    --primary-glow: 199 100% 70%;
 
     --secondary: 220 8% 90%; /* Soft grey inspired by palette */
     --secondary-foreground: 220 9% 14%;
@@ -35,7 +35,7 @@ All colors MUST be HSL.
 
     --border: 220 8% 85%; /* Subtle border color */
     --input: 220 6% 88%;
-    --ring: 250 84% 54%;
+    --ring: 199 89% 48%;
 
     /* CodeTrail specific colors - keeping original theme colors */
     --codetrail-blue: 250 84% 54%;
@@ -152,9 +152,9 @@ All colors MUST be HSL.
     --popover: 220 8% 16%;
     --popover-foreground: 240 4% 97%;
 
-    --primary: 250 84% 54%;
+    --primary: 199 89% 48%; /* Beautiful cyan-blue that works well on dark backgrounds */
     --primary-foreground: 0 0% 98%;
-    --primary-glow: 250 100% 75%;
+    --primary-glow: 199 100% 70%;
 
     --secondary: 220 8% 20%;
     --secondary-foreground: 240 4% 97%;
@@ -170,7 +170,7 @@ All colors MUST be HSL.
 
     --border: 220 8% 22%;
     --input: 220 8% 20%;
-    --ring: 250 84% 54%;
+    --ring: 199 89% 48%;
 
     /* Dark mode custom palette */
     --custom-dark: 240 4% 97%; /* Inverted for dark mode */
