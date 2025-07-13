@@ -101,10 +101,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
                         navigate('/');
                     }}
                 >
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center hover:shadow-lg transition-shadow">
-                        <Code className="w-3 h-3 sm:w-4 sm:h-4 text-primary-foreground" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center hover:shadow-lg tech-transition glow-primary">
+                        <Code className="w-3 h-3 sm:w-4 sm:h-4 text-tech-deep-black" />
                     </div>
-                    <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                    <span className="text-lg sm:text-xl font-bold neon-text font-brand">
                         CodeTrail
                     </span>
                 </button>
@@ -118,10 +118,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
     return (
         <header className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
             <Link to="/" className="flex items-center space-x-2">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center">
-                    <Code className="w-3 h-3 sm:w-4 sm:h-4 text-primary-foreground" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center glow-primary">
+                    <Code className="w-3 h-3 sm:w-4 sm:h-4 text-tech-deep-black" />
                 </div>
-                <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                <span className="text-lg sm:text-xl font-bold neon-text font-brand">
                     CodeTrail
                 </span>
             </Link>

@@ -20,17 +20,17 @@ const SuggestedQuestionCard: React.FC<SuggestedQuestionProps> = ({ question }) =
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty) {
             case 'Easy': return 'text-green-500 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-800';
-            case 'Medium': return 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800';
+            case 'Medium': return 'text-custom-orange bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800'; /* Your orange */
             case 'Hard': return 'text-red-500 bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-800';
-            default: return 'text-gray-500 bg-gray-100 dark:bg-gray-900/30 border-gray-200 dark:border-gray-800';
+            default: return 'text-custom-gray-medium bg-gray-100 dark:bg-gray-900/30 border-gray-200 dark:border-gray-800'; /* Your gray */
         }
     };
 
     const getPriorityIcon = (priority: string) => {
         switch (priority) {
             case 'critical': return <AlertCircle className="w-4 h-4 text-red-500" />;
-            case 'high': return <Star className="w-4 h-4 text-orange-500" />;
-            case 'medium': return <Target className="w-4 h-4 text-yellow-500" />;
+            case 'high': return <Star className="w-4 h-4 text-custom-orange" />; /* Your orange */
+            case 'medium': return <Target className="w-4 h-4 text-custom-orange" />; /* Your orange */
             case 'low': return <CheckCircle className="w-4 h-4 text-green-500" />;
             default: return null;
         }
@@ -39,10 +39,10 @@ const SuggestedQuestionCard: React.FC<SuggestedQuestionProps> = ({ question }) =
     const getPriorityColor = (priority: string) => {
         switch (priority) {
             case 'critical': return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10';
-            case 'high': return 'border-l-orange-500 bg-orange-50/50 dark:bg-orange-900/10';
-            case 'medium': return 'border-l-yellow-500 bg-yellow-50/50 dark:bg-yellow-900/10';
+            case 'high': return 'border-l-custom-orange bg-orange-50/50 dark:bg-orange-900/10'; /* Your orange */
+            case 'medium': return 'border-l-custom-orange bg-orange-50/50 dark:bg-orange-900/10'; /* Your orange */
             case 'low': return 'border-l-green-500 bg-green-50/50 dark:bg-green-900/10';
-            default: return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-900/10';
+            default: return 'border-l-custom-gray-medium bg-gray-50/50 dark:bg-gray-900/10'; /* Your gray */
         }
     };
 

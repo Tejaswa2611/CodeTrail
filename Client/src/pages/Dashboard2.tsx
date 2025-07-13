@@ -34,13 +34,13 @@ const InfoTooltip = ({ message }: { message: string }) => {
     );
 };
 
-// Helper function to get difficulty colors
+// Helper function to get difficulty colors with hacker theme
 const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
-        case 'easy': return 'text-green-400';
-        case 'medium': return 'text-yellow-400';
-        case 'hard': return 'text-red-400';
-        default: return 'text-gray-400';
+        case 'easy': return 'text-hacker-success'; /* Hacker green for easy */
+        case 'medium': return 'text-hacker-warning'; /* Orange for medium */
+        case 'hard': return 'text-red-400'; /* Red for hard */
+        default: return 'text-hacker-green-dark'; /* Dark green for unknown */
     }
 };
 
@@ -226,26 +226,26 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
     const codeforcesProfile = getCodeforcesProfile();
 
     return (
-        <aside className="w-full lg:w-80 bg-card/80 backdrop-blur-sm border border-custom-muted/20 rounded-2xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh] shadow-card">
+        <aside className="w-full lg:w-80 hacker-terminal hacker-glow backdrop-blur-sm rounded-2xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh] font-mono">
             {/* User Profile Section */}
             <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2 text-white">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-hacker-green via-hacker-green-bright to-hacker-green rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2 text-hacker-black hacker-glow">
                     {isLoading ? (
-                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <Loader2 className="w-8 h-8 animate-spin text-hacker-green" />
                     ) : (
                         userProfile?.firstName?.[0]?.toUpperCase() || 'U'
                     )}
                 </div>
-                <h2 className="text-lg lg:text-xl font-semibold text-center">
+                <h2 className="text-lg lg:text-xl font-semibold text-center text-hacker-green-bright font-mono">
                     {isLoading ? 'Loading...' : (
                         userProfile ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim() : 'User'
                     )}
                 </h2>
-                <p className="text-primary text-sm">
+                <p className="text-hacker-green text-sm font-mono">
                     {isLoading ? '...' : userProfile?.email || 'No email'}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                    Joined: {isLoading ? '...' : (
+                <p className="text-xs text-hacker-green-dark font-mono">
+                    {'>'} Joined: {isLoading ? '...' : (
                         userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Unknown'
                     )}
                 </p>
@@ -253,26 +253,26 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
 
             {/* Platform Profiles Section */}
             <div>
-                <h3 className="text-sm font-semibold mb-3">Connected Platforms</h3>
+                <h3 className="text-sm font-semibold mb-3 text-hacker-green-bright font-mono">{'>'} Connected Platforms</h3>
                 <div className="space-y-3">
                     {/* LeetCode */}
-                    <div className="p-3 rounded-lg hover:bg-accent/50 transition-colors border border-transparent hover:border-border">
+                    <div className="p-3 rounded-lg bg-hacker-green-muted/30 border border-hacker-green-dark hover:border-hacker-green transition-colors">
                         <div className="flex items-center gap-3 mb-2">
-                            <img src={getPlatformLogo('leetcode', actualTheme)} alt="LeetCode" className="w-6 h-6" />
+                            <span className="text-hacker-green font-mono text-sm">[LC]</span>
 
                             {editingPlatform === 'leetcode' ? (
-                                <div className="flex-1 text-sm font-medium text-orange-500">
-                                    Edit LeetCode Handle
+                                <div className="flex-1 text-sm font-medium text-hacker-green-bright font-mono">
+                                    {'>'} Edit LeetCode Handle
                                 </div>
                             ) : (
                                 <>
                                     <button
                                         onClick={() => handlePlatformEdit('leetcode')}
-                                        className="flex-1 text-left text-sm hover:text-orange-500 transition-colors"
+                                        className="flex-1 text-left text-sm hover:text-hacker-green-bright transition-colors font-mono"
                                     >
                                         LeetCode {leetcodeProfile?.handle ? `(@${leetcodeProfile.handle})` : ''}
                                     </button>
-                                    <div className={`w-2 h-2 rounded-full ${leetcodeProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                    <div className={`w-2 h-2 rounded-full hacker-pulse ${leetcodeProfile ? 'bg-hacker-success' : 'bg-red-500'}`}></div>
                                 </>
                             )}
                         </div>
@@ -283,7 +283,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                                     type="text"
                                     value={platformHandle}
                                     onChange={(e) => setPlatformHandle(e.target.value)}
-                                    className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-foreground placeholder-muted-foreground"
+                                    className="w-full px-3 py-2 text-sm bg-hacker-black border border-hacker-green-dark rounded-md focus:outline-none focus:ring-2 focus:ring-hacker-green focus:border-transparent text-hacker-green placeholder-hacker-green-dark font-mono"
                                     placeholder="Enter LeetCode handle"
                                     autoFocus
                                 />
@@ -291,14 +291,14 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                                     <button
                                         onClick={handlePlatformSave}
                                         disabled={isSaving}
-                                        className="flex-1 px-3 py-2 bg-green-500 text-white text-xs rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium"
+                                        className="flex-1 px-3 py-2 bg-hacker-success text-hacker-black text-xs rounded-md hover:bg-hacker-success/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium font-mono hacker-glow"
                                     >
                                         {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
                                         {isSaving ? 'Syncing...' : 'Save & Sync'}
                                     </button>
                                     <button
                                         onClick={() => setEditingPlatform(null)}
-                                        className="flex-1 px-3 py-2 bg-muted text-muted-foreground text-xs rounded-md hover:bg-muted/80 font-medium"
+                                        className="flex-1 px-3 py-2 bg-hacker-green-muted text-hacker-green text-xs rounded-md hover:bg-hacker-green-muted/80 font-medium font-mono border border-hacker-green-dark"
                                     >
                                         Cancel
                                     </button>
@@ -308,23 +308,23 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                     </div>
 
                     {/* Codeforces */}
-                    <div className="p-3 rounded-lg hover:bg-accent/50 transition-colors border border-transparent hover:border-border">
+                    <div className="p-3 rounded-lg bg-hacker-green-muted/30 border border-hacker-green-dark hover:border-hacker-green transition-colors">
                         <div className="flex items-center gap-3 mb-2">
-                            <img src={getPlatformLogo('codeforces', actualTheme)} alt="CodeForces" className="w-6 h-6" />
+                            <span className="text-hacker-green font-mono text-sm">[CF]</span>
 
                             {editingPlatform === 'codeforces' ? (
-                                <div className="flex-1 text-sm font-medium text-blue-500">
-                                    Edit Codeforces Handle
+                                <div className="flex-1 text-sm font-medium text-hacker-green-bright font-mono">
+                                    {'>'} Edit Codeforces Handle
                                 </div>
                             ) : (
                                 <>
                                     <button
                                         onClick={() => handlePlatformEdit('codeforces')}
-                                        className="flex-1 text-left text-sm hover:text-blue-500 transition-colors"
+                                        className="flex-1 text-left text-sm hover:text-hacker-green-bright transition-colors font-mono"
                                     >
                                         Codeforces {codeforcesProfile?.handle ? `(@${codeforcesProfile.handle})` : ''}
                                     </button>
-                                    <div className={`w-2 h-2 rounded-full ${codeforcesProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                    <div className={`w-2 h-2 rounded-full hacker-pulse ${codeforcesProfile ? 'bg-hacker-success' : 'bg-red-500'}`}></div>
                                 </>
                             )}
                         </div>
@@ -335,7 +335,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                                     type="text"
                                     value={platformHandle}
                                     onChange={(e) => setPlatformHandle(e.target.value)}
-                                    className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-foreground placeholder-muted-foreground"
+                                    className="w-full px-3 py-2 text-sm bg-hacker-black border border-hacker-green-dark rounded-md focus:outline-none focus:ring-2 focus:ring-hacker-green focus:border-transparent text-hacker-green placeholder-hacker-green-dark font-mono"
                                     placeholder="Enter Codeforces handle"
                                     autoFocus
                                 />
@@ -343,14 +343,14 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                                     <button
                                         onClick={handlePlatformSave}
                                         disabled={isSaving}
-                                        className="flex-1 px-3 py-2 bg-green-500 text-white text-xs rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium"
+                                        className="flex-1 px-3 py-2 bg-hacker-success text-hacker-black text-xs rounded-md hover:bg-hacker-success/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium font-mono hacker-glow"
                                     >
                                         {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
                                         {isSaving ? 'Saving...' : 'Save'}
                                     </button>
                                     <button
                                         onClick={() => setEditingPlatform(null)}
-                                        className="flex-1 px-3 py-2 bg-muted text-muted-foreground text-xs rounded-md hover:bg-muted/80 font-medium"
+                                        className="flex-1 px-3 py-2 bg-hacker-green-muted text-hacker-green text-xs rounded-md hover:bg-hacker-green-muted/80 font-medium font-mono border border-hacker-green-dark"
                                     >
                                         Cancel
                                     </button>
@@ -361,7 +361,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
 
                     {/* Rating info for Codeforces if available */}
                     {codeforcesProfile && codeforcesProfile.currentRating && (
-                        <div className="text-xs text-muted-foreground pl-9">
+                        <div className="text-xs text-hacker-green-dark pl-9 font-mono">
                             Rating: {codeforcesProfile.currentRating} ({codeforcesProfile.rank || 'Unrated'})
                             {codeforcesProfile.maxRating && (
                                 <span> • Max: {codeforcesProfile.maxRating}</span>
@@ -373,23 +373,23 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
 
             {/* Quick Stats */}
             <div>
-                <h3 className="text-sm font-semibold mb-3">Quick Stats</h3>
-                <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                        <span className="text-muted-foreground">Problems Solved:</span>
-                        <span className="font-medium">
+                <h3 className="text-sm font-semibold mb-3 text-hacker-green-bright font-mono">{'>'} Quick Stats</h3>
+                <div className="space-y-2 text-sm font-mono">
+                    <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
+                        <span className="text-hacker-green-dark">Problems Solved:</span>
+                        <span className="font-medium text-hacker-green">
                             {isLoading ? '...' : (data?.totalQuestions?.total || 0)}
                         </span>
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-muted-foreground">Active Days:</span>
-                        <span className="font-medium">
+                    <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
+                        <span className="text-hacker-green-dark">Active Days:</span>
+                        <span className="font-medium text-hacker-green">
                             {isLoading ? '...' : (data?.totalActiveDays?.total || 0)}
                         </span>
                     </div>
-                    <div className="flex justify-between">
-                        <span className="text-muted-foreground">Contests:</span>
-                        <span className="font-medium">
+                    <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
+                        <span className="text-hacker-green-dark">Contests:</span>
+                        <span className="font-medium text-hacker-green">
                             {isLoading ? '...' : (data?.totalContests?.total || 0)}
                         </span>
                     </div>
@@ -397,18 +397,18 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
             </div>
 
             {/* Footer */}
-            <div className="text-xs text-muted-foreground space-y-1 mt-auto">
-                <div className="flex justify-between">
+            <div className="text-xs text-hacker-green-dark space-y-1 mt-auto font-mono">
+                <div className="flex justify-between border-b border-hacker-green-dark/20 pb-1">
                     <span>Profile Views:</span>
                     <span>0</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between border-b border-hacker-green-dark/20 pb-1">
                     <span>Last Refresh:</span>
                     <span>{new Date().toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Profile Visibility:</span>
-                    <span>Public</span>
+                    <span className="text-hacker-success">Public</span>
                 </div>
             </div>
         </aside>
@@ -830,7 +830,7 @@ const Dashboard2 = () => {
     const topicAnalysis = getTopicAnalysis();
 
     return (
-        <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen p-3 lg:p-6 gap-4 lg:gap-6">
+        <div className="flex flex-col lg:flex-row matrix-bg min-h-screen p-3 lg:p-6 gap-4 lg:gap-6 font-mono">
             {/* Sidebar */}
             <Sidebar data={data} isLoading={isLoading} refreshData={fetchData} />
             {/* Main Content */}
@@ -838,23 +838,23 @@ const Dashboard2 = () => {
                 {/* Row 1: 2 squares + 1 rectangle */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6">
                     {/* Total Questions */}
-                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover relative">
+                    <div className="lg:col-span-2 hacker-terminal hacker-glow rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] hover:shadow-hacker-green/20 transition-shadow duration-300 relative">
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined total from all connected platforms" />
                         </div>
-                        <div className="text-sm text-muted-foreground mb-2">Total Questions</div>
-                        <div className="text-3xl lg:text-4xl font-bold">
-                            {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : formatNumber(getTotalQuestions())}
+                        <div className="text-sm text-hacker-green-dark mb-2 font-mono uppercase tracking-wider">Total Questions</div>
+                        <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
+                            {isLoading ? <Loader2 className="w-8 h-8 animate-spin text-hacker-green" /> : formatNumber(getTotalQuestions())}
                         </div>
                     </div>
                     {/* Total Active Days */}
-                    <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 card-hover relative">
+                    <div className="lg:col-span-2 hacker-terminal hacker-glow rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] hover:shadow-hacker-green/20 transition-shadow duration-300 relative">
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined active days from all connected platforms" />
                         </div>
-                        <div className="text-sm text-muted-foreground mb-2">Total Active Days</div>
-                        <div className="text-3xl lg:text-4xl font-bold">
-                            {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : formatNumber(getTotalActiveDays())}
+                        <div className="text-sm text-hacker-green-dark mb-2 font-mono uppercase tracking-wider">Active Days</div>
+                        <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
+                            {isLoading ? <Loader2 className="w-8 h-8 animate-spin text-hacker-green" /> : formatNumber(getTotalActiveDays())}
                         </div>
                     </div>
                     {/* Heatmap */}

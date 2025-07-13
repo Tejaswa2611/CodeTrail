@@ -2,52 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Hacker Theme - Black & Green Matrix Style */
 
 @layer base {
   :root {
-    --background: 240 4% 97%; /* Light grey background #F1F0EF inspired */
-    --foreground: 220 9% 14%; /* Dark text similar to #202226 */
+    /* HACKER THEME - Black & Green Matrix Style */
+    --background: 0 0% 0%; /* #000000 - Pure black background */
+    --foreground: 142 76% 36%; /* #10B981 - Classic hacker green */
 
-    --card: 240 4% 95%; /* Slightly darker than background for cards */
-    --card-foreground: 220 9% 14%;
+    --card: 120 100% 3%; /* #001100 - Very dark green card background */
+    --card-foreground: 142 76% 36%; /* #10B981 - Hacker green text */
 
-    --popover: 240 4% 96%;
-    --popover-foreground: 220 9% 14%;
+    --popover: 0 0% 3%; /* #080808 - Near black popover */
+    --popover-foreground: 142 76% 36%; /* #10B981 - Green text */
 
-    --primary: 199 89% 48%; /* Beautiful cyan-blue that works well on dark backgrounds */
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 199 100% 70%;
+    --primary: 142 76% 36%; /* #10B981 - Hacker green primary */
+    --primary-foreground: 0 0% 0%; /* #000000 - Black text on green */
+    --primary-glow: 142 76% 36%; /* Green glow effect */
 
-    --secondary: 220 8% 90%; /* Soft grey inspired by palette */
-    --secondary-foreground: 220 9% 14%;
+    --secondary: 120 100% 8%; /* #002200 - Dark green secondary */
+    --secondary-foreground: 142 76% 36%; /* #10B981 - Green text */
 
-    --muted: 220 6% 88%; /* Muted grey similar to #949CA0 */
-    --muted-foreground: 220 8% 46%;
+    --muted: 120 100% 5%; /* #001A00 - Muted dark green */
+    --muted-foreground: 142 30% 25%; /* #4B7C59 - Muted green text */
 
-    --accent: 220 8% 92%;
-    --accent-foreground: 220 9% 14%;
+    --accent: 142 84% 47%; /* #16E678 - Bright accent green */
+    --accent-foreground: 0 0% 0%; /* #000000 - Black on bright green */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%; /* Red for errors */
+    --destructive-foreground: 0 0% 100%; /* White text on red */
 
-    --border: 220 8% 85%; /* Subtle border color */
-    --input: 220 6% 88%;
-    --ring: 199 89% 48%;
+    --border: 142 76% 15%; /* #0F5F3F - Green border */
+    --input: 120 100% 5%; /* #001A00 - Dark green input background */
+    --ring: 142 84% 47%; /* #16E678 - Bright green focus ring */
 
-    /* CodeTrail specific colors - keeping original theme colors */
-    --codetrail-blue: 250 84% 54%;
-    --codetrail-purple: 280 80% 60%;
-    --codetrail-green: 142 76% 36%;
-    --codetrail-orange: 25 95% 53%;
-    --codetrail-red: 0 84% 60%;
+    /* Custom hacker theme colors */
+    --hacker-black: 0 0% 0%; /* #000000 - Pure black */
+    --hacker-green: 142 76% 36%; /* #10B981 - Classic green */
+    --hacker-green-bright: 142 84% 47%; /* #16E678 - Bright green */
+    --hacker-green-dark: 142 30% 25%; /* #4B7C59 - Dark green */
+    --hacker-green-muted: 120 100% 5%; /* #001A00 - Very muted green */
+    --hacker-success: 120 60% 50%; /* #4ADE80 - Success green */
+    --hacker-warning: 45 93% 47%; /* #F59E0B - Orange warning */
 
-    /* Custom palette additions */
-    --custom-dark: 220 9% 14%; /* #202226 equivalent */
-    --custom-light: 240 4% 97%; /* #F1F0EF equivalent */
-    --custom-muted: 220 8% 60%; /* #949CA0 equivalent */
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* HACKER THEME - Same colors for dark mode (always dark) */
+    --background: 0 0% 0%; /* #000000 - Pure black */
+    --foreground: 142 76% 36%; /* #10B981 - Hacker green */
+
+    --card: 120 100% 3%; /* #001100 - Very dark green */
+    --card-foreground: 142 76% 36%; /* #10B981 */
+
+    --popover: 0 0% 3%; /* #080808 */
+    --popover-foreground: 142 76% 36%; /* #10B981 */
+
+    --primary: 142 76% 36%; /* #10B981 */
+    --primary-foreground: 0 0% 0%; /* #000000 */
+
+    --secondary: 120 100% 8%; /* #002200 */
+    --secondary-foreground: 142 76% 36%; /* #10B981 */
+
+    --muted: 120 100% 5%; /* #001A00 */
+    --muted-foreground: 142 30% 25%; /* #4B7C59 */
+
+    --accent: 142 84% 47%; /* #16E678 */
+    --accent-foreground: 0 0% 0%; /* #000000 */
+
+    --destructive: 0 84% 60%; /* Red */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 142 76% 15%; /* #0F5F3F */
+    --input: 120 100% 5%; /* #001A00 */
+    --ring: 142 84% 47%; /* #16E678 */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    background: hsl(0, 0%, 4%); /* Deep black */
+    color: hsl(0, 0%, 85%); /* Light gray */
+  }
+
+  .font-mono {
+    font-family: 'Courier New', monospace;
+  }
+
+  .font-brand {
+    font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+  }
+}
 
 @layer components {
   /* Custom markdown styling for chatbot */
@@ -110,103 +161,154 @@ All colors MUST be HSL.
   .chatbot-markdown a {
     @apply text-primary hover:text-primary/80 underline underline-offset-2;
   }
-  
-  .chatbot-markdown pre {
-    @apply bg-gray-100 p-2 rounded mt-2 mb-2 overflow-x-auto;
-  }
-  
-  .chatbot-markdown pre code {
-    @apply bg-transparent p-0;
-  }
 }
 
-    /* Enhanced gradients for sophisticated look */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--codetrail-blue)), hsl(var(--codetrail-purple)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
-
-    /* Enhanced shadows with custom colors */
-    --shadow-soft: 0 4px 20px hsl(var(--custom-dark) / 0.08);
-    --shadow-card: 0 2px 8px hsl(var(--custom-dark) / 0.06);
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.15);
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 240 4% 96%;
-    --sidebar-foreground: 220 9% 14%;
-    --sidebar-primary: 220 9% 14%;
-    --sidebar-primary-foreground: 240 4% 97%;
-    --sidebar-accent: 220 8% 92%;
-    --sidebar-accent-foreground: 220 9% 14%;
-    --sidebar-border: 220 8% 85%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+@layer utilities {
+  /* TECH DESIGN SYSTEM UTILITIES */
+  
+  /* Primary Glow Effect */
+  .glow-primary {
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5), 0 0 60px rgba(0, 255, 0, 0.2);
+    border: 1px solid hsl(120, 100%, 50%);
   }
-
-  .dark {
-    --background: 220 9% 14%; /* Using #202226 for dark background */
-    --foreground: 240 4% 97%; /* Using #F1F0EF for dark mode text */
-
-    --card: 220 8% 16%; /* Slightly lighter than background */
-    --card-foreground: 240 4% 97%;
-
-    --popover: 220 8% 16%;
-    --popover-foreground: 240 4% 97%;
-
-    --primary: 199 89% 48%; /* Beautiful cyan-blue that works well on dark backgrounds */
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 199 100% 70%;
-
-    --secondary: 220 8% 20%;
-    --secondary-foreground: 240 4% 97%;
-
-    --muted: 220 8% 20%;
-    --muted-foreground: 220 8% 60%; /* Using #949CA0 equivalent for muted text */
-
-    --accent: 220 8% 20%;
-    --accent-foreground: 240 4% 97%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 240 4% 97%;
-
-    --border: 220 8% 22%;
-    --input: 220 8% 20%;
-    --ring: 199 89% 48%;
-
-    /* Dark mode custom palette */
-    --custom-dark: 240 4% 97%; /* Inverted for dark mode */
-    --custom-light: 220 9% 14%; /* Inverted for dark mode */
-    --custom-muted: 220 8% 60%; /* Keep muted color consistent */
-
-    /* Dark mode gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%);
-    --shadow-soft: 0 4px 20px hsl(0 0% 0% / 0.3);
-    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.2);
-    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.25);
-    
-    --sidebar-background: 220 8% 16%;
-    --sidebar-foreground: 240 4% 97%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 8% 18%;
-    --sidebar-accent-foreground: 240 4% 97%;
-    --sidebar-border: 220 8% 22%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  
+  .glow-primary:hover {
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.7), 0 0 80px rgba(0, 255, 0, 0.3);
+    border: 1px solid hsl(120, 100%, 60%);
   }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  
+  /* Terminal Text Effect */
+  .terminal-text {
+    font-family: 'Courier New', monospace;
+    color: hsl(120, 100%, 50%);
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    letter-spacing: 0.02em;
   }
-
-  body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  
+  /* Tech Card Styling */
+  .tech-card {
+    background: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(120, 100%, 10%) 100%);
+    border: 1px solid hsl(120, 100%, 25%);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 0, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
-  .font-mono {
-    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  
+  .tech-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 0, 0.3);
+    border-color: hsl(120, 100%, 40%);
+  }
+  
+  /* Tech Background Gradients */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(0, 0%, 4%) 0%, hsl(120, 100%, 8%) 50%, hsl(0, 0%, 4%) 100%);
+  }
+  
+  .bg-gradient-secondary {
+    background: linear-gradient(135deg, hsl(120, 100%, 8%) 0%, hsl(0, 0%, 4%) 100%);
+  }
+  
+  .bg-gradient-hero {
+    background: linear-gradient(135deg, hsl(0, 0%, 4%) 0%, hsl(120, 100%, 6%) 25%, hsl(0, 0%, 4%) 100%);
+  }
+  
+  .bg-gradient-card {
+    background: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(120, 100%, 10%) 100%);
+  }
+  
+  /* Floating Animation */
+  .animate-float {
+    animation: animate-float 4s ease-in-out infinite;
+  }
+  
+  /* Matrix-style background effect - Updated */
+  .matrix-bg {
+    background: linear-gradient(135deg, hsl(0, 0%, 4%) 0%, hsl(120, 100%, 6%) 25%, hsl(0, 0%, 4%) 100%);
+    position: relative;
+  }
+  
+  .matrix-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  
+  /* HACKER THEME UTILITIES - Updated */
+  .hacker-terminal {
+    font-family: 'Courier New', monospace;
+    background: hsl(0, 0%, 4%);
+    color: hsl(120, 100%, 50%);
+    border: 1px solid hsl(120, 100%, 25%);
+    border-radius: 0.75rem;
+  }
+  
+  .hacker-glow {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+    border: 1px solid hsl(120, 100%, 30%);
+  }
+  
+  .hacker-glow:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+    border: 1px solid hsl(120, 100%, 50%);
+  }
+  
+  .hacker-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  
+  /* Updated Text Colors */
+  .text-hacker-green {
+    color: hsl(120, 100%, 50%);
+  }
+  
+  .text-hacker-green-bright {
+    color: hsl(120, 100%, 60%);
+  }
+  
+  .text-hacker-green-dark {
+    color: hsl(120, 100%, 30%);
+  }
+  
+  .text-hacker-success {
+    color: hsl(120, 100%, 45%);
+  }
+  
+  .text-hacker-warning {
+    color: hsl(45, 100%, 50%);
+  }
+  
+  /* Updated Background Colors */
+  .bg-hacker-black {
+    background-color: hsl(0, 0%, 4%);
+  }
+  
+  .bg-hacker-green {
+    background-color: hsl(120, 100%, 50%);
+  }
+  
+  .bg-hacker-green-muted {
+    background-color: hsl(120, 100%, 8%);
+  }
+  
+  .bg-hacker-success {
+    background-color: hsl(120, 100%, 45%);
+  }
+  
+  /* Updated Border Colors */
+  .border-hacker-green {
+    border-color: hsl(120, 100%, 50%);
+  }
+  
+  .border-hacker-green-dark {
+    border-color: hsl(120, 100%, 25%);
   }
 
   /* Enhanced card hover effects */
@@ -215,152 +317,104 @@ All colors MUST be HSL.
   }
 
   .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 0, 0.3);
+  }
+
+  /* Interactive Element Transitions */
+  .tech-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .tech-button {
+    background: linear-gradient(135deg, hsl(0, 0%, 8%) 0%, hsl(120, 100%, 15%) 100%);
+    border: 1px solid hsl(120, 100%, 50%);
+    color: hsl(120, 100%, 50%);
+    font-family: 'Inter', system-ui, sans-serif;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  }
+  
+  .tech-button:hover {
+    background: linear-gradient(135deg, hsl(120, 100%, 15%) 0%, hsl(120, 100%, 20%) 100%);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3);
     transform: translateY(-2px);
-  }
-
-  /* Custom color utilities */
-  .bg-custom-dark {
-    background-color: hsl(var(--custom-dark));
+    border-color: hsl(120, 100%, 60%);
   }
   
-  .bg-custom-light {
-    background-color: hsl(var(--custom-light));
+  /* Neon Text Effects */
+  .neon-text {
+    color: hsl(120, 100%, 50%);
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.5);
   }
   
-  .bg-custom-muted {
-    background-color: hsl(var(--custom-muted));
+  .neon-text-bright {
+    color: hsl(120, 100%, 60%);
+    text-shadow: 0 0 15px rgba(0, 255, 0, 1), 0 0 30px rgba(0, 255, 0, 0.7);
   }
-  
-  .text-custom-dark {
-    color: hsl(var(--custom-dark));
-  }
-  
-  .text-custom-light {
-    color: hsl(var(--custom-light));
-  }
-  
-  .text-custom-muted {
-    color: hsl(var(--custom-muted));
-  }
-  
-  .border-custom-muted {
-    border-color: hsl(var(--custom-muted) / 0.3);
-  }
-}
 
-/* Animation Keyframes */
-@keyframes fade-in-elegant {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+  /* Animation keyframes */
+  @keyframes float-subtle {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes slide-in-elegant {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px hsl(var(--hacker-green) / 0.5), 0 0 20px hsl(var(--hacker-green) / 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px hsl(var(--hacker-green) / 0.8), 0 0 35px hsl(var(--hacker-green) / 0.4);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes scale-in-elegant {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 
-@keyframes typewriter {
-  from {
-    width: 0;
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
-  to {
-    width: 100%;
-  }
-}
 
-@keyframes blink {
-  50% {
-    border-color: transparent;
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
 
-@keyframes float-subtle {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
-  }
-  50% {
-    box-shadow: 0 0 30px hsl(var(--primary) / 0.4);
-  }
-}
-
-@keyframes page-enter {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Animation Classes */
-@layer utilities {
-  .animate-fade-in {
-    animation: fade-in-elegant 0.8s ease-out forwards;
-    opacity: 0;
-  }
-  
+  /* Animation classes */
   .animate-fade-in-up {
-    animation: slide-in-elegant 0.8s ease-out forwards;
+    animation: fade-in-up 0.6s ease-out forwards;
     opacity: 0;
   }
-  
+
   .animate-scale-in {
-    animation: scale-in-elegant 0.6s ease-out forwards;
-    opacity: 0;
-  }
-  
-  .animate-slide-in-left {
-    animation: slide-in-elegant 0.7s ease-out forwards;
-    opacity: 0;
-  }
-  
-  .animate-slide-in-right {
-    animation: slide-in-elegant 0.7s ease-out forwards;
+    animation: scale-in 0.6s ease-out forwards;
     opacity: 0;
   }
   
@@ -370,18 +424,6 @@ All colors MUST be HSL.
   
   .animate-pulse-glow {
     animation: glow-pulse 3s ease-in-out infinite;
-  }
-
-  .animate-slide-down {
-    animation: slide-down 0.6s ease-out forwards;
-    opacity: 0;
-  }
-
-  .animate-typewriter {
-    overflow: hidden;
-    border-right: 2px solid hsl(var(--primary));
-    white-space: nowrap;
-    animation: typewriter 3s steps(40, end), blink 0.75s step-end infinite;
   }
   
   /* Staggered animation delays */
@@ -429,18 +471,18 @@ All colors MUST be HSL.
   
   .hover-lift:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px hsl(var(--primary) / 0.15);
+    box-shadow: 0 10px 25px hsl(var(--hacker-green) / 0.15);
   }
   
-  /* Glass morphism effect */
+  /* Glass morphism effect with hacker theme */
   .glass {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 20, 0, 0.3);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid hsl(var(--hacker-green) / 0.2);
   }
   
   .dark .glass {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 20, 0, 0.3);
+    border: 1px solid hsl(var(--hacker-green) / 0.1);
   }
 }

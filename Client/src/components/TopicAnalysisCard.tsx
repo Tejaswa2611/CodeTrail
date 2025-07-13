@@ -22,13 +22,13 @@ interface TopicAnalysisProps {
 const TopicAnalysisCard: React.FC<TopicAnalysisProps> = ({ topic }) => {
     const getProficiencyColor = (score: number) => {
         if (score >= 80) return 'text-green-500';
-        if (score >= 60) return 'text-yellow-500';
+        if (score >= 60) return 'text-custom-orange'; /* Your orange for good progress */
         return 'text-red-500';
     };
 
     const getProficiencyBg = (score: number) => {
         if (score >= 80) return 'bg-green-500';
-        if (score >= 60) return 'bg-yellow-500';
+        if (score >= 60) return 'bg-custom-orange'; /* Your orange */
         return 'bg-red-500';
     };
 
@@ -38,7 +38,7 @@ const TopicAnalysisCard: React.FC<TopicAnalysisProps> = ({ topic }) => {
             case 'good':
                 return <TrendingUp className="w-4 h-4 text-green-500" />;
             case 'improving':
-                return <TrendingUp className="w-4 h-4 text-yellow-500" />;
+                return <TrendingUp className="w-4 h-4 text-custom-orange" />; /* Your orange */
             case 'needs_work':
                 return <TrendingDown className="w-4 h-4 text-red-500" />;
             default:
@@ -49,9 +49,9 @@ const TopicAnalysisCard: React.FC<TopicAnalysisProps> = ({ topic }) => {
     const getImportanceColor = (importance: string) => {
         switch (importance) {
             case 'high': return 'text-red-500 bg-red-100 dark:bg-red-900/30';
-            case 'medium': return 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30';
+            case 'medium': return 'text-custom-orange bg-orange-100 dark:bg-orange-900/30'; /* Your orange */
             case 'low': return 'text-green-500 bg-green-100 dark:bg-green-900/30';
-            default: return 'text-gray-500 bg-gray-100 dark:bg-gray-900/30';
+            default: return 'text-custom-gray-medium bg-gray-100 dark:bg-gray-900/30'; /* Your gray */
         }
     };
 
@@ -93,7 +93,7 @@ const TopicAnalysisCard: React.FC<TopicAnalysisProps> = ({ topic }) => {
                     <div>
                         <div className="text-sm text-muted-foreground mb-1">Company Frequency</div>
                         <div className="flex items-center gap-2">
-                            <Star className="w-4 h-4 text-yellow-500" />
+                            <Star className="w-4 h-4 text-custom-orange" /> /* Your orange */
                             <span className="font-medium">{topic.companyFrequency}%</span>
                             <span className="text-xs text-muted-foreground">asked in interviews</span>
                         </div>
@@ -123,20 +123,20 @@ const TopicAnalysisCard: React.FC<TopicAnalysisProps> = ({ topic }) => {
                         <ul className="space-y-2">
                             {topic.nextSteps.map((step, stepIdx) => (
                                 <li key={stepIdx} className="flex items-start gap-2 text-sm group">
-                                    <ChevronRight className="w-3 h-3 text-primary mt-0.5 group-hover:translate-x-1 transition-transform" />
+                                    <ChevronRight className="w-3 h-3 text-custom-blue mt-0.5 group-hover:translate-x-1 transition-transform" />
                                     <div className="flex-1">
                                         {step.type === 'link' && step.url ? (
                                             <a 
                                                 href={step.url} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer"
-                                                className="text-primary hover:text-primary/80 underline underline-offset-2 flex items-center gap-1 group/link"
+                                                className="text-custom-blue hover:text-custom-blue-light underline underline-offset-2 flex items-center gap-1 group/link"
                                             >
                                                 <span>{step.text}</span>
                                                 <ExternalLink className="w-3 h-3 opacity-60 group-hover/link:opacity-100 transition-opacity" />
                                             </a>
                                         ) : (
-                                            <span>{step.text}</span>
+                                            <span className="text-foreground">{step.text}</span>
                                         )}
                                     </div>
                                     <CheckCircle className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />

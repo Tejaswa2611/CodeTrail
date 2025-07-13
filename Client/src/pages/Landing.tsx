@@ -139,45 +139,45 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 page-enter">
+    <div className="min-h-screen bg-gradient-hero page-enter font-brand">
       {/* Header */}
       <Navbar />
 
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-primary opacity-5 animate-pulse-glow"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-tech-primary-green/5 via-transparent to-tech-primary-green/5 animate-glow-pulse"></div>
         <div className="max-w-4xl mx-auto relative z-10">
-          <Badge variant="secondary" className="mb-6 animate-scale-in animate-delay-200 glass">
+          <Badge variant="secondary" className="mb-6 animate-scale-in animate-delay-200 glow-primary bg-tech-deep-black border-tech-primary-green text-tech-primary-green">
             <Zap className="w-3 h-3 mr-1" />
             AI-Powered Tracking
           </Badge>
           
           <div className="mb-6">
-            <h1 className="text-5xl md:text-7xl font-bold leading-tight min-h-[2em]">
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight min-h-[2em] font-brand neon-text-bright">
               <span className={`${
                 typewriterText.includes('Track') 
-                  ? 'bg-gradient-to-r from-foreground via-primary to-foreground' 
-                  : 'bg-gradient-primary'
-              } bg-clip-text text-transparent`}>
+                  ? 'text-tech-primary-green' 
+                  : 'text-tech-accent-green'
+              }`}>
                 {typewriterText}
               </span>
-              <span className="animate-pulse text-primary">|</span>
+              <span className="animate-pulse text-tech-accent-green">|</span>
             </h1>
           </div>
           
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-1000">
-            The smart way to monitor your progress across coding platforms and get personalized recommendations 
+          <p className="text-xl text-tech-gray mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-1000 font-brand">
+            {'>'} The smart way to monitor your progress across coding platforms and get personalized recommendations 
             to accelerate your learning.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up animate-delay-1200">
             <Link to="/signup" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto group hover-lift shadow-glow">
+              <Button size="lg" className="w-full sm:w-auto group tech-button tech-transition animate-glow-pulse">
                 Start Tracking Free
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto group hover-lift glass">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto group tech-transition border-tech-border text-tech-primary-green hover:bg-tech-dark-green hover:text-tech-accent-green font-brand glow-primary">
               <Github className="mr-2 w-4 h-4" />
               View on GitHub
             </Button>
@@ -186,10 +186,14 @@ const Landing = () => {
           {/* Stats */}
           <div className="flex flex-col sm:flex-row gap-8 justify-center items-center animate-fade-in-up animate-delay-1400">
             {stats.map((stat, index) => (
-              <div key={index} className="flex items-center space-x-2 hover-lift p-3 rounded-lg glass">
-                <stat.icon className="w-5 h-5 text-primary" />
-                <span className="font-semibold">{stat.value}</span>
-                <span className="text-muted-foreground">{stat.label}</span>
+              <div key={index} className="tech-card animate-float p-4 rounded-tech">
+                <div className="flex items-center space-x-3">
+                  <stat.icon className="w-6 h-6 text-tech-accent-green animate-tech-glow" />
+                  <div className="text-left">
+                    <div className="font-bold text-tech-primary-green font-brand text-lg neon-text">{stat.value}</div>
+                    <div className="text-tech-gray font-brand text-sm">{stat.label}</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -199,45 +203,45 @@ const Landing = () => {
       {/* Demo Section */}
       <section id="demo" className="container mx-auto px-6 py-16 relative">
         <div className="text-center mb-8 animate-fade-in-up">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-            See CodeTrail in Action
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand">
+            {'>'} See CodeTrail in Action
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-tech-gray max-w-2xl mx-auto font-brand">
             Experience the power of AI-driven coding progress tracking
           </p>
         </div>
         
         <div className="max-w-5xl mx-auto animate-scale-in animate-delay-300">
-          <Card className="overflow-hidden shadow-soft border-0 bg-gradient-hero hover-lift">
+          <Card className="tech-card overflow-hidden">
             <CardContent className="p-6">
               <div className="text-center mb-4">
-                <h3 className="text-xl font-semibold text-foreground mb-1">
-                  {demoTitles[currentDemo]}
+                <h3 className="text-xl font-semibold terminal-text mb-1 font-brand">
+                  [System] {demoTitles[currentDemo]}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-tech-gray font-brand">
                   {currentDemo + 1} of {demoImages.length}
                 </p>
               </div>
               
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-primary opacity-20 rounded-lg blur-xl group-hover:opacity-30 transition-opacity"></div>
+                <div className="absolute inset-0 bg-tech-primary-green/20 rounded-tech blur-xl group-hover:opacity-30 transition-opacity"></div>
                 <img 
                   src={demoImages[currentDemo]} 
                   alt={demoTitles[currentDemo]}
-                  className="w-full h-auto max-h-[400px] object-cover rounded-lg shadow-glow transition-all duration-700 hover:scale-[1.02] relative z-10"
+                  className="w-full h-auto max-h-[400px] object-cover rounded-tech transition-all duration-700 hover:scale-[1.02] relative z-10 glow-subtle"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-lg z-20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-tech-deep-black/40 to-transparent rounded-tech z-20" />
                 
                 {/* Navigation arrows */}
                 <button
                   onClick={() => setCurrentDemo((prev) => (prev - 1 + demoImages.length) % demoImages.length)}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30 hover:bg-black/70"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 tech-card text-tech-primary-green rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 tech-transition z-30 terminal-text"
                 >
                   ←
                 </button>
                 <button
                   onClick={() => setCurrentDemo((prev) => (prev + 1) % demoImages.length)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-30 hover:bg-black/70"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 tech-card text-tech-primary-green rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 tech-transition z-30 terminal-text"
                 >
                   →
                 </button>
@@ -248,10 +252,10 @@ const Landing = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentDemo(index)}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    className={`w-3 h-3 rounded-full tech-transition ${
                       currentDemo === index 
-                        ? 'bg-primary shadow-glow scale-125' 
-                        : 'bg-muted hover:bg-muted-foreground/50 hover:scale-110'
+                        ? 'bg-tech-primary-green glow-primary scale-125' 
+                        : 'bg-tech-border hover:bg-tech-accent-green hover:scale-110'
                     }`}
                   />
                 ))}
@@ -264,23 +268,23 @@ const Landing = () => {
       {/* Features Section */}
       <section id="features" className="container mx-auto px-6 py-20 relative">
         <div className="text-center mb-16 animate-fade-in-up">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-            Powerful Features
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand">
+            {'>'} Powerful Features
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-tech-gray max-w-2xl mx-auto font-brand">
             Everything you need to accelerate your coding journey
           </p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {features.map((feature, index) => (
-            <Card key={index} className="group hover-lift border-0 bg-gradient-hero animate-fade-in-up glass" style={{ animationDelay: `${index * 0.2}s` }}>
+            <Card key={index} className="group tech-card animate-fade-in-up animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
               <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:shadow-glow transition-all duration-300">
-                  <feature.icon className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-gradient-to-br from-tech-primary-green to-tech-accent-green border border-tech-border rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 tech-transition glow-primary">
+                  <feature.icon className="w-8 h-8 text-tech-deep-black" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4 group-hover:text-primary transition-colors">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-4 text-tech-primary-green group-hover:text-tech-accent-green tech-transition font-brand neon-text">{feature.title}</h3>
+                <p className="text-tech-gray leading-relaxed font-brand">{feature.description}</p>
               </CardContent>
             </Card>
           ))}
@@ -289,17 +293,17 @@ const Landing = () => {
 
       {/* CTA Section */}
       <section className="container mx-auto px-6 py-20">
-        <Card className="bg-gradient-primary border-0 shadow-glow hover-lift animate-scale-in glass relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary-glow/20 to-primary/20 animate-pulse-glow"></div>
+        <Card className="tech-card animate-scale-in relative overflow-hidden glow-primary">
+          <div className="absolute inset-0 bg-gradient-to-r from-tech-primary-green/10 via-tech-accent-green/10 to-tech-primary-green/10 animate-glow-pulse"></div>
           <CardContent className="p-12 text-center relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white animate-fade-in-up">
-              Ready to level up your coding?
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright animate-fade-in-up font-brand">
+              {'>'} Ready to level up your coding?
             </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto animate-fade-in-up animate-delay-200">
+            <p className="text-xl text-tech-gray mb-8 max-w-2xl mx-auto animate-fade-in-up animate-delay-200 font-brand">
               Join thousands of developers who are already tracking their progress with CodeTrail.
             </p>
             <Link to="/signup" className="inline-block animate-scale-in animate-delay-300">
-              <Button size="lg" variant="secondary" className="group shadow-soft hover-lift">
+              <Button size="lg" variant="secondary" className="group tech-button tech-transition animate-glow-pulse">
                 Get Started for Free
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
