@@ -216,25 +216,41 @@ Strong Areas (Top 10):`;
     }
 
     /**
-     * Get total problems solved from DSA analysis
+     * Get total problems solved from DSA analysis (matching dashboard calculation)
      */
     private static async getTotalProblemsFromDSA(userId: string): Promise<number> {
         try {
-            // Get all accepted submissions
+            // Get all submissions (matching dashboard service logic)
             const submissions = await prisma.submission.findMany({
-                where: {
-                    userId,
-                    verdict: { in: ['AC', 'OK'] }
+                where: { userId },
+                include: {
+                    problem: {
+                        select: { externalId: true, tags: true }
+                    }
                 }
             });
 
-            // Count unique problems
-            const uniqueProblems = new Set();
-            submissions.forEach(submission => {
-                uniqueProblems.add(`${submission.platform}-${submission.problemId}`);
-            });
+            // Count unique problems using same logic as dashboard service
+            const solvedProblems = new Set();
 
-            return uniqueProblems.size;
+            submissions
+                .filter(sub => {
+                    // Handle different verdict formats for different platforms
+                    if (sub.platform === 'leetcode') {
+                        return sub.verdict === 'AC' || sub.verdict === 'Accepted';
+                    } else if (sub.platform === 'codeforces') {
+                        return sub.verdict === 'OK';
+                    }
+                    return sub.verdict === 'AC' || sub.verdict === 'OK' || sub.verdict === 'Accepted';
+                })
+                // Exclude daily activity problems (they're only for tracking active days, not actual solved problems)
+                .filter(sub => !sub.problem.tags?.includes('daily-activity'))
+                .forEach(submission => {
+                    const problemKey = `${submission.platform}-${submission.problem.externalId}`;
+                    solvedProblems.add(problemKey);
+                });
+
+            return solvedProblems.size;
         } catch (error) {
             console.error('Error getting total problems count:', error);
             return 0;
@@ -284,6 +300,7 @@ Strong Areas (Top 10):`;
             
             // Calculate total problems solved from DSA data
             const totalProblemsSolved = await this.getTotalProblemsFromDSA(userId);
+            console.log(`🎯 Chatbot: Total problems solved for user ${userId}: ${totalProblemsSolved}`);
 
             // Build context string with comprehensive profile analysis
             let context = `USER PROFILE ANALYSIS:
