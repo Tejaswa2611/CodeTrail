@@ -52,35 +52,35 @@ All colors MUST be HSL.
 @layer components {
   /* Custom markdown styling for chatbot */
   .chatbot-markdown {
-    @apply text-sm leading-relaxed;
+    @apply text-sm leading-relaxed text-card-foreground;
   }
   
   .chatbot-markdown p {
-    @apply mb-2 last:mb-0;
+    @apply mb-3 last:mb-0;
   }
   
   .chatbot-markdown ul {
-    @apply mb-2 last:mb-0 pl-4 list-disc;
+    @apply mb-3 last:mb-0 pl-4 list-disc space-y-1;
   }
   
   .chatbot-markdown ol {
-    @apply mb-2 last:mb-0 pl-4 list-decimal;
+    @apply mb-3 last:mb-0 pl-4 list-decimal space-y-1;
   }
   
   .chatbot-markdown li {
-    @apply mb-1;
+    @apply leading-relaxed;
   }
   
   .chatbot-markdown strong {
-    @apply font-semibold text-gray-900;
+    @apply font-semibold text-foreground;
   }
   
   .chatbot-markdown em {
-    @apply italic;
+    @apply italic text-muted-foreground;
   }
   
   .chatbot-markdown h1, .chatbot-markdown h2, .chatbot-markdown h3 {
-    @apply font-semibold text-gray-900 mb-2 mt-3 first:mt-0;
+    @apply font-semibold text-foreground mb-2 mt-4 first:mt-0;
   }
   
   .chatbot-markdown h1 {
@@ -96,7 +96,19 @@ All colors MUST be HSL.
   }
   
   .chatbot-markdown code {
-    @apply bg-gray-200 px-1 py-0.5 rounded text-xs font-mono;
+    @apply bg-muted/50 px-1.5 py-0.5 rounded text-xs font-mono text-foreground;
+  }
+  
+  .chatbot-markdown pre {
+    @apply bg-muted/30 p-3 rounded-lg mt-2 mb-3 overflow-x-auto;
+  }
+  
+  .chatbot-markdown pre code {
+    @apply bg-transparent p-0;
+  }
+  
+  .chatbot-markdown a {
+    @apply text-primary hover:text-primary/80 underline underline-offset-2;
   }
   
   .chatbot-markdown pre {

@@ -152,11 +152,11 @@ const AICoach = () => {
     }
 
     return (
-        <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen p-3 lg:p-6 gap-4 lg:gap-6">
+        <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 h-screen p-3 lg:p-6 gap-4 lg:gap-6 overflow-hidden">
             {/* Main Content */}
-            <main className="flex-1 flex flex-col gap-4 lg:gap-6">
+            <main className="flex-1 flex flex-col gap-4 lg:gap-6 overflow-y-auto">
                 {/* Header */}
-                <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
+                <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative flex-shrink-0">
                     <div className="absolute top-4 right-4">
                         <div className="group relative">
                             <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
@@ -174,7 +174,7 @@ const AICoach = () => {
                     </div>
                     
                     {/* Tab Navigation */}
-                    <div className="flex gap-2 border-b border-border">
+                    <div className="flex gap-2 border-b border-border flex-shrink-0">
                         <button
                             onClick={() => setActiveTab('mentor')}
                             className={`px-4 py-2 font-medium transition-colors ${
@@ -210,7 +210,7 @@ const AICoach = () => {
 
                 {/* Tab Content */}
                 {activeTab === 'topics' && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 flex-1 overflow-y-auto">
                         <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
                             <div className="absolute top-4 right-4">
                                 <div className="group relative">
@@ -253,7 +253,7 @@ const AICoach = () => {
                 )}
 
                 {activeTab === 'questions' && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 flex-1 overflow-y-auto">
                         <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
                             <div className="absolute top-4 right-4">
                                 <div className="group relative">
@@ -338,8 +338,8 @@ const AICoach = () => {
                 )}
 
                 {activeTab === 'mentor' && (
-                    <div className="space-y-6">
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
+                    <div className="space-y-6 flex-1 overflow-hidden">
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative h-full flex flex-col overflow-hidden">
                             <div className="absolute top-4 right-4">
                                 <div className="group relative">
                                     <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
@@ -348,7 +348,7 @@ const AICoach = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center justify-between mb-4 flex-shrink-0">
                                 <h2 className="text-xl font-semibold flex items-center gap-2">
                                     <Brain className="w-5 h-5" />
                                     AI Mentor
@@ -356,7 +356,7 @@ const AICoach = () => {
                             </div>
 
                             {/* AI Chatbot Component */}
-                            <div className="h-[600px] flex justify-center">
+                            <div className="flex-1 flex justify-center overflow-hidden">
                                 <AIChatbot suggestedQuestions={[
                                     "How can I improve my problem-solving speed?",
                                     "What topics should I focus on next?",
