@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard2";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import AICoach from "./pages/AICoach";
+import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -87,12 +88,7 @@ const App = () => (
               <Route path="/analytics" element={
                 <ProtectedRoute>
                   <Layout>
-                    <div className="flex items-center justify-center min-h-96">
-                      <div className="text-center">
-                        <h2 className="text-2xl font-bold text-foreground mb-2">Analytics Page</h2>
-                        <p className="text-muted-foreground">Coming soon...</p>
-                      </div>
-                    </div>
+                    <Analytics />
                   </Layout>
                 </ProtectedRoute>
               } />
