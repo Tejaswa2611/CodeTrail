@@ -99,21 +99,21 @@ export default function Signup() {
                     <div className="text-center animate-scale-in animate-delay-200">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center shadow-lg animate-floating">
-                                <span className="text-primary-foreground font-bold text-2xl">C</span>
+                                <span className="text-primary-foreground font-bold text-2xl">&lt;&gt;</span>
                             </div>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 animate-fade-in-up animate-delay-300">
+                        <h1 className="text-3xl md:text-4xl font-bold mb-2 animate-fade-in-up animate-delay-300 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                             Join CodeTrail
                         </h1>
-                        <p className="text-white/90 text-lg animate-fade-in-up animate-delay-500">
+                        <p className="text-muted-foreground text-lg animate-fade-in-up animate-delay-500">
                             Start tracking your coding journey today
                         </p>
                     </div>
 
-                    <Card className="shadow-glow glass animate-scale-in animate-delay-300 hover-lift">
+                    <Card className="shadow-glow glass animate-scale-in animate-delay-300 hover-lift tech-card-enhanced">
                         <CardHeader className="text-center">
-                            <CardTitle className="text-xl font-semibold">Create your account</CardTitle>
-                            <CardDescription>
+                            <CardTitle className="text-xl font-semibold terminal-text text-tech-primary-green" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>Create your account</CardTitle>
+                            <CardDescription className="text-tech-gray">
                                 Choose your preferred sign-up method to get started
                             </CardDescription>
                         </CardHeader>
@@ -200,7 +200,8 @@ export default function Signup() {
                                 <Button
                                     type="submit"
                                     size="lg"
-                                    className="w-full bg-gradient-primary hover-lift shadow-glow group"
+                                    variant="gradient"
+                                    className="w-full group terminal-text glow-primary hover:shadow-glow"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (
@@ -233,7 +234,7 @@ export default function Signup() {
                                     disabled={isLoading}
                                     variant="outline"
                                     size="lg"
-                                    className="group hover-lift glass"
+                                    className="group hover-lift glass hover:glow-primary hover:border-tech-primary-green hover:text-tech-primary-green terminal-text"
                                 >
                                     <Github className="h-5 w-5" />
                                     <span className="sr-only">Sign up with GitHub</span>
@@ -244,7 +245,7 @@ export default function Signup() {
                                     disabled={isLoading}
                                     variant="outline"
                                     size="lg"
-                                    className="group hover-lift glass"
+                                    className="group hover-lift glass hover:glow-primary hover:border-tech-primary-green hover:text-tech-primary-green terminal-text"
                                 >
                                     <Mail className="h-5 w-5" />
                                     <span className="sr-only">Sign up with Google</span>
@@ -255,18 +256,18 @@ export default function Signup() {
                         </CardContent>
                     </Card>
 
-                    <div className="text-center text-sm text-white/60">
+                    <div className="text-center text-sm text-muted-foreground">
                         Already have an account?{' '}
-                        <Link to="/login" replace className="text-white hover:text-white/80 underline">
+                        <Link to="/login" replace className="text-foreground hover:text-primary underline">
                             Sign in here
                         </Link>
                     </div>
 
-                    <div className="text-center text-sm text-white/60">
+                    <div className="text-center text-sm text-muted-foreground">
                         By creating an account, you agree to our{' '}
-                        <a href="#" className="text-white hover:text-white/80 underline">Terms of Service</a>
+                        <a href="#" className="text-foreground hover:text-primary underline">Terms of Service</a>
                         {' '}and{' '}
-                        <a href="#" className="text-white hover:text-white/80 underline">Privacy Policy</a>.
+                        <a href="#" className="text-foreground hover:text-primary underline">Privacy Policy</a>.
                     </div>
 
 

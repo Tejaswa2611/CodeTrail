@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, Loader2, HelpCircle } from 'lucide-react';
+import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, HelpCircle } from 'lucide-react';
 import { fetchDashboardData, DashboardStats, dashboardApi } from '../services/apiService';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorToastConfig, logError, safeAsync } from '@/utils/errorHandling';
 import ContestRatingGraph from '../components/ContestRatingGraph';
+import MatrixLoader, { MatrixSpinner, MatrixSkeleton } from '../components/MatrixLoader';
 import { useTheme } from '../contexts/ThemeContext';
 
 // Import platform images
@@ -231,21 +232,29 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
             <div className="flex flex-col items-center gap-2">
                 <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-hacker-green via-hacker-green-bright to-hacker-green rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2 text-hacker-black hacker-glow">
                     {isLoading ? (
-                        <Loader2 className="w-8 h-8 animate-spin text-hacker-green" />
+                        <MatrixLoader size="md" />
                     ) : (
                         userProfile?.firstName?.[0]?.toUpperCase() || 'U'
                     )}
                 </div>
                 <h2 className="text-lg lg:text-xl font-semibold text-center text-hacker-green-bright font-mono">
-                    {isLoading ? 'Loading...' : (
+                    {isLoading ? (
+                        <MatrixSkeleton lines={1} className="w-32 mx-auto" />
+                    ) : (
                         userProfile ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim() : 'User'
                     )}
                 </h2>
                 <p className="text-hacker-green text-sm font-mono">
-                    {isLoading ? '...' : userProfile?.email || 'No email'}
+                    {isLoading ? (
+                        <MatrixSkeleton lines={1} className="w-24 mx-auto" />
+                    ) : (
+                        userProfile?.email || 'No email'
+                    )}
                 </p>
                 <p className="text-xs text-hacker-green-dark font-mono">
-                    {'>'} Joined: {isLoading ? '...' : (
+                    {'>'} Joined: {isLoading ? (
+                        <MatrixSkeleton lines={1} className="w-20 inline-block" />
+                    ) : (
                         userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Unknown'
                     )}
                 </p>
@@ -293,7 +302,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                                         disabled={isSaving}
                                         className="flex-1 px-3 py-2 bg-hacker-success text-hacker-black text-xs rounded-md hover:bg-hacker-success/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium font-mono hacker-glow"
                                     >
-                                        {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                        {isSaving && <MatrixSpinner size="sm" />}
                                         {isSaving ? 'Syncing...' : 'Save & Sync'}
                                     </button>
                                     <button
@@ -345,7 +354,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                                         disabled={isSaving}
                                         className="flex-1 px-3 py-2 bg-hacker-success text-hacker-black text-xs rounded-md hover:bg-hacker-success/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium font-mono hacker-glow"
                                     >
-                                        {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                                        {isSaving && <MatrixSpinner size="sm" />}
                                         {isSaving ? 'Saving...' : 'Save'}
                                     </button>
                                     <button
@@ -378,19 +387,19 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                     <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
                         <span className="text-hacker-green-dark">Problems Solved:</span>
                         <span className="font-medium text-hacker-green">
-                            {isLoading ? '...' : (data?.totalQuestions?.total || 0)}
+                            {isLoading ? <MatrixSkeleton lines={1} className="w-8 h-3" /> : (data?.totalQuestions?.total || 0)}
                         </span>
                     </div>
                     <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
                         <span className="text-hacker-green-dark">Active Days:</span>
                         <span className="font-medium text-hacker-green">
-                            {isLoading ? '...' : (data?.totalActiveDays?.total || 0)}
+                            {isLoading ? <MatrixSkeleton lines={1} className="w-8 h-3" /> : (data?.totalActiveDays?.total || 0)}
                         </span>
                     </div>
                     <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
                         <span className="text-hacker-green-dark">Contests:</span>
                         <span className="font-medium text-hacker-green">
-                            {isLoading ? '...' : (data?.totalContests?.total || 0)}
+                            {isLoading ? <MatrixSkeleton lines={1} className="w-8 h-3" /> : (data?.totalContests?.total || 0)}
                         </span>
                     </div>
                 </div>
@@ -795,7 +804,7 @@ const Dashboard2 = () => {
                                 Retrying automatically... ({retryCount}/{maxRetries})
                             </p>
                             <div className="flex items-center justify-center">
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                <MatrixSpinner size="sm" className="mr-2" />
                                 <span className="text-sm">Please wait</span>
                             </div>
                         </div>
@@ -844,7 +853,7 @@ const Dashboard2 = () => {
                         </div>
                         <div className="text-sm text-hacker-green-dark mb-2 font-mono uppercase tracking-wider">Total Questions</div>
                         <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
-                            {isLoading ? <Loader2 className="w-8 h-8 animate-spin text-hacker-green" /> : formatNumber(getTotalQuestions())}
+                            {isLoading ? <MatrixLoader size="md" /> : formatNumber(getTotalQuestions())}
                         </div>
                     </div>
                     {/* Total Active Days */}
@@ -854,7 +863,7 @@ const Dashboard2 = () => {
                         </div>
                         <div className="text-sm text-hacker-green-dark mb-2 font-mono uppercase tracking-wider">Active Days</div>
                         <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
-                            {isLoading ? <Loader2 className="w-8 h-8 animate-spin text-hacker-green" /> : formatNumber(getTotalActiveDays())}
+                            {isLoading ? <MatrixLoader size="md" /> : formatNumber(getTotalActiveDays())}
                         </div>
                     </div>
                     {/* Heatmap */}
@@ -881,7 +890,7 @@ const Dashboard2 = () => {
                         {/* Monthly Heatmap */}
                         {isLoading ? (
                             <div className="flex items-center justify-center h-24">
-                                <Loader2 className="w-6 h-6 animate-spin" />
+                                <MatrixLoader size="md" text="Loading heatmap..." />
                             </div>
                         ) : (
                             <div className="space-y-1">
@@ -996,7 +1005,7 @@ const Dashboard2 = () => {
                                     <div className="text-lg font-semibold mb-2">Total Contests</div>
                                     <div className="text-4xl lg:text-5xl font-bold text-foreground">
                                         {isLoading ? (
-                                            <Loader2 className="w-12 h-12 animate-spin" />
+                                            <MatrixLoader size="lg" />
                                         ) : (
                                             (() => {
                                                 try {
@@ -1096,7 +1105,7 @@ const Dashboard2 = () => {
                                 <h3 className="text-lg font-semibold mb-4 text-center">Contest Rankings</h3>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
-                                        <Loader2 className="w-8 h-8 animate-spin" />
+                                        <MatrixLoader size="md" text="Loading rankings..." />
                                     </div>
                                 ) : (
                                     <>
@@ -1180,7 +1189,7 @@ const Dashboard2 = () => {
                                 <div className="text-lg font-semibold mb-2">Problems Solved</div>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
-                                        <Loader2 className="w-8 h-8 animate-spin" />
+                                        <MatrixLoader size="md" text="Loading problems..." />
                                     </div>
                                 ) : (
                                     <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center">
@@ -1274,7 +1283,7 @@ const Dashboard2 = () => {
                             <div className="flex items-center justify-between mb-4 flex-shrink-0">
                                 <span className="text-lg font-semibold">DSA Topic Analysis</span>
                                 <div className="flex items-center gap-2">
-                                    {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    {isLoading && <MatrixSpinner size="sm" />}
                                     {(() => {
                                         try {
                                             const analysisResult = topicAnalysis;

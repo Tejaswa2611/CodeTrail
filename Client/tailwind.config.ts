@@ -86,14 +86,15 @@ export default {
 					success: 'hsl(var(--hacker-success))',
 					warning: 'hsl(var(--hacker-warning))'
 				},
+				'neon-green': 'hsl(var(--neon-green))',
 				tech: {
-					'primary-green': 'hsl(120, 100%, 50%)', // #00ff00 - Neon green
-					'accent-green': 'hsl(120, 100%, 45%)', // #00e600 - Bright neon green
-					'dark-green': 'hsl(120, 100%, 15%)', // Dark green variation
-					'deep-black': 'hsl(0, 0%, 4%)', // #0a0a0a - Deep black
-					'tech-gray': 'hsl(0, 0%, 85%)', // Light gray for text
-					'tech-border': 'hsl(120, 100%, 25%)', // Green border
-					'tech-glow': 'hsl(120, 100%, 50%)', // Glow color
+					'primary-green': 'hsl(var(--hacker-green))', // Dynamic green
+					'accent-green': 'hsl(var(--hacker-green-bright))', // Dynamic bright green
+					'dark-green': 'hsl(var(--hacker-green-dark))', // Dynamic dark green
+					'deep-black': 'hsl(var(--hacker-black))', // Dynamic black/dark
+					'tech-gray': 'hsl(var(--muted-foreground))', // Dynamic gray for text
+					'tech-border': 'hsl(var(--border))', // Dynamic border
+					'tech-glow': 'hsl(var(--hacker-green))', // Dynamic glow color
 				}
 			},
 			backgroundImage: {
@@ -113,7 +114,7 @@ export default {
 			},
 			fontFamily: {
 				'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-				'mono': ['Courier New', 'monospace'],
+				'mono': ['JetBrains Mono', 'Courier New', 'monospace'],
 				'brand': ['Inter', 'system-ui', '-apple-system', 'sans-serif']
 			},
 			borderRadius: {

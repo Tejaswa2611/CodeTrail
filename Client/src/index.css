@@ -6,44 +6,46 @@
 
 @layer base {
   :root {
-    /* HACKER THEME - Black & Green Matrix Style */
-    --background: 0 0% 0%; /* #000000 - Pure black background */
-    --foreground: 142 76% 36%; /* #10B981 - Classic hacker green */
+    /* LIGHT MODE - Clean off-white with Matrix green accents */
+    --background: 0 0% 98%; /* #fafafa - Off-white background */
+    --foreground: 0 0% 15%; /* #262626 - Dark gray text */
 
-    --card: 120 100% 3%; /* #001100 - Very dark green card background */
-    --card-foreground: 142 76% 36%; /* #10B981 - Hacker green text */
+    --card: 0 0% 96%; /* #f5f5f5 - Light gray cards */
+    --card-foreground: 0 0% 15%; /* #262626 - Dark gray text */
 
-    --popover: 0 0% 3%; /* #080808 - Near black popover */
-    --popover-foreground: 142 76% 36%; /* #10B981 - Green text */
+    --popover: 0 0% 98%; /* #fafafa - Off-white popover */
+    --popover-foreground: 0 0% 15%; /* #262626 - Dark gray text */
 
-    --primary: 142 76% 36%; /* #10B981 - Hacker green primary */
-    --primary-foreground: 0 0% 0%; /* #000000 - Black text on green */
-    --primary-glow: 142 76% 36%; /* Green glow effect */
+    --primary: 120 100% 25%; /* #008000 - Rich green primary */
+    --primary-foreground: 0 0% 100%; /* #ffffff - White text on green */
 
-    --secondary: 120 100% 8%; /* #002200 - Dark green secondary */
-    --secondary-foreground: 142 76% 36%; /* #10B981 - Green text */
+    --secondary: 0 0% 94%; /* #f0f0f0 - Light gray secondary */
+    --secondary-foreground: 0 0% 15%; /* #262626 - Dark gray text */
 
-    --muted: 120 100% 5%; /* #001A00 - Muted dark green */
-    --muted-foreground: 142 30% 25%; /* #4B7C59 - Muted green text */
+    --muted: 0 0% 94%; /* #f0f0f0 - Light gray muted */
+    --muted-foreground: 0 0% 45%; /* #737373 - Medium gray text */
 
-    --accent: 142 84% 47%; /* #16E678 - Bright accent green */
-    --accent-foreground: 0 0% 0%; /* #000000 - Black on bright green */
+    --accent: 120 100% 35%; /* #00b300 - Bright green accent */
+    --accent-foreground: 0 0% 100%; /* #ffffff - White text on green */
 
     --destructive: 0 84% 60%; /* Red for errors */
     --destructive-foreground: 0 0% 100%; /* White text on red */
 
-    --border: 142 76% 15%; /* #0F5F3F - Green border */
-    --input: 120 100% 5%; /* #001A00 - Dark green input background */
-    --ring: 142 84% 47%; /* #16E678 - Bright green focus ring */
+    --border: 0 0% 88%; /* #e0e0e0 - Light gray border */
+    --input: 0 0% 96%; /* #f5f5f5 - Light gray input background */
+    --ring: 120 100% 35%; /* #00b300 - Green focus ring */
 
-    /* Custom hacker theme colors */
-    --hacker-black: 0 0% 0%; /* #000000 - Pure black */
-    --hacker-green: 142 76% 36%; /* #10B981 - Classic green */
-    --hacker-green-bright: 142 84% 47%; /* #16E678 - Bright green */
-    --hacker-green-dark: 142 30% 25%; /* #4B7C59 - Dark green */
-    --hacker-green-muted: 120 100% 5%; /* #001A00 - Very muted green */
-    --hacker-success: 120 60% 50%; /* #4ADE80 - Success green */
-    --hacker-warning: 45 93% 47%; /* #F59E0B - Orange warning */
+    /* Hacker theme colors - Matrix in daylight */
+    --hacker-black: 0 0% 15%; /* Dark gray instead of black */
+    --hacker-green: 120 100% 35%; /* #00b300 - Matrix green */
+    --hacker-green-bright: 120 100% 30%; /* #009900 - Bright matrix green */
+    --hacker-green-dark: 120 100% 20%; /* #006600 - Dark matrix green */
+    --hacker-green-muted: 120 30% 96%; /* Very light green tint */
+    --hacker-success: 120 60% 40%; /* Success green */
+    --hacker-warning: 45 93% 47%; /* Orange warning */
+
+    /* Neon green for terminal text - vibrant but readable on off-white */
+    --neon-green: 120 100% 30%; /* #009900 - Vibrant green for terminal */
 
     --radius: 0.5rem;
   }
@@ -85,18 +87,30 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+    font-family: 'Inter', 'system-ui', '-apple-system', sans-serif !important;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    background: hsl(0, 0%, 4%); /* Deep black */
-    color: hsl(0, 0%, 85%); /* Light gray */
+    font-display: swap;
+    /* Remove fixed colors, let CSS variables handle theme switching */
+  }
+
+  /* Force font loading */
+  @font-face {
+    font-family: 'JetBrains Mono Fallback';
+    src: local('JetBrains Mono'), local('Courier New'), monospace;
+    font-display: swap;
   }
 
   .font-mono {
-    font-family: 'Courier New', monospace;
+    font-family: 'JetBrains Mono', 'JetBrains Mono Fallback', 'Courier New', monospace !important;
+    font-display: swap;
   }
 
   .font-brand {
-    font-family: 'Inter', 'system-ui', '-apple-system', sans-serif;
+    font-family: 'Inter', 'system-ui', '-apple-system', sans-serif !important;
+  }
+
+  .font-sans {
+    font-family: 'Inter', 'system-ui', '-apple-system', sans-serif !important;
   }
 }
 
@@ -177,44 +191,114 @@
     border: 1px solid hsl(120, 100%, 60%);
   }
   
-  /* Terminal Text Effect */
+  /* Terminal Text Effect - Matrix style for both themes */
   .terminal-text {
-    font-family: 'Courier New', monospace;
-    color: hsl(120, 100%, 50%);
-    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-    letter-spacing: 0.02em;
+    font-family: 'JetBrains Mono', 'JetBrains Mono Fallback', 'Courier New', monospace !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  /* Light mode terminal text - Matrix green on white */
+  :root .terminal-text {
+    color: hsl(var(--neon-green)) !important;
+    text-shadow: 
+      0 0 10px hsl(var(--neon-green) / 0.4),
+      0 0 20px hsl(var(--neon-green) / 0.2),
+      0 0 30px hsl(var(--neon-green) / 0.1) !important;
+  }
+
+  /* Dark mode terminal text - Bright neon green */
+  .dark .terminal-text {
+    color: hsl(var(--neon-green)) !important;
+    text-shadow: 
+      0 0 10px hsl(var(--neon-green) / 0.5),
+      0 0 20px hsl(var(--neon-green) / 0.3),
+      0 0 40px hsl(var(--neon-green) / 0.2) !important;
+  }
+
+  /* Terminal text with specific neon green color */
+  .terminal-text.text-neon-green {
+    color: hsl(var(--neon-green)) !important;
+    text-shadow: 0 0 5px hsl(var(--neon-green) / 0.3) !important;
+  }
+
+  /* Ensure terminal text overrides other font classes */
+  h1.terminal-text,
+  .terminal-text h1,
+  span.terminal-text {
+    font-family: 'JetBrains Mono', 'JetBrains Mono Fallback', 'Courier New', monospace !important;
   }
   
-  /* Tech Card Styling */
+  /* Tech Card Styling - Adaptive for light/dark themes */
   .tech-card {
-    background: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(120, 100%, 10%) 100%);
-    border: 1px solid hsl(120, 100%, 25%);
     border-radius: 0.75rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 0, 0.1);
     backdrop-filter: blur(10px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Light mode tech cards - Clean off-white with green accents */
+  :root .tech-card {
+    background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(120, 15%, 97%) 100%);
+    border: 1px solid hsl(120, 20%, 85%);
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.08), 
+      0 0 20px rgba(0, 180, 0, 0.08);
+  }
   
-  .tech-card:hover {
+  :root .tech-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 15px 35px rgba(0, 0, 0, 0.12), 
+      0 0 30px rgba(0, 180, 0, 0.15);
+    border-color: hsl(120, 100%, 35%);
+  }
+
+  /* Dark mode tech cards - Matrix style */
+  .dark .tech-card {
+    background: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(120, 100%, 10%) 100%);
+    border: 1px solid hsl(120, 100%, 25%);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 0, 0.1);
+  }
+  
+  .dark .tech-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 0, 0.3);
     border-color: hsl(120, 100%, 40%);
   }
   
-  /* Tech Background Gradients */
-  .bg-gradient-primary {
+  /* Tech Background Gradients - Adaptive for light/dark themes */
+  
+  /* Light mode backgrounds - Clean off-white with subtle green hints */
+  :root .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(0, 0%, 98%) 0%, hsl(120, 15%, 97%) 50%, hsl(0, 0%, 98%) 100%);
+  }
+  
+  :root .bg-gradient-secondary {
+    background: linear-gradient(135deg, hsl(120, 15%, 97%) 0%, hsl(0, 0%, 98%) 100%);
+  }
+  
+  :root .bg-gradient-hero {
+    background: linear-gradient(135deg, hsl(0, 0%, 98%) 0%, hsl(120, 10%, 98%) 25%, hsl(0, 0%, 98%) 100%);
+  }
+  
+  :root .bg-gradient-card {
+    background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(120, 15%, 97%) 100%);
+  }
+
+  /* Dark mode backgrounds - Matrix style */
+  .dark .bg-gradient-primary {
     background: linear-gradient(135deg, hsl(0, 0%, 4%) 0%, hsl(120, 100%, 8%) 50%, hsl(0, 0%, 4%) 100%);
   }
   
-  .bg-gradient-secondary {
+  .dark .bg-gradient-secondary {
     background: linear-gradient(135deg, hsl(120, 100%, 8%) 0%, hsl(0, 0%, 4%) 100%);
   }
   
-  .bg-gradient-hero {
+  .dark .bg-gradient-hero {
     background: linear-gradient(135deg, hsl(0, 0%, 4%) 0%, hsl(120, 100%, 6%) 25%, hsl(0, 0%, 4%) 100%);
   }
   
-  .bg-gradient-card {
+  .dark .bg-gradient-card {
     background: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(120, 100%, 10%) 100%);
   }
   
@@ -223,13 +307,35 @@
     animation: animate-float 4s ease-in-out infinite;
   }
   
-  /* Matrix-style background effect - Updated */
-  .matrix-bg {
+  /* Matrix-style background effect - Adaptive for light/dark themes */
+  
+  /* Light mode matrix - Clean off-white with subtle green pattern */
+  :root .matrix-bg {
+    background: linear-gradient(135deg, hsl(0, 0%, 98%) 0%, hsl(120, 10%, 98%) 25%, hsl(0, 0%, 98%) 100%);
+    position: relative;
+  }
+  
+  :root .matrix-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(120, 100%, 35% / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsl(120, 100%, 35% / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, hsl(120, 100%, 35% / 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Dark mode matrix - Traditional Matrix style */
+  .dark .matrix-bg {
     background: linear-gradient(135deg, hsl(0, 0%, 4%) 0%, hsl(120, 100%, 6%) 25%, hsl(0, 0%, 4%) 100%);
     position: relative;
   }
   
-  .matrix-bg::before {
+  .dark .matrix-bg::before {
     content: '';
     position: absolute;
     top: 0;
@@ -344,13 +450,26 @@
     border-color: hsl(120, 100%, 60%);
   }
   
-  /* Neon Text Effects */
-  .neon-text {
+  /* Neon Text Effects - Adaptive for light/dark themes */
+  
+  /* Light mode neon text - Subtle green with minimal glow */
+  :root .neon-text {
+    color: hsl(120, 100%, 25%);
+    text-shadow: 0 0 5px rgba(0, 180, 0, 0.3);
+  }
+  
+  :root .neon-text-bright {
+    color: hsl(120, 100%, 30%);
+    text-shadow: 0 0 8px rgba(0, 180, 0, 0.4), 0 0 15px rgba(0, 180, 0, 0.2);
+  }
+
+  /* Dark mode neon text - Full Matrix glow */
+  .dark .neon-text {
     color: hsl(120, 100%, 50%);
     text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.5);
   }
   
-  .neon-text-bright {
+  .dark .neon-text-bright {
     color: hsl(120, 100%, 60%);
     text-shadow: 0 0 15px rgba(0, 255, 0, 1), 0 0 30px rgba(0, 255, 0, 0.7);
   }
@@ -476,13 +595,76 @@
   
   /* Glass morphism effect with hacker theme */
   .glass {
-    background: rgba(0, 20, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid hsl(var(--hacker-green) / 0.2);
+    background: rgba(0, 40, 0, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--hacker-green) / 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 255, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass:hover {
+    background: rgba(0, 50, 0, 0.7);
+    border: 1px solid hsl(var(--hacker-green) / 0.6);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 35px rgba(0, 255, 0, 0.25);
+    transform: translateY(-2px);
   }
   
   .dark .glass {
-    background: rgba(0, 20, 0, 0.3);
-    border: 1px solid hsl(var(--hacker-green) / 0.1);
+    background: rgba(0, 40, 0, 0.6);
+    border: 1px solid hsl(var(--hacker-green) / 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 255, 0, 0.2);
+  }
+
+  .dark .glass:hover {
+    background: rgba(0, 50, 0, 0.8);
+    border: 1px solid hsl(var(--hacker-green) / 0.7);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 255, 0, 0.3);
+  }
+
+  /* Shadow glow utility */
+  .shadow-glow {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 25px rgba(0, 255, 0, 0.15);
+  }
+
+  .shadow-glow:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 35px rgba(0, 255, 0, 0.25);
+  }
+
+  /* Glow utility for hover effects */
+  .hover\:glow-primary:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4), 0 0 40px rgba(0, 255, 0, 0.2);
+  }
+
+  /* Enhanced button glow effects */
+  .btn-primary-glow {
+    background: linear-gradient(135deg, hsl(120, 100%, 50%) 0%, hsl(120, 100%, 45%) 100%);
+    box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+    border: 1px solid hsl(120, 100%, 50%);
+    color: hsl(0, 0%, 0%);
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-primary-glow:hover {
+    background: linear-gradient(135deg, hsl(120, 100%, 55%) 0%, hsl(120, 100%, 50%) 100%);
+    box-shadow: 0 8px 25px rgba(0, 255, 0, 0.5), 0 0 30px rgba(0, 255, 0, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Enhanced tech card with better visibility */
+  .tech-card-enhanced {
+    background: linear-gradient(135deg, rgba(0, 40, 0, 0.8) 0%, rgba(0, 60, 0, 0.6) 100%);
+    border: 1px solid hsl(120, 100%, 30%);
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 255, 0, 0.15);
+    backdrop-filter: blur(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .tech-card-enhanced:hover {
+    transform: translateY(-4px);
+    background: linear-gradient(135deg, rgba(0, 50, 0, 0.9) 0%, rgba(0, 70, 0, 0.7) 100%);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 255, 0, 0.3);
+    border-color: hsl(120, 100%, 45%);
   }
 }

@@ -1,22 +1,43 @@
 import { useState, useEffect } from "react";
-import { ArrowRight, Code, TrendingUp, Target, Github, Star, Users, Zap, CheckCircle } from "lucide-react";
+import { ArrowRight, Code, TrendingUp, Target, Github, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Link } from "react-router-dom";
 import dashboardDemo from "@/assets/dashboard-demo.jpg";
+import leetcodeDark from "@/assets/leetcode_dark.png";
+import leetcodeLight from "@/assets/leetcode_light.png";
+import codeforcesDark from "@/assets/codeforces_dark.png";
+import codeforcesLight from "@/assets/codeforces_light.png";
+import codechefDark from "@/assets/codechef_dark.png";
+import codechefLight from "@/assets/codechef_light.png";
+import codestudioDark from "@/assets/codestudio_dark.png";
+import codestudioLight from "@/assets/codestudio_light.png";
+import gfgLogo from "@/assets/gfg.png";
+import interviewbitLogo from "@/assets/interviewbit.png";
 
 const Landing = () => {
+  const { actualTheme } = useTheme();
   const [currentDemo, setCurrentDemo] = useState(0);
   const [typewriterText, setTypewriterText] = useState("");
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   
+  // Ensure fonts are loaded
+  useEffect(() => {
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        console.log('Fonts loaded successfully');
+      });
+    }
+  }, []);
+  
   // Typewriter effect for both lines with continuous loop
   useEffect(() => {
     const lines = [
-      "Track your coding journey.",
-      "Let AI guide your next step."
+      "<> Track your coding journey.",
+      "<> Let AI guide your next step."
     ];
     
     let charIndex = 0;
@@ -132,10 +153,38 @@ const Landing = () => {
     }
   ];
 
-  const stats = [
-    { label: "Active Users", value: "10K+", icon: Users },
-    { label: "Problems Solved", value: "500K+", icon: CheckCircle },
-    { label: "GitHub Stars", value: "2.5K+", icon: Star }
+  // Platform logos based on theme
+  const platforms = [
+    { 
+      name: "LeetCode", 
+      logo: actualTheme === 'dark' ? leetcodeDark : leetcodeLight,
+      alt: "LeetCode"
+    },
+    { 
+      name: "Codeforces", 
+      logo: actualTheme === 'dark' ? codeforcesDark : codeforcesLight,
+      alt: "Codeforces"
+    },
+    { 
+      name: "CodeChef", 
+      logo: actualTheme === 'dark' ? codechefDark : codechefLight,
+      alt: "CodeChef"
+    },
+    { 
+      name: "GeeksforGeeks", 
+      logo: gfgLogo,
+      alt: "GeeksforGeeks"
+    },
+    { 
+      name: "CodeStudio", 
+      logo: actualTheme === 'dark' ? codestudioDark : codestudioLight,
+      alt: "CodeStudio"
+    },
+    { 
+      name: "InterviewBit", 
+      logo: interviewbitLogo,
+      alt: "InterviewBit"
+    }
   ];
 
   return (
@@ -153,15 +202,11 @@ const Landing = () => {
           </Badge>
           
           <div className="mb-6">
-            <h1 className="text-5xl md:text-7xl font-bold leading-tight min-h-[2em] font-brand neon-text-bright">
-              <span className={`${
-                typewriterText.includes('Track') 
-                  ? 'text-tech-primary-green' 
-                  : 'text-tech-accent-green'
-              }`}>
+            <h1 className={`text-5xl md:text-7xl font-bold leading-tight min-h-[2em] terminal-text`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+              <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                 {typewriterText}
               </span>
-              <span className="animate-pulse text-tech-accent-green">|</span>
+              <span className={`animate-pulse terminal-text`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>|</span>
             </h1>
           </div>
           
@@ -177,25 +222,41 @@ const Landing = () => {
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto group tech-transition border-tech-border text-tech-primary-green hover:bg-tech-dark-green hover:text-tech-accent-green font-brand glow-primary">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="w-full sm:w-auto group tech-transition border-tech-border text-tech-primary-green hover:bg-tech-dark-green hover:text-tech-accent-green font-brand glow-primary"
+              onClick={() => window.open('https://github.com/Tejaswa2611/CodeTrail', '_blank')}
+            >
               <Github className="mr-2 w-4 h-4" />
               View on GitHub
             </Button>
           </div>
           
-          {/* Stats */}
-          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center animate-fade-in-up animate-delay-1400">
-            {stats.map((stat, index) => (
-              <div key={index} className="tech-card animate-float p-4 rounded-tech">
-                <div className="flex items-center space-x-3">
-                  <stat.icon className="w-6 h-6 text-tech-accent-green animate-tech-glow" />
-                  <div className="text-left">
-                    <div className="font-bold text-tech-primary-green font-brand text-lg neon-text">{stat.value}</div>
-                    <div className="text-tech-gray font-brand text-sm">{stat.label}</div>
+          {/* Supported Platforms */}
+          <div className="animate-fade-in-up animate-delay-1400">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                {'<>'} _Supported Platforms_
+              </h3>
+             
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-center items-center max-w-4xl mx-auto">
+              {platforms.map((platform, index) => (
+                <div key={index} className="tech-card animate-float p-4 rounded-tech hover:tech-card-hover transition-all duration-300 hover:scale-105">
+                  <div className="flex flex-col items-center space-y-3">
+                    <img 
+                      src={platform.logo} 
+                      alt={platform.alt}
+                      className="w-10 h-10 object-contain animate-tech-glow"
+                    />
+                    <div className="text-center">
+                      <div className="font-bold text-tech-primary-green font-brand text-xs neon-text">{platform.name}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -203,7 +264,7 @@ const Landing = () => {
       {/* Demo Section */}
       <section id="demo" className="container mx-auto px-6 py-16 relative">
         <div className="text-center mb-8 animate-fade-in-up">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
             {'>'} See CodeTrail in Action
           </h2>
           <p className="text-xl text-tech-gray max-w-2xl mx-auto font-brand">
@@ -215,7 +276,7 @@ const Landing = () => {
           <Card className="tech-card overflow-hidden">
             <CardContent className="p-6">
               <div className="text-center mb-4">
-                <h3 className="text-xl font-semibold terminal-text mb-1 font-brand">
+                <h3 className="text-xl font-semibold terminal-text mb-1 font-brand" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                   [System] {demoTitles[currentDemo]}
                 </h3>
                 <p className="text-sm text-tech-gray font-brand">
@@ -268,8 +329,8 @@ const Landing = () => {
       {/* Features Section */}
       <section id="features" className="container mx-auto px-6 py-20 relative">
         <div className="text-center mb-16 animate-fade-in-up">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand">
-            {'>'} Powerful Features
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+            {'<>'} Powerful Features
           </h2>
           <p className="text-xl text-tech-gray max-w-2xl mx-auto font-brand">
             Everything you need to accelerate your coding journey
@@ -283,7 +344,7 @@ const Landing = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-tech-primary-green to-tech-accent-green border border-tech-border rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 tech-transition glow-primary">
                   <feature.icon className="w-8 h-8 text-tech-deep-black" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-tech-primary-green group-hover:text-tech-accent-green tech-transition font-brand neon-text">{feature.title}</h3>
+                <h3 className="text-xl font-semibold mb-4 text-tech-primary-green group-hover:text-tech-accent-green tech-transition font-brand neon-text terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>{feature.title}</h3>
                 <p className="text-tech-gray leading-relaxed font-brand">{feature.description}</p>
               </CardContent>
             </Card>
@@ -296,8 +357,8 @@ const Landing = () => {
         <Card className="tech-card animate-scale-in relative overflow-hidden glow-primary">
           <div className="absolute inset-0 bg-gradient-to-r from-tech-primary-green/10 via-tech-accent-green/10 to-tech-primary-green/10 animate-glow-pulse"></div>
           <CardContent className="p-12 text-center relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright animate-fade-in-up font-brand">
-              {'>'} Ready to level up your coding?
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright animate-fade-in-up font-brand terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+              {'<>'} Ready to level up your coding?
             </h2>
             <p className="text-xl text-tech-gray mb-8 max-w-2xl mx-auto animate-fade-in-up animate-delay-200 font-brand">
               Join thousands of developers who are already tracking their progress with CodeTrail.

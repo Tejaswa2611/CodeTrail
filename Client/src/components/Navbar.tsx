@@ -3,6 +3,7 @@ import { Code, LogOut, User, Settings, Bell, HelpCircle, Shield } from "lucide-r
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,6 +22,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
     const location = useLocation();
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
+    const { actualTheme } = useTheme();
 
     const handleLogout = async () => {
         try {
@@ -104,7 +106,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                     <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center hover:shadow-lg tech-transition glow-primary">
                         <Code className="w-3 h-3 sm:w-4 sm:h-4 text-tech-deep-black" />
                     </div>
-                    <span className="text-lg sm:text-xl font-bold neon-text font-brand">
+                    <span className={`text-lg sm:text-xl font-bold terminal-text ${actualTheme === 'dark' ? 'text-neon-green' : 'text-primary'}`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                         CodeTrail
                     </span>
                 </button>
@@ -121,7 +123,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center glow-primary">
                     <Code className="w-3 h-3 sm:w-4 sm:h-4 text-tech-deep-black" />
                 </div>
-                <span className="text-lg sm:text-xl font-bold neon-text font-brand">
+                <span className={`text-lg sm:text-xl font-bold terminal-text ${actualTheme === 'dark' ? 'text-neon-green' : 'text-primary'}`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                     CodeTrail
                 </span>
             </Link>
@@ -129,13 +131,15 @@ export function Navbar({ minimal = false }: NavbarProps) {
             <nav className="flex items-center space-x-2 md:space-x-8">
                 <button
                     onClick={() => scrollToSection('features')}
-                    className="hidden md:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    className="hidden md:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer terminal-text"
+                    style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}
                 >
                     Features
                 </button>
                 <button
                     onClick={() => scrollToSection('demo')}
-                    className="hidden md:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    className="hidden md:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer terminal-text"
+                    style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}
                 >
                     Demo
                 </button>
@@ -153,10 +157,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
                         <DropdownMenuContent className="w-56" align="end" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none">
+                                    <p className="text-sm font-medium leading-none terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                         {user?.firstName} {user?.lastName}
                                     </p>
-                                    <p className="text-xs leading-none text-muted-foreground">
+                                    <p className="text-xs leading-none text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                         {user?.email}
                                     </p>
                                 </div>
@@ -164,11 +168,11 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
                             
                             {/* Dashboard & Profile */}
-                            <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                            <DropdownMenuItem onClick={() => navigate('/dashboard')} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Dashboard</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleEditProfile}>
+                            <DropdownMenuItem onClick={handleEditProfile} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Edit Profile</span>
                             </DropdownMenuItem>
@@ -176,15 +180,15 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
                             
                             {/* Settings & Preferences */}
-                            <DropdownMenuItem onClick={handleSettings}>
+                            <DropdownMenuItem onClick={handleSettings} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleNotifications}>
+                            <DropdownMenuItem onClick={handleNotifications} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <Bell className="mr-2 h-4 w-4" />
                                 <span>Notifications</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handlePrivacy}>
+                            <DropdownMenuItem onClick={handlePrivacy} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <Shield className="mr-2 h-4 w-4" />
                                 <span>Privacy & Security</span>
                             </DropdownMenuItem>
@@ -192,7 +196,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
                             
                             {/* Help & Support */}
-                            <DropdownMenuItem onClick={handleHelp}>
+                            <DropdownMenuItem onClick={handleHelp} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <HelpCircle className="mr-2 h-4 w-4" />
                                 <span>Help & Support</span>
                             </DropdownMenuItem>
@@ -200,7 +204,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
                             
                             {/* Sign Out */}
-                            <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
+                            <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <LogOut className="mr-2 h-4 w-4" />
                                 <span>Sign Out</span>
                             </DropdownMenuItem>
@@ -209,12 +213,12 @@ export function Navbar({ minimal = false }: NavbarProps) {
                 ) : (
                     <>
                         <Link to="/login">
-                            <Button variant="outline" size="sm" className="text-xs px-2 py-1 sm:text-sm sm:px-3 sm:py-2">
+                            <Button variant="gradient" size="sm" className="text-xs px-2 py-1 sm:text-sm sm:px-3 sm:py-2 terminal-text text-white" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 Login
                             </Button>
                         </Link>
                         <Link to="/signup" replace>
-                            <Button size="sm" className="text-xs px-2 py-1 sm:text-sm sm:px-3 sm:py-2">
+                            <Button variant="gradient" size="sm" className="text-xs px-2 py-1 sm:text-sm sm:px-3 sm:py-2 terminal-text text-white" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 Get Started
                             </Button>
                         </Link>
