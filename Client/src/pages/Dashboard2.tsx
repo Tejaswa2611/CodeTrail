@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, HelpCircle } from 'lucide-react';
 import { fetchDashboardData, DashboardStats, dashboardApi } from '../services/apiService';
 import { useToast } from '@/hooks/use-toast';
@@ -237,21 +237,21 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                         userProfile?.firstName?.[0]?.toUpperCase() || 'U'
                     )}
                 </div>
-                <h2 className="text-lg lg:text-xl font-semibold text-center text-hacker-green-bright font-mono">
+                <h2 className="text-lg lg:text-xl font-semibold text-center text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                     {isLoading ? (
                         <MatrixSkeleton lines={1} className="w-32 mx-auto" />
                     ) : (
                         userProfile ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim() : 'User'
                     )}
                 </h2>
-                <p className="text-hacker-green text-sm font-mono">
+                <p className="text-hacker-green text-sm terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                     {isLoading ? (
                         <MatrixSkeleton lines={1} className="w-24 mx-auto" />
                     ) : (
                         userProfile?.email || 'No email'
                     )}
                 </p>
-                <p className="text-xs text-hacker-green-dark font-mono">
+                <p className="text-xs text-hacker-green-dark terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                     {'>'} Joined: {isLoading ? (
                         <MatrixSkeleton lines={1} className="w-20 inline-block" />
                     ) : (
@@ -262,15 +262,21 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
 
             {/* Platform Profiles Section */}
             <div>
-                <h3 className="text-sm font-semibold mb-3 text-hacker-green-bright font-mono">{'>'} Connected Platforms</h3>
+                <h3 className="text-sm font-bold mb-3 text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                    {'<>'} Connected Platforms
+                </h3>
                 <div className="space-y-3">
                     {/* LeetCode */}
                     <div className="p-3 rounded-lg bg-hacker-green-muted/30 border border-hacker-green-dark hover:border-hacker-green transition-colors">
                         <div className="flex items-center gap-3 mb-2">
-                            <span className="text-hacker-green font-mono text-sm">[LC]</span>
+                            <img 
+                                src={getPlatformLogo('leetcode', actualTheme)} 
+                                alt="LeetCode" 
+                                className="w-5 h-5 object-contain"
+                            />
 
                             {editingPlatform === 'leetcode' ? (
-                                <div className="flex-1 text-sm font-medium text-hacker-green-bright font-mono">
+                                <div className="flex-1 text-sm font-medium text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                     {'>'} Edit LeetCode Handle
                                 </div>
                             ) : (
@@ -319,10 +325,14 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                     {/* Codeforces */}
                     <div className="p-3 rounded-lg bg-hacker-green-muted/30 border border-hacker-green-dark hover:border-hacker-green transition-colors">
                         <div className="flex items-center gap-3 mb-2">
-                            <span className="text-hacker-green font-mono text-sm">[CF]</span>
+                            <img 
+                                src={getPlatformLogo('codeforces', actualTheme)} 
+                                alt="Codeforces" 
+                                className="w-5 h-5 object-contain"
+                            />
 
                             {editingPlatform === 'codeforces' ? (
-                                <div className="flex-1 text-sm font-medium text-hacker-green-bright font-mono">
+                                <div className="flex-1 text-sm font-medium text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                     {'>'} Edit Codeforces Handle
                                 </div>
                             ) : (
@@ -382,7 +392,9 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
 
             {/* Quick Stats */}
             <div>
-                <h3 className="text-sm font-semibold mb-3 text-hacker-green-bright font-mono">{'>'} Quick Stats</h3>
+                <h3 className="text-sm font-bold mb-3 text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                    {'<>'} Quick Stats
+                </h3>
                 <div className="space-y-2 text-sm font-mono">
                     <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
                         <span className="text-hacker-green-dark">Problems Solved:</span>
@@ -434,6 +446,7 @@ const Dashboard2 = () => {
     const maxRetries = 3;
     const { toast } = useToast();
     const { actualTheme } = useTheme();
+    const heatmapRef = useRef<HTMLDivElement>(null);
 
     // Extract fetchData function to be reusable with useCallback
     const fetchData = useCallback(async () => {
@@ -500,6 +513,19 @@ const Dashboard2 = () => {
 
         initialFetch();
     }, [fetchData, toast, error]); // Now fetchData is properly memoized
+
+    // Scroll heatmap to the latest (rightmost) position when data loads
+    useEffect(() => {
+        if (!isLoading && data && heatmapRef.current) {
+            const timer = setTimeout(() => {
+                if (heatmapRef.current) {
+                    heatmapRef.current.scrollLeft = heatmapRef.current.scrollWidth - heatmapRef.current.clientWidth;
+                }
+            }, 300); // Wait a bit for the component to render completely
+
+            return () => clearTimeout(timer);
+        }
+    }, [isLoading, data]);
 
     // Helper functions for data extraction with error handling
     const getConnectedPlatforms = () => {
@@ -851,7 +877,9 @@ const Dashboard2 = () => {
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined total from all connected platforms" />
                         </div>
-                        <div className="text-sm text-hacker-green-dark mb-2 font-mono uppercase tracking-wider">Total Questions</div>
+                        <div className="text-sm text-hacker-green-dark mb-2 uppercase tracking-wider terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            {'>'} Total Questions
+                        </div>
                         <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
                             {isLoading ? <MatrixLoader size="md" /> : formatNumber(getTotalQuestions())}
                         </div>
@@ -861,7 +889,9 @@ const Dashboard2 = () => {
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined active days from all connected platforms" />
                         </div>
-                        <div className="text-sm text-hacker-green-dark mb-2 font-mono uppercase tracking-wider">Active Days</div>
+                        <div className="text-sm text-hacker-green-dark mb-2 uppercase tracking-wider terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            {'>'} Active Days
+                        </div>
                         <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
                             {isLoading ? <MatrixLoader size="md" /> : formatNumber(getTotalActiveDays())}
                         </div>
@@ -869,8 +899,8 @@ const Dashboard2 = () => {
                     {/* Heatmap */}
                     <div className="md:col-span-2 lg:col-span-8 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300">
                         <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-2 text-xs">
-                            <span className="text-muted-foreground">
-                                {isLoading ? 'Loading...' : 'Activity Overview (All Platforms)'}
+                            <span className="text-hacker-green-bright font-bold terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                {isLoading ? 'Loading...' : '<> Activity Overview (All Platforms)'}
                             </span>
                             <span className="text-muted-foreground">
                                 {(() => {
@@ -895,12 +925,15 @@ const Dashboard2 = () => {
                         ) : (
                             <div className="space-y-1">
                                 {/* Single continuous heatmap grid - GitHub style with horizontal scrolling */}
-                                <div className="overflow-x-auto pb-2">
+                                <div 
+                                    ref={heatmapRef}
+                                    className="overflow-x-auto pb-2 hide-scrollbar"
+                                >
                                     <div className="flex gap-2 min-w-max">
                                         {getHeatmapData().map((month, monthIndex) => (
                                             <div key={`${month.year}-${month.name}`} className="flex flex-col">
                                                 {/* Month label */}
-                                                <div className="text-xs text-muted-foreground mb-1 text-center min-w-[50px]">
+                                                <div className="text-xs text-muted-foreground mb-1 text-center min-w-[50px] terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                                     {month.name}
                                                 </div>
                                                 
@@ -965,20 +998,20 @@ const Dashboard2 = () => {
                                 
                                 {/* Day labels at the bottom */}
                                 <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-                                    <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-6 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                         <span>Mon</span>
                                         <span>Wed</span>
                                         <span>Fri</span>
                                     </div>
-                                    <div className="text-xs text-muted-foreground opacity-70">
-                                        ← Scroll to see full year →
+                                    <div className="text-xs text-muted-foreground opacity-70 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                        ← Drag to see full year →
                                     </div>
                                 </div>
                             </div>
                         )}
                         
                         {/* Activity level legend */}
-                        <div className="flex justify-end items-center gap-1 text-xs mt-1">
+                        <div className="flex justify-end items-center gap-1 text-xs mt-1 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                             <span className="text-muted-foreground">Less</span>
                             <div className="flex gap-[2px]">
                                 <div className="w-[11px] h-[11px] rounded-[2px] bg-gray-200 dark:bg-gray-800" title="No activity"></div>
@@ -1002,7 +1035,9 @@ const Dashboard2 = () => {
                             <div className="flex items-center justify-between gap-6">
                                 {/* Left Side - Total Number */}
                                 <div className="flex flex-col items-center justify-center">
-                                    <div className="text-lg font-semibold mb-2">Total Contests</div>
+                                    <div className="text-lg font-bold mb-2 terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                        {'>'} Total Contests
+                                    </div>
                                     <div className="text-4xl lg:text-5xl font-bold text-foreground">
                                         {isLoading ? (
                                             <MatrixLoader size="lg" />
@@ -1102,7 +1137,9 @@ const Dashboard2 = () => {
                         {/* Contest Rankings */}
                         <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[260px] max-h-[360px] shadow-card hover:shadow-soft transition-shadow duration-300">
                             <div>
-                                <h3 className="text-lg font-semibold mb-4 text-center">Contest Rankings</h3>
+                                <h3 className="text-lg font-bold mb-4 text-center text-hacker-green-bright terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                    {'<>'} Contest Rankings
+                                </h3>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
                                         <MatrixLoader size="md" text="Loading rankings..." />
@@ -1186,7 +1223,9 @@ const Dashboard2 = () => {
                         {/* Problems Solved + Competitive Programming Donut */}
                         <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 h-auto lg:h-60 flex flex-col gap-4 lg:gap-6 shadow-card hover:shadow-soft transition-shadow duration-300">
                             <div>
-                                <div className="text-lg font-semibold mb-2">Problems Solved</div>
+                                <div className="text-lg font-bold mb-2 terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                    {'>'} Problems Solved
+                                </div>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
                                         <MatrixLoader size="md" text="Loading problems..." />
@@ -1299,7 +1338,7 @@ const Dashboard2 = () => {
                                 </div>
                             </div>
                             {/* Topic bar chart with constrained height */}
-                            <div className="space-y-2 flex-1 overflow-y-auto pr-2 -mr-2">
+                            <div className="space-y-2 flex-1 overflow-y-auto pr-2 -mr-2 hide-scrollbar">
                                 {(() => {
                                     try {
                                         const analysisResult = topicAnalysis;

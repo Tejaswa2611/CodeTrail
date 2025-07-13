@@ -5,6 +5,7 @@ import TopicAnalysisCard from '../components/TopicAnalysisCard';
 import SuggestedQuestionCard from '../components/SuggestedQuestionCard';
 import AIChatbot from '../components/AIChatbotNew';
 import { dashboardApi, AICoachAnalysis } from '../services/apiService';
+import { AICoachContentLoader } from '../components/MatrixContentLoader';
 
 const AICoach = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -40,18 +41,8 @@ const AICoach = () => {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen p-3 lg:p-6">
-                <div className="flex-1 flex flex-col items-center justify-center">
-                    <Brain className="w-16 h-16 text-primary animate-pulse mb-4" />
-                    <h2 className="text-2xl font-bold mb-2">AI Coach is analyzing your progress...</h2>
-                    <p className="text-muted-foreground">Generating personalized recommendations with AI</p>
-                    <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        <span className="ml-2">This may take a moment...</span>
-                    </div>
-                </div>
+            <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 p-3 lg:p-6">
+                <AICoachContentLoader size="lg" />
             </div>
         );
     }

@@ -23,7 +23,7 @@ const Landing = () => {
   const [currentDemo, setCurrentDemo] = useState(0);
   const [typewriterText, setTypewriterText] = useState("");
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
-  
+
   // Ensure fonts are loaded
   useEffect(() => {
     if (document.fonts) {
@@ -32,22 +32,22 @@ const Landing = () => {
       });
     }
   }, []);
-  
+
   // Typewriter effect for both lines with continuous loop
   useEffect(() => {
     const lines = [
       "<> Track your coding journey.",
       "<> Let AI guide your next step."
     ];
-    
+
     let charIndex = 0;
     let lineIndex = 0;
     let isErasing = false;
     let pauseTimer: NodeJS.Timeout;
-    
+
     const timer = setInterval(() => {
       const currentLine = lines[lineIndex];
-      
+
       if (!isErasing) {
         // Writing phase
         if (charIndex < currentLine.length) {
@@ -76,17 +76,17 @@ const Landing = () => {
           // Finished erasing
           isErasing = false;
           lineIndex++;
-          
+
           // Reset to first line after completing both lines
           if (lineIndex >= lines.length) {
             lineIndex = 0;
           }
-          
+
           charIndex = 0;
         }
       }
     }, isErasing ? 20 : 80); // Much faster erasing speed
-    
+
     return () => {
       clearInterval(timer);
       if (pauseTimer) clearTimeout(pauseTimer);
@@ -102,7 +102,7 @@ const Landing = () => {
 
   const demoTitles = [
     "Dashboard Overview",
-    "Profile Management", 
+    "Profile Management",
     "Analytics & Insights",
     "AI Coach Features"
   ];
@@ -125,7 +125,7 @@ const Landing = () => {
           const headerOffset = 80; // Account for fixed header
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          
+
           window.scrollTo({
             top: offsetPosition,
             behavior: 'smooth'
@@ -155,33 +155,33 @@ const Landing = () => {
 
   // Platform logos based on theme
   const platforms = [
-    { 
-      name: "LeetCode", 
+    {
+      name: "LeetCode",
       logo: actualTheme === 'dark' ? leetcodeDark : leetcodeLight,
       alt: "LeetCode"
     },
-    { 
-      name: "Codeforces", 
+    {
+      name: "Codeforces",
       logo: actualTheme === 'dark' ? codeforcesDark : codeforcesLight,
       alt: "Codeforces"
     },
-    { 
-      name: "CodeChef", 
+    {
+      name: "CodeChef",
       logo: actualTheme === 'dark' ? codechefDark : codechefLight,
       alt: "CodeChef"
     },
-    { 
-      name: "GeeksforGeeks", 
+    {
+      name: "GeeksforGeeks",
       logo: gfgLogo,
       alt: "GeeksforGeeks"
     },
-    { 
-      name: "CodeStudio", 
+    {
+      name: "CodeStudio",
       logo: actualTheme === 'dark' ? codestudioDark : codestudioLight,
       alt: "CodeStudio"
     },
-    { 
-      name: "InterviewBit", 
+    {
+      name: "InterviewBit",
       logo: interviewbitLogo,
       alt: "InterviewBit"
     }
@@ -200,7 +200,7 @@ const Landing = () => {
             <Zap className="w-3 h-3 mr-1" />
             AI-Powered Tracking
           </Badge>
-          
+
           <div className="mb-6">
             <h1 className={`text-5xl md:text-7xl font-bold leading-tight min-h-[2em] terminal-text`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
               <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
@@ -209,12 +209,12 @@ const Landing = () => {
               <span className={`animate-pulse terminal-text`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>|</span>
             </h1>
           </div>
-          
+
           <p className="text-xl text-tech-gray mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-1000 font-brand">
-            {'>'} The smart way to monitor your progress across coding platforms and get personalized recommendations 
+            {'>'} The smart way to monitor your progress across coding platforms and get personalized recommendations
             to accelerate your learning.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up animate-delay-1200">
             <Link to="/signup" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto group tech-button tech-transition animate-glow-pulse">
@@ -222,9 +222,9 @@ const Landing = () => {
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button 
-              variant="outline" 
-              size="lg" 
+            <Button
+              variant="outline"
+              size="lg"
               className="w-full sm:w-auto group tech-transition border-tech-border text-tech-primary-green hover:bg-tech-dark-green hover:text-tech-accent-green font-brand glow-primary"
               onClick={() => window.open('https://github.com/Tejaswa2611/CodeTrail', '_blank')}
             >
@@ -232,21 +232,21 @@ const Landing = () => {
               View on GitHub
             </Button>
           </div>
-          
+
           {/* Supported Platforms */}
           <div className="animate-fade-in-up animate-delay-1400">
             <div className="text-center mb-8">
               <h3 className="text-2xl md:text-3xl font-bold mb-2 terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                 {'<>'} _Supported Platforms_
               </h3>
-             
+
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-center items-center max-w-4xl mx-auto">
               {platforms.map((platform, index) => (
                 <div key={index} className="tech-card animate-float p-4 rounded-tech hover:tech-card-hover transition-all duration-300 hover:scale-105">
                   <div className="flex flex-col items-center space-y-3">
-                    <img 
-                      src={platform.logo} 
+                    <img
+                      src={platform.logo}
                       alt={platform.alt}
                       className="w-10 h-10 object-contain animate-tech-glow"
                     />
@@ -271,7 +271,7 @@ const Landing = () => {
             Experience the power of AI-driven coding progress tracking
           </p>
         </div>
-        
+
         <div className="max-w-5xl mx-auto animate-scale-in animate-delay-300">
           <Card className="tech-card overflow-hidden">
             <CardContent className="p-6">
@@ -283,16 +283,16 @@ const Landing = () => {
                   {currentDemo + 1} of {demoImages.length}
                 </p>
               </div>
-              
+
               <div className="relative group">
                 <div className="absolute inset-0 bg-tech-primary-green/20 rounded-tech blur-xl group-hover:opacity-30 transition-opacity"></div>
-                <img 
-                  src={demoImages[currentDemo]} 
+                <img
+                  src={demoImages[currentDemo]}
                   alt={demoTitles[currentDemo]}
                   className="w-full h-auto max-h-[400px] object-cover rounded-tech transition-all duration-700 hover:scale-[1.02] relative z-10 glow-subtle"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-tech-deep-black/40 to-transparent rounded-tech z-20" />
-                
+
                 {/* Navigation arrows */}
                 <button
                   onClick={() => setCurrentDemo((prev) => (prev - 1 + demoImages.length) % demoImages.length)}
@@ -307,17 +307,16 @@ const Landing = () => {
                   →
                 </button>
               </div>
-              
+
               <div className="flex justify-center mt-4 space-x-3">
                 {demoImages.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentDemo(index)}
-                    className={`w-3 h-3 rounded-full tech-transition ${
-                      currentDemo === index 
-                        ? 'bg-tech-primary-green glow-primary scale-125' 
+                    className={`w-3 h-3 rounded-full tech-transition ${currentDemo === index
+                        ? 'bg-tech-primary-green glow-primary scale-125'
                         : 'bg-tech-border hover:bg-tech-accent-green hover:scale-110'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -336,7 +335,7 @@ const Landing = () => {
             Everything you need to accelerate your coding journey
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <Card key={index} className="group tech-card animate-fade-in-up animate-float" style={{ animationDelay: `${index * 0.2}s` }}>
@@ -372,7 +371,7 @@ const Landing = () => {
           </CardContent>
         </Card>
       </section>
-      
+
     </div>
   );
 };

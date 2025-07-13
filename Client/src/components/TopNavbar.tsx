@@ -99,8 +99,12 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
 
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="text-sm font-medium text-foreground">{getGreeting()}</p>
-            <p className="text-xs text-muted-foreground">Ready to practice?</p>
+            <p className="text-sm font-medium text-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+              {getGreeting()}
+            </p>
+            <p className="text-xs text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+              Ready to practice?
+            </p>
           </div>
           
           {/* Profile Dropdown */}
@@ -117,10 +121,10 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
+                  <p className="text-sm font-medium leading-none terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-xs leading-none text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                     {user?.email}
                   </p>
                 </div>
@@ -130,11 +134,15 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
               {/* Profile & Settings */}
               <DropdownMenuItem onClick={handleEditProfile}>
                 <User className="mr-2 h-4 w-4" />
-                <span>Edit Profile</span>
+                <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                  Edit Profile
+                </span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSettings}>
                 <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+                <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                  Settings
+                </span>
               </DropdownMenuItem>
               
               <DropdownMenuSeparator />
@@ -142,7 +150,9 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
               {/* Sign Out */}
               <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950">
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Sign Out</span>
+                <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                  Sign Out
+                </span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

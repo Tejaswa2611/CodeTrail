@@ -667,4 +667,14 @@
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 255, 0, 0.3);
     border-color: hsl(120, 100%, 45%);
   }
+
+  /* Hide scrollbar utility class */
+  .hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* WebKit */
+  }
 }

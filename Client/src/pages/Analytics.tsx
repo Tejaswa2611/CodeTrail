@@ -3,6 +3,7 @@ import { Brain, TrendingUp, TrendingDown, Target, Lightbulb, BookOpen, Clock, St
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../contexts/ThemeContext';
 import { dashboardApi } from '../services/apiService';
+import { AnalyticsContentLoader } from '../components/MatrixContentLoader';
 
 // Mock data - will be replaced with real API data later
 const mockAnalysis = {
@@ -290,12 +291,8 @@ const Analytics = () => {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen p-3 lg:p-6">
-                <div className="flex-1 flex flex-col items-center justify-center">
-                    <BarChart className="w-16 h-16 text-primary animate-pulse mb-4" />
-                    <h2 className="text-2xl font-bold mb-2">Loading Analytics...</h2>
-                    <p className="text-muted-foreground">Analyzing your coding progress</p>
-                </div>
+            <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 p-3 lg:p-6">
+                <AnalyticsContentLoader size="lg" />
             </div>
         );
     }

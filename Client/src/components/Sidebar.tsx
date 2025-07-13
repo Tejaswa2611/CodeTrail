@@ -54,10 +54,12 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
       <div className="flex items-center justify-between p-4 border-b border-border">
         {!isCollapsed && (
           <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">C</span>
+            <div className="w-8 h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center border border-tech-border glow-primary">
+              <span className="text-tech-deep-black font-bold text-lg font-mono">C</span>
             </div>
-            <span className="font-semibold text-xl text-foreground">CodeTrail</span>
+            <span className="font-bold text-xl text-tech-primary-green neon-text terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+              CodeTrail
+            </span>
           </Link>
         )}
         <Button
@@ -80,13 +82,17 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
               cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
                 "hover:bg-accent hover:text-accent-foreground",
-                isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground",
+                isActive ? "bg-tech-primary-green text-tech-deep-black" : "text-muted-foreground",
                 isCollapsed && "justify-center"
               )
             }
           >
             <item.icon className="h-5 w-5 flex-shrink-0" />
-            {!isCollapsed && <span className="font-medium">{item.name}</span>}
+            {!isCollapsed && (
+              <span className="font-medium terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                {item.name}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
@@ -96,7 +102,11 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
           "flex items-center gap-3",
           isCollapsed && "justify-center"
         )}>
-          {!isCollapsed && <span className="text-sm font-medium text-muted-foreground">Theme</span>}
+          {!isCollapsed && (
+            <span className="text-sm font-medium text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+              Theme
+            </span>
+          )}
           <ThemeToggle />
         </div>
         
@@ -109,8 +119,12 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{getUserName()}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email || "user@example.com"}</p>
+              <p className="text-sm font-medium text-foreground truncate terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                {getUserName()}
+              </p>
+              <p className="text-xs text-muted-foreground truncate terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                {user?.email || "user@example.com"}
+              </p>
             </div>
           )}
         </div>

@@ -1,0 +1,5 @@
+/* This will be served as favicon.ico replacement */
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <rect width="16" height="16" fill="#0d1117"/>
+  <text x="8" y="11" font-family="monospace" font-weight="bold" font-size="10" text-anchor="middle" fill="#00ff41">&lt;&gt;</text>
+</svg>
