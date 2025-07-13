@@ -124,10 +124,16 @@ const mockAnalysis = {
 
 const AICoach = () => {
     const [isLoading, setIsLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'topics' | 'questions'>('topics');
+    const [activeTab, setActiveTab] = useState<'topics' | 'questions' | 'mentor'>('mentor');
     const { actualTheme } = useTheme();
 
     useEffect(() => {
+        // Handle hash navigation
+        const hash = window.location.hash.substring(1); // Remove the '#' character
+        if (hash === 'mentor' || hash === 'topics' || hash === 'questions') {
+            setActiveTab(hash as 'topics' | 'questions' | 'mentor');
+        }
+        
         // Simulate loading time
         setTimeout(() => setIsLoading(false), 1000);
     }, []);
@@ -168,6 +174,16 @@ const AICoach = () => {
                     
                     {/* Tab Navigation */}
                     <div className="flex gap-2 border-b border-border">
+                        <button
+                            onClick={() => setActiveTab('mentor')}
+                            className={`px-4 py-2 font-medium transition-colors ${
+                                activeTab === 'mentor'
+                                    ? 'text-primary border-b-2 border-primary'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            AI Mentor
+                        </button>
                         <button
                             onClick={() => setActiveTab('topics')}
                             className={`px-4 py-2 font-medium transition-colors ${
@@ -314,6 +330,56 @@ const AICoach = () => {
                                             <span>Hash Table advanced problems</span>
                                         </li>
                                     </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'mentor' && (
+                    <div className="space-y-6">
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
+                            <div className="absolute top-4 right-4">
+                                <div className="group relative">
+                                    <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
+                                    <div className="absolute top-6 right-0 bg-popover border border-border rounded-md p-2 text-xs text-popover-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                        AI-powered mentoring and guidance
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-xl font-semibold flex items-center gap-2">
+                                    <Brain className="w-5 h-5" />
+                                    AI Mentor
+                                </h2>
+                            </div>
+
+                            {/* Coming Soon Message */}
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <div className="p-4 bg-primary/10 rounded-full mb-4">
+                                    <Brain className="w-12 h-12 text-primary" />
+                                </div>
+                                <h3 className="text-xl font-semibold mb-2">Coming Soon</h3>
+                                <p className="text-muted-foreground text-center max-w-md">
+                                    AI Mentor is being developed to provide personalized guidance, 
+                                    coding advice, and interactive mentoring sessions.
+                                </p>
+                                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl">
+                                    <div className="text-center p-4 bg-secondary/20 rounded-lg">
+                                        <Target className="w-6 h-6 text-primary mx-auto mb-2" />
+                                        <h4 className="font-medium mb-1">Personalized Goals</h4>
+                                        <p className="text-sm text-muted-foreground">Set and track coding goals</p>
+                                    </div>
+                                    <div className="text-center p-4 bg-secondary/20 rounded-lg">
+                                        <Lightbulb className="w-6 h-6 text-primary mx-auto mb-2" />
+                                        <h4 className="font-medium mb-1">Smart Insights</h4>
+                                        <p className="text-sm text-muted-foreground">AI-powered learning insights</p>
+                                    </div>
+                                    <div className="text-center p-4 bg-secondary/20 rounded-lg">
+                                        <Users className="w-6 h-6 text-primary mx-auto mb-2" />
+                                        <h4 className="font-medium mb-1">Interactive Chat</h4>
+                                        <p className="text-sm text-muted-foreground">Chat with your AI mentor</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

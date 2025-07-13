@@ -10,7 +10,6 @@ import { Layout } from "./components/Layout";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard2";
-import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import AICoach from "./pages/AICoach";
 import Analytics from "./pages/Analytics";
@@ -59,13 +58,7 @@ const App = () => (
                   </Layout>
                 </ProtectedRoute>
               } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Profile />
-                  </Layout>
-                </ProtectedRoute>
-              } />
+          
               <Route path="/settings" element={
                 <ProtectedRoute>
                   <Layout>
@@ -73,18 +66,7 @@ const App = () => (
                   </Layout>
                 </ProtectedRoute>
               } />
-              <Route path="/practice" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <div className="flex items-center justify-center min-h-96">
-                      <div className="text-center">
-                        <h2 className="text-2xl font-bold text-foreground mb-2">Practice Page</h2>
-                        <p className="text-muted-foreground">Coming soon...</p>
-                      </div>
-                    </div>
-                  </Layout>
-                </ProtectedRoute>
-              } />
+              
               <Route path="/analytics" element={
                 <ProtectedRoute>
                   <Layout>

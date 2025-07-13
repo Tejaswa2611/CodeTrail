@@ -53,45 +53,45 @@ const Analytics = () => {
     const calculateProgressMetrics = (submissionCalendar: string) => {
         const calendar = JSON.parse(submissionCalendar);
         const now = new Date();
-        
+
         console.log('🔍 DEBUG: Current date:', now.toISOString());
         console.log('🔍 DEBUG: Day of week (0=Sunday):', now.getDay());
-        
+
         // Calculate week boundaries - Let's try last 7 days instead of Sunday-based week
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         console.log('🔍 DEBUG: Seven days ago:', sevenDaysAgo.toISOString());
-        
+
         // Also keep Sunday-based week for comparison
         const startOfWeek = new Date(now);
         startOfWeek.setDate(now.getDate() - now.getDay()); // Go to Sunday
         startOfWeek.setHours(0, 0, 0, 0);
         console.log('🔍 DEBUG: Start of week (Sunday):', startOfWeek.toISOString());
-        
+
         // Calculate month boundaries
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         console.log('🔍 DEBUG: Start of month:', startOfMonth.toISOString());
-        
+
         // Calculate last 4 weeks for average
         const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000);
-        
+
         // Calculate last 30 days for consistency
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        
+
         let thisWeekSolved = 0;
         let last7DaysSolved = 0;
         let thisMonthSolved = 0;
         let last4WeeksSolved = 0;
         let activeDaysLast30 = 0;
-        
+
         console.log('🔍 DEBUG: Calendar entries count:', Object.keys(calendar).length);
-        
+
         Object.entries(calendar).forEach(([timestamp, count]) => {
             const originalDate = new Date(parseInt(timestamp) * 1000);
             // Subtract 1 day to fix the date shifting issue (same as dashboard)
             const adjustedDate = new Date(originalDate);
             adjustedDate.setDate(originalDate.getDate() - 1);
             const submissionCount = count as number;
-            
+
             // Debug recent entries
             if (adjustedDate >= thirtyDaysAgo) {
                 console.log('🔍 DEBUG: Recent entry:', {
@@ -105,37 +105,37 @@ const Analytics = () => {
                     isThisMonth: adjustedDate >= startOfMonth
                 });
             }
-            
+
             // This week calculations (Sunday-based)
             if (adjustedDate >= startOfWeek) {
                 thisWeekSolved += submissionCount;
             }
-            
+
             // Last 7 days calculation
             if (adjustedDate >= sevenDaysAgo) {
                 last7DaysSolved += submissionCount;
             }
-            
+
             // This month calculations
             if (adjustedDate >= startOfMonth) {
                 thisMonthSolved += submissionCount;
             }
-            
+
             // Last 4 weeks for average
             if (adjustedDate >= fourWeeksAgo) {
                 last4WeeksSolved += submissionCount;
             }
-            
+
             // Active days in last 30 days for consistency
             if (adjustedDate >= thirtyDaysAgo && submissionCount > 0) {
                 activeDaysLast30++;
             }
         });
-        
+
         // Calculate metrics
         const weeklyAverage = Math.round(last4WeeksSolved / 4);
         const consistencyScore = Math.round((activeDaysLast30 / 30) * 100);
-        
+
         console.log('🔍 DEBUG: Final calculations:', {
             thisWeekSolved: thisWeekSolved,
             last7DaysSolved: last7DaysSolved,
@@ -145,7 +145,7 @@ const Analytics = () => {
             last4WeeksSolved,
             activeDaysLast30
         });
-        
+
         // Use last 7 days instead of Sunday-based week
         return {
             thisWeekSolved: last7DaysSolved, // Using last 7 days for more accurate "this week"
@@ -161,7 +161,7 @@ const Analytics = () => {
             console.log('🔍 DEBUG: Fetching user platform profiles...');
             const profiles = await dashboardApi.getUserPlatformProfiles();
             console.log('🔍 DEBUG: Platform profiles response:', profiles);
-            
+
             // Extract LeetCode handle
             let leetcodeHandle = null;
             if (profiles?.connectedPlatforms?.leetcode?.handle) {
@@ -175,7 +175,7 @@ const Analytics = () => {
             // Extract contest ratings from platform profiles (same logic as dashboard)
             const codeforcesRating = profiles?.connectedPlatforms?.codeforces?.currentRating || null;
             const codeforcesRank = profiles?.connectedPlatforms?.codeforces?.rank || 'unrated';
-            
+
             // For LeetCode rating, we'll need to get it from dashboard stats
             // Let's fetch dashboard stats to get contest rankings
             const dashboardStats = await dashboardApi.getDashboardStats();
@@ -192,7 +192,7 @@ const Analytics = () => {
                 leetcode: leetcodeRating,
                 codeforcesRank: String(codeforcesRank)
             });
-            
+
             return leetcodeHandle;
         } catch (error) {
             console.error('Error fetching user profiles:', error);
@@ -206,20 +206,20 @@ const Analytics = () => {
             console.log('🔍 DEBUG: Fetching daily submissions data...');
             const data = await dashboardApi.getDailySubmissions();
             console.log('🔍 DEBUG: Daily submissions response:', data);
-            
+
             if (data?.dailySubmissions) {
                 // Format data for the chart with proper date formatting
                 const formattedData = data.dailySubmissions.map(entry => ({
                     date: entry.date,
-                    displayDate: new Date(entry.date).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric' 
+                    displayDate: new Date(entry.date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
                     }),
                     leetcode: entry.leetcode,
                     codeforces: entry.codeforces,
                     total: entry.total
                 }));
-                
+
                 setDailySubmissionsData(formattedData);
                 console.log('🔍 DEBUG: Formatted daily submissions data:', formattedData.length, 'entries');
             } else {
@@ -238,11 +238,11 @@ const Analytics = () => {
             console.log('🔍 DEBUG: Fetching progress data for handle:', handle);
             const response = await fetch(`http://localhost:3001/api/leetcode/user/${handle}/profile`);
             console.log('🔍 DEBUG: API response status:', response.status);
-            
+
             if (response.ok) {
                 const data = await response.json();
                 console.log('🔍 DEBUG: API response data keys:', Object.keys(data));
-                
+
                 if (data.data?.matchedUser?.submissionCalendar) {
                     console.log('🔍 DEBUG: Found submission calendar, length:', data.data.matchedUser.submissionCalendar.length);
                     const metrics = calculateProgressMetrics(data.data.matchedUser.submissionCalendar);
@@ -264,15 +264,15 @@ const Analytics = () => {
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
-            
+
             console.log('🔍 DEBUG: Starting to load Analytics data...');
-            
+
             // First get the user's LeetCode handle
             const handle = await fetchUserProfiles();
-            
+
             // Fetch daily submissions data
             await fetchDailySubmissions();
-            
+
             // Then fetch progress data if handle exists
             if (handle) {
                 console.log('🔍 DEBUG: LeetCode handle found, fetching progress data...');
@@ -280,11 +280,11 @@ const Analytics = () => {
             } else {
                 console.log('🔍 DEBUG: No LeetCode handle found, skipping progress data fetch');
             }
-            
+
             // Simulate additional loading time
             setTimeout(() => setIsLoading(false), 1000);
         };
-        
+
         loadData();
     }, [fetchUserProfiles, fetchDailySubmissions, fetchProgressData]);
 
@@ -323,6 +323,9 @@ const Analytics = () => {
                     </div>
                 </div>
 
+                {/* Quick Navigate Section */}
+
+
                 {/* Overview Section - Moved from AI Coach */}
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -340,7 +343,7 @@ const Analytics = () => {
                                 <TrendingUp className="w-5 h-5" />
                                 Overall Progress & Trends
                             </h2>
-                            
+
                             <div className="grid grid-cols-1 gap-6 mb-6">
                                 {/* Daily Submissions Chart */}
                                 <div className="bg-secondary/20 rounded-lg p-4">
@@ -356,20 +359,20 @@ const Analytics = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     {dailySubmissionsData.length > 0 ? (
                                         <div className="h-48">
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <LineChart data={dailySubmissionsData}>
                                                     <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.2} />
-                                                    <XAxis 
-                                                        dataKey="displayDate" 
+                                                    <XAxis
+                                                        dataKey="displayDate"
                                                         stroke="currentColor"
                                                         fontSize={10}
                                                         interval="preserveStartEnd"
                                                     />
                                                     <YAxis stroke="currentColor" fontSize={10} />
-                                                    <Tooltip 
+                                                    <Tooltip
                                                         contentStyle={{
                                                             backgroundColor: 'hsl(var(--popover))',
                                                             border: '1px solid hsl(var(--border))',
@@ -378,26 +381,26 @@ const Analytics = () => {
                                                         }}
                                                         labelStyle={{ color: 'hsl(var(--popover-foreground))' }}
                                                     />
-                                                    <Line 
-                                                        type="monotone" 
-                                                        dataKey="total" 
-                                                        stroke="hsl(var(--primary))" 
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="total"
+                                                        stroke="hsl(var(--primary))"
                                                         strokeWidth={2}
                                                         dot={{ fill: 'hsl(var(--primary))', strokeWidth: 0, r: 3 }}
                                                         activeDot={{ r: 5, stroke: 'hsl(var(--primary))' }}
                                                     />
-                                                    <Line 
-                                                        type="monotone" 
-                                                        dataKey="leetcode" 
-                                                        stroke="#f59e0b" 
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="leetcode"
+                                                        stroke="#f59e0b"
                                                         strokeWidth={1}
                                                         strokeDasharray="3 3"
                                                         dot={false}
                                                     />
-                                                    <Line 
-                                                        type="monotone" 
-                                                        dataKey="codeforces" 
-                                                        stroke="#3b82f6" 
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="codeforces"
+                                                        stroke="#3b82f6"
                                                         strokeWidth={1}
                                                         strokeDasharray="3 3"
                                                         dot={false}
@@ -413,7 +416,7 @@ const Analytics = () => {
                                             </div>
                                         </div>
                                     )}
-                                    
+
                                     {/* Legend */}
                                     <div className="flex justify-center gap-4 mt-3 text-xs">
                                         <div className="flex items-center gap-1">
@@ -461,7 +464,7 @@ const Analytics = () => {
                                     <BarChart className="w-4 h-4" />
                                     Recent Progress Analysis
                                 </h3>
-                                
+
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                     <div className="text-center p-3 bg-secondary/30 rounded-lg relative group">
                                         <div className="absolute top-1 right-1">
@@ -529,10 +532,9 @@ const Analytics = () => {
                                                 ) : (
                                                     <TrendingDown className="w-4 h-4 text-red-500" />
                                                 )}
-                                                <span className={`text-sm font-medium ${
-                                                    mockAnalysis.overallProgress.recentProgress.ratingTrend.codeforces.change > 0 
+                                                <span className={`text-sm font-medium ${mockAnalysis.overallProgress.recentProgress.ratingTrend.codeforces.change > 0
                                                         ? 'text-green-500' : 'text-red-500'
-                                                }`}>
+                                                    }`}>
                                                     {mockAnalysis.overallProgress.recentProgress.ratingTrend.codeforces.change > 0 ? '+' : ''}
                                                     {mockAnalysis.overallProgress.recentProgress.ratingTrend.codeforces.change}
                                                 </span>
@@ -554,10 +556,9 @@ const Analytics = () => {
                                                 ) : (
                                                     <TrendingDown className="w-4 h-4 text-red-500" />
                                                 )}
-                                                <span className={`text-sm font-medium ${
-                                                    mockAnalysis.overallProgress.recentProgress.ratingTrend.leetcode.change > 0 
+                                                <span className={`text-sm font-medium ${mockAnalysis.overallProgress.recentProgress.ratingTrend.leetcode.change > 0
                                                         ? 'text-green-500' : 'text-red-500'
-                                                }`}>
+                                                    }`}>
                                                     {mockAnalysis.overallProgress.recentProgress.ratingTrend.leetcode.change > 0 ? '+' : ''}
                                                     {mockAnalysis.overallProgress.recentProgress.ratingTrend.leetcode.change}
                                                 </span>
@@ -568,56 +569,143 @@ const Analytics = () => {
                             </div>
                         </div>
 
-                        {/* Quick Actions & Progress Insights */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
-                            <div className="absolute top-4 right-4">
-                                <div className="group relative">
-                                    <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
-                                    <div className="absolute top-6 right-0 bg-popover border border-border rounded-md p-2 text-xs text-popover-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                                        Quick actions and AI-generated insights about your progress
+                        {/* Quick Navigate & Progress Insights Column */}
+                        <div className="space-y-6">
+                            {/* Quick Navigate Section */}
+                            <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
+                                <div className="absolute top-4 right-4">
+                                    <div className="group relative">
+                                        <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
+                                        <div className="absolute top-6 right-0 bg-popover border border-border rounded-md p-2 text-xs text-popover-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                            Quick access to common coding activities
+                                        </div>
+                                    </div>
+                                </div>
+                                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                                    <Zap className="w-5 h-5" />
+                                    Quick Navigate
+                                </h2>
+
+                                <div className="grid grid-cols-1 gap-4">
+                                    {/* AI Mentor */}
+                                    <div className="bg-secondary/20 rounded-lg p-4 hover:bg-secondary/30 transition-colors cursor-pointer group">
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-purple-500/20 rounded-lg group-hover:bg-purple-500/30 transition-colors">
+                                                    <MessageCircle className="w-5 h-5 text-purple-500" />
+                                                </div>
+                                                <h3 className="font-medium">AI Mentor</h3>
+                                            </div>
+                                            <p className="text-sm text-muted-foreground">
+                                                Get personalized guidance and coding advice
+                                            </p>
+                                            <button
+                                                onClick={() => window.location.href = '/ai-coach#mentor'}
+                                                className="w-full text-xs px-3 py-2 bg-purple-500/20 text-purple-400 rounded-md hover:bg-purple-500/30 transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <Brain className="w-3 h-3" />
+                                                Open AI Mentor
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Topic Wise Analysis */}
+                                    <div className="bg-secondary/20 rounded-lg p-4 hover:bg-secondary/30 transition-colors cursor-pointer group">
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-green-500/20 rounded-lg group-hover:bg-green-500/30 transition-colors">
+                                                    <Target className="w-5 h-5 text-green-500" />
+                                                </div>
+                                                <h3 className="font-medium">Topic Wise Analysis</h3>
+                                            </div>
+                                            <p className="text-sm text-muted-foreground">
+                                                Analyse weak topics with AI and get detailed insights
+                                            </p>
+                                            <button
+                                                onClick={() => window.location.href = '/ai-coach#topics'}
+                                                className="w-full text-xs px-3 py-2 bg-green-500/20 text-green-400 rounded-md hover:bg-green-500/30 transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <Brain className="w-3 h-3" />
+                                                Topic Analysis
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Suggested Questions */}
+                                    <div className="bg-secondary/20 rounded-lg p-4 hover:bg-secondary/30 transition-colors cursor-pointer group">
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-orange-500/20 rounded-lg group-hover:bg-orange-500/30 transition-colors">
+                                                    <BookOpen className="w-5 h-5 text-orange-500" />
+                                                </div>
+                                                <h3 className="font-medium">Suggested Questions</h3>
+                                            </div>
+                                            <p className="text-sm text-muted-foreground">
+                                                Get AI-suggested problems tailored to your skill level
+                                            </p>
+                                            <button
+                                                onClick={() => window.location.href = '/ai-coach#questions'}
+                                                className="w-full text-xs px-3 py-2 bg-orange-500/20 text-orange-400 rounded-md hover:bg-orange-500/30 transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <Target className="w-3 h-3" />
+                                                Suggested Questions
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                <Lightbulb className="w-5 h-5" />
-                                Progress Insights
-                            </h2>
-                            
-                            <div className="space-y-3">
-                                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <TrendingUp className="w-4 h-4 text-green-500" />
-                                        <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                                            Improving!
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-green-600 dark:text-green-400">
-                                        You solved 33% more problems this week compared to last week. Keep it up!
-                                    </p>
-                                </div>
 
-                                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Star className="w-4 h-4 text-blue-500" />
-                                        <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                                            Consistency Win
-                                        </span>
+                            {/* Progress Insights Section */}
+                            <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
+                                <div className="absolute top-4 right-4">
+                                    <div className="group relative">
+                                        <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
+                                        <div className="absolute top-6 right-0 bg-popover border border-border rounded-md p-2 text-xs text-popover-foreground opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                                            AI-generated insights about your progress
+                                        </div>
                                     </div>
-                                    <p className="text-xs text-blue-600 dark:text-blue-400">
-                                        You've solved problems for 5 consecutive days!
-                                    </p>
                                 </div>
+                                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                                    <Lightbulb className="w-5 h-5" />
+                                    Progress Insights
+                                </h2>
 
-                                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Lightbulb className="w-4 h-4 text-purple-500" />
-                                        <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                                            Coming Soon
-                                        </span>
+                                <div className="space-y-3">
+                                    <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <TrendingUp className="w-4 h-4 text-green-500" />
+                                            <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                                                Improving!
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-green-600 dark:text-green-400">
+                                            You solved 33% more problems this week compared to last week. Keep it up!
+                                        </p>
                                     </div>
-                                    <p className="text-xs text-purple-600 dark:text-purple-400">
-                                        More insights will be added after AI integration
-                                    </p>
+
+                                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Star className="w-4 h-4 text-blue-500" />
+                                            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                                                Consistency Win
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-blue-600 dark:text-blue-400">
+                                            You've solved problems for 5 consecutive days!
+                                        </p>
+                                    </div>
+
+                                    <div className="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Lightbulb className="w-4 h-4 text-purple-500" />
+                                            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                                Coming Soon
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-purple-600 dark:text-purple-400">
+                                            More insights will be added after AI integration
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -80,13 +80,6 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
           <Menu className="h-5 w-5" />
         </Button>
         
-        <div className="relative max-w-md w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search problems, topics, or platforms..."
-            className="pl-10 bg-background text-sm"
-          />
-        </div>
       </div>
 
       <div className="flex items-center gap-4">
@@ -103,21 +96,6 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
           )}
         </Button>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative"
-        >
-          <Bell className="h-5 w-5" />
-          {hasNotifications && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
-            >
-              3
-            </Badge>
-          )}
-        </Button>
 
         <div className="flex items-center gap-3">
           <div className="text-right">

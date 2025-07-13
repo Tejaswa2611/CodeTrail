@@ -91,7 +91,7 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="flex">
+      <div className="flex min-h-screen">
         {/* Desktop Sidebar */}
         <div className="hidden md:block">
           <Sidebar />

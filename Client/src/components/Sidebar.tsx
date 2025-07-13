@@ -17,10 +17,8 @@ import { cn } from "@/lib/utils";
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Practice", href: "/practice", icon: Target },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "AI Coach", href: "/ai-coach", icon: Brain },
-  { name: "Profile", href: "/profile", icon: User },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -49,7 +47,7 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
 
   return (
     <div className={cn(
-      "relative flex flex-col bg-card border-r border-border transition-all duration-300",
+      "relative flex flex-col bg-card border-r border-border transition-all duration-300 h-full min-h-screen",
       isCollapsed ? "w-16" : "w-64",
       className
     )}>
