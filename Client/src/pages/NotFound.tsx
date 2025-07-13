@@ -1,8 +1,10 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { Logo404 } from "../components/LogoVariants";
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.error(
@@ -12,13 +14,39 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+    <div className="min-h-screen flex items-center justify-center bg-tech-dark">
+      <div className="text-center max-w-md mx-auto px-6">
+        <Logo404 />
+        
+        <div className="mt-8 space-y-4">
+          <div className="text-tech-gray font-mono text-sm">
+            <span className="text-tech-accent-green">{'>'}</span> Error Code: 404
+            <br />
+            <span className="text-tech-accent-green">{'>'}</span> Route: {location.pathname}
+            <br />
+            <span className="text-tech-accent-green">{'>'}</span> Status: Resource not found
+          </div>
+          
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/')}
+              className="block w-full px-6 py-3 bg-tech-primary-green text-black font-mono font-semibold rounded-lg hover:bg-tech-accent-green transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-tech-primary-green/25"
+            >
+              {'>'} Return to Dashboard
+            </button>
+            
+            <button
+              onClick={() => navigate(-1)}
+              className="block w-full px-6 py-3 border border-tech-primary-green text-tech-primary-green font-mono font-medium rounded-lg hover:bg-tech-primary-green hover:text-black transition-all duration-300"
+            >
+              {'<'} Go Back
+            </button>
+          </div>
+          
+          <div className="mt-6 text-xs text-tech-gray font-mono opacity-60">
+            <p>{'{'} "message": "The matrix has no record of this location" {'}'}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

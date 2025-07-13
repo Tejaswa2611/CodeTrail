@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Target, 
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import CodeTrailLogo from "@/components/CodeTrailLogo";
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -30,6 +31,23 @@ interface SidebarProps {
 export function Sidebar({ className, onMobileClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Safe logo click handler
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      // Only navigate if we're not already on dashboard
+      if (location.pathname !== '/dashboard') {
+        navigate('/dashboard', { replace: true });
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback - reload the page
+      window.location.href = '/dashboard';
+    }
+  };
 
   // Get user's initials for avatar
   const getUserInitials = () => {
@@ -53,14 +71,30 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
     )}>
       <div className="flex items-center justify-between p-4 border-b border-border">
         {!isCollapsed && (
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <div className="w-8 h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center border border-tech-border glow-primary">
-              <span className="text-tech-deep-black font-bold text-lg font-mono">C</span>
-            </div>
-            <span className="font-bold text-xl text-tech-primary-green neon-text terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-              CodeTrail
-            </span>
-          </Link>
+          <button 
+            onClick={handleLogoClick}
+            className="hover:opacity-80 transition-opacity focus:outline-none"
+          >
+            <CodeTrailLogo 
+              size="md" 
+              animated={true} 
+              showText={true} 
+              variant="compact"
+            />
+          </button>
+        )}
+        {isCollapsed && (
+          <button 
+            onClick={handleLogoClick}
+            className="hover:opacity-80 transition-opacity focus:outline-none"
+          >
+            <CodeTrailLogo 
+              size="md" 
+              animated={true} 
+              showText={false} 
+              variant="icon-only"
+            />
+          </button>
         )}
         <Button
           variant="ghost"

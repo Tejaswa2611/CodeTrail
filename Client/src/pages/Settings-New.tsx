@@ -7,9 +7,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { dashboardApi } from "@/services/apiService";
 import { useAuth } from "@/contexts/AuthContext";
-import { SettingsContentLoader } from "@/components/MatrixContentLoader";
-import { LogoLoading } from "@/components/LogoVariants";
-import { MatrixSpinner } from "@/components/MatrixLoader";
 
 interface PlatformHandle {
   platform: string;
@@ -136,11 +133,18 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-tech-dark">
-        <LogoLoading 
-          size="lg" 
-          message="Loading settings configuration"
-        />
+      <div className="space-y-6 animate-fade-in-up">
+        <div className="animate-slide-in-left">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+            Settings
+          </h1>
+          <p className="text-muted-foreground text-lg terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+            Loading your platform settings...
+          </p>
+        </div>
+        <div className="flex items-center justify-center h-32">
+          <div className="w-8 h-8 border-2 border-tech-primary-green border-t-transparent rounded-full animate-spin"></div>
+        </div>
       </div>
     );
   }
@@ -217,7 +221,7 @@ export default function Settings() {
                     >
                       {isSaving === platform.platform ? (
                         <div className="flex items-center gap-2">
-                          <MatrixSpinner size="sm" />
+                          <div className="w-4 h-4 border-2 border-tech-deep-black border-t-transparent rounded-full animate-spin"></div>
                           Validating & Syncing...
                         </div>
                       ) : (

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import CodeTrailLogo from "@/components/CodeTrailLogo";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -98,17 +99,17 @@ export function Navbar({ minimal = false }: NavbarProps) {
             <header className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
                 <button
                     type="button"
-                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer select-none bg-transparent border-none p-0"
+                    className="hover:opacity-80 transition-opacity cursor-pointer select-none bg-transparent border-none p-0"
                     onClick={() => {
                         navigate('/');
                     }}
                 >
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center hover:shadow-lg tech-transition glow-primary">
-                        <Code className="w-3 h-3 sm:w-4 sm:h-4 text-tech-deep-black" />
-                    </div>
-                    <span className={`text-lg sm:text-xl font-bold terminal-text ${actualTheme === 'dark' ? 'text-neon-green' : 'text-primary'}`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                        CodeTrail
-                    </span>
+                    <CodeTrailLogo 
+                        size="md" 
+                        animated={true} 
+                        showText={true} 
+                        variant="compact"
+                    />
                 </button>
 
                 <ThemeToggle />
@@ -119,13 +120,13 @@ export function Navbar({ minimal = false }: NavbarProps) {
     // Full navbar for landing page
     return (
         <header className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-            <Link to="/" className="flex items-center space-x-2">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-tech-primary-green to-tech-accent-green rounded-lg flex items-center justify-center glow-primary">
-                    <Code className="w-3 h-3 sm:w-4 sm:h-4 text-tech-deep-black" />
-                </div>
-                <span className={`text-lg sm:text-xl font-bold terminal-text ${actualTheme === 'dark' ? 'text-neon-green' : 'text-primary'}`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                    CodeTrail
-                </span>
+            <Link to="/" className="hover:opacity-80 transition-opacity">
+                <CodeTrailLogo 
+                    size="md" 
+                    animated={true} 
+                    showText={true} 
+                    variant="compact"
+                />
             </Link>
 
             <nav className="flex items-center space-x-2 md:space-x-8">

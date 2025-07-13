@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/Navbar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Link } from "react-router-dom";
+import CodeTrailLogo from "@/components/CodeTrailLogo";
 import dashboardDemo from "@/assets/dashboard-demo.jpg";
 import leetcodeDark from "@/assets/leetcode_dark.png";
 import leetcodeLight from "@/assets/leetcode_light.png";
@@ -21,8 +22,6 @@ import interviewbitLogo from "@/assets/interviewbit.png";
 const Landing = () => {
   const { actualTheme } = useTheme();
   const [currentDemo, setCurrentDemo] = useState(0);
-  const [typewriterText, setTypewriterText] = useState("");
-  const [currentLineIndex, setCurrentLineIndex] = useState(0);
 
   // Ensure fonts are loaded
   useEffect(() => {
@@ -31,66 +30,6 @@ const Landing = () => {
         console.log('Fonts loaded successfully');
       });
     }
-  }, []);
-
-  // Typewriter effect for both lines with continuous loop
-  useEffect(() => {
-    const lines = [
-      "<> Track your coding journey.",
-      "<> Let AI guide your next step."
-    ];
-
-    let charIndex = 0;
-    let lineIndex = 0;
-    let isErasing = false;
-    let pauseTimer: NodeJS.Timeout;
-
-    const timer = setInterval(() => {
-      const currentLine = lines[lineIndex];
-
-      if (!isErasing) {
-        // Writing phase
-        if (charIndex < currentLine.length) {
-          setTypewriterText(currentLine.slice(0, charIndex + 1));
-          charIndex++;
-        } else {
-          // Finished writing current line
-          if (lineIndex === 0) {
-            // Pause before erasing first line
-            pauseTimer = setTimeout(() => {
-              isErasing = true;
-            }, 1500);
-          } else {
-            // Finished writing second line, pause before starting over
-            pauseTimer = setTimeout(() => {
-              isErasing = true;
-            }, 2000);
-          }
-        }
-      } else {
-        // Erasing phase
-        if (charIndex > 0) {
-          setTypewriterText(currentLine.slice(0, charIndex - 1));
-          charIndex--;
-        } else {
-          // Finished erasing
-          isErasing = false;
-          lineIndex++;
-
-          // Reset to first line after completing both lines
-          if (lineIndex >= lines.length) {
-            lineIndex = 0;
-          }
-
-          charIndex = 0;
-        }
-      }
-    }, isErasing ? 20 : 80); // Much faster erasing speed
-
-    return () => {
-      clearInterval(timer);
-      if (pauseTimer) clearTimeout(pauseTimer);
-    };
   }, []);
 
   const demoImages = [
@@ -196,24 +135,31 @@ const Landing = () => {
       <section className="container mx-auto px-6 py-20 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-tech-primary-green/5 via-transparent to-tech-primary-green/5 animate-glow-pulse"></div>
         <div className="max-w-4xl mx-auto relative z-10">
+          {/* Animated Brand Logo */}
+          <div className="mb-8 animate-scale-in animate-delay-100">
+            <CodeTrailLogo 
+              size="xl" 
+              animated={true} 
+              showText={true} 
+              variant="default"
+              className="justify-center"
+            />
+          </div>
+
           <Badge variant="secondary" className="mb-6 animate-scale-in animate-delay-200 glow-primary bg-tech-deep-black border-tech-primary-green text-tech-primary-green">
             <Zap className="w-3 h-3 mr-1" />
             AI-Powered Tracking
           </Badge>
 
           <div className="mb-6">
-            <h1 className={`text-5xl md:text-7xl font-bold leading-tight min-h-[2em] terminal-text`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+            <h1 className={`text-5xl md:text-7xl font-bold leading-tight terminal-text`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
               <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                {typewriterText}
+                Let AI guide your coding journey
               </span>
-              <span className={`animate-pulse terminal-text`} style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>|</span>
             </h1>
           </div>
 
-          <p className="text-xl text-tech-gray mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in-up animate-delay-1000 font-brand">
-            {'>'} The smart way to monitor your progress across coding platforms and get personalized recommendations
-            to accelerate your learning.
-          </p>
+      
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up animate-delay-1200">
             <Link to="/signup" className="w-full sm:w-auto">
