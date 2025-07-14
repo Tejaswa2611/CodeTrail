@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Target, 
@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import CodeTrailLogo from "@/components/CodeTrailLogo";
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -31,23 +30,6 @@ interface SidebarProps {
 export function Sidebar({ className, onMobileClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Safe logo click handler
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    try {
-      // Only navigate if we're not already on dashboard
-      if (location.pathname !== '/dashboard') {
-        navigate('/dashboard', { replace: true });
-      }
-    } catch (error) {
-      console.error('Navigation error:', error);
-      // Fallback - reload the page
-      window.location.href = '/dashboard';
-    }
-  };
 
   // Get user's initials for avatar
   const getUserInitials = () => {
@@ -70,32 +52,7 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
       className
     )}>
       <div className="flex items-center justify-between p-4 border-b border-border">
-        {!isCollapsed && (
-          <button 
-            onClick={handleLogoClick}
-            className="hover:opacity-80 transition-opacity focus:outline-none"
-          >
-            <CodeTrailLogo 
-              size="md" 
-              animated={true} 
-              showText={true} 
-              variant="compact"
-            />
-          </button>
-        )}
-        {isCollapsed && (
-          <button 
-            onClick={handleLogoClick}
-            className="hover:opacity-80 transition-opacity focus:outline-none"
-          >
-            <CodeTrailLogo 
-              size="md" 
-              animated={true} 
-              showText={false} 
-              variant="icon-only"
-            />
-          </button>
-        )}
+        <div className="flex-1"></div>
         <Button
           variant="ghost"
           size="icon"
@@ -114,54 +71,75 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
             onClick={() => onMobileClose?.()} // Close mobile menu when navigating
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+                "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors relative group",
                 "hover:bg-accent hover:text-accent-foreground",
                 isActive ? "bg-tech-primary-green text-tech-deep-black" : "text-muted-foreground",
-                isCollapsed && "justify-center"
+                isCollapsed && "justify-center",
+                // Special styling for AI Coach
+                item.name === "AI Coach" && !isActive && "hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20"
               )
             }
           >
-            <item.icon className="h-5 w-5 flex-shrink-0" />
+            <item.icon className={cn(
+              "w-5 h-5 flex-shrink-0 transition-all duration-300",
+              // Special glow effect for AI Coach icon
+              item.name === "AI Coach" && "text-purple-400 group-hover:drop-shadow-[0_0_6px_rgba(147,51,234,0.8)] group-hover:scale-110"
+            )} />
             {!isCollapsed && (
-              <span className="font-medium terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                {item.name}
-              </span>
+              <span className={cn(
+                "font-medium",
+                // Special glittering effect for AI Coach text
+                item.name === "AI Coach" && [
+                  "bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent",
+                  "relative",
+                  "group-hover:animate-[glow_1.5s_ease-in-out_infinite_alternate]",
+                  "animate-[matrix-flicker_3s_ease-in-out_infinite]",
+                  "transition-all duration-300",
+                  "before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-purple-500/20 before:to-transparent",
+                  "before:animate-[matrix-scan_2s_linear_infinite] before:opacity-0 group-hover:before:opacity-100",
+                  "font-bold uppercase tracking-wider"
+                ]
+              )}
+              style={item.name === "AI Coach" ? {
+                textShadow: "0 0 8px rgba(147, 51, 234, 0.4), 0 0 16px rgba(147, 51, 234, 0.2)",
+                filter: "brightness(1.2)",
+                fontFamily: "'JetBrains Mono', 'Courier New', monospace"
+              } : {}}
+            >
+              {item.name}
+            </span>
             )}
           </NavLink>
         ))}
       </nav>
 
-      <div className="p-4 border-t border-border space-y-3">
-        <div className={cn(
-          "flex items-center gap-3",
-          isCollapsed && "justify-center"
-        )}>
-          {!isCollapsed && (
-            <span className="text-sm font-medium text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-              Theme
-            </span>
-          )}
-          <ThemeToggle />
-        </div>
-        
-        <div className={cn(
-          "flex items-center gap-3 p-3 rounded-lg bg-accent/50",
-          isCollapsed && "justify-center"
-        )}>
-          <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold text-sm">{getUserInitials()}</span>
+      {/* User Profile Section */}
+      <div className="border-t border-border p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-tech-primary-green text-tech-deep-black rounded-full flex items-center justify-center text-sm font-bold">
+            {getUserInitials()}
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                {getUserName()}
-              </p>
-              <p className="text-xs text-muted-foreground truncate terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                {user?.email || "user@example.com"}
-              </p>
+              <div className="font-medium text-sm truncate">{getUserName()}</div>
+              <div className="text-xs text-muted-foreground truncate">{user?.email}</div>
             </div>
           )}
         </div>
+        
+        {!isCollapsed && (
+          <div className="mt-3 flex items-center justify-between">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              title="User Profile"
+            >
+              <User className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

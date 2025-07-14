@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import ScrambleLogo from "@/components/ScrambleLogo";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -79,6 +80,16 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
         >
           <Menu className="h-5 w-5" />
         </Button>
+        
+        {/* Logo */}
+        <div className="flex items-center">
+          <ScrambleLogo 
+            size="md" 
+            animated={true} 
+            autoScramble={false}
+            variant="compact"
+          />
+        </div>
         
       </div>
 

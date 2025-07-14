@@ -6,8 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/Navbar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Link } from "react-router-dom";
-import CodeTrailLogo from "@/components/CodeTrailLogo";
+import ScrambleLogo from "@/components/ScrambleLogo";
 import dashboardDemo from "@/assets/dashboard-demo.jpg";
+import dashboardLight from "@/assets/dashboard light.png";
+import dashboardDark from "@/assets/dashboard dark.png";
+import analyticsLight from "@/assets/analytics lilght.png";
+import analyticsDark from "@/assets/analytics dark.png";
+import aiMentorLight from "@/assets/AI mentor light.png";
+import aiMentorDark from "@/assets/AI mentor dark.png";
+import aiAnalysisLight from "@/assets/AI analysis light.png";
+import aiAnalysisDark from "@/assets/AI analysis dark.png";
 import leetcodeDark from "@/assets/leetcode_dark.png";
 import leetcodeLight from "@/assets/leetcode_light.png";
 import codeforcesDark from "@/assets/codeforces_dark.png";
@@ -18,6 +26,7 @@ import codestudioDark from "@/assets/codestudio_dark.png";
 import codestudioLight from "@/assets/codestudio_light.png";
 import gfgLogo from "@/assets/gfg.png";
 import interviewbitLogo from "@/assets/interviewbit.png";
+import CodeTrailHero from "@/components/HeroSection";
 
 const Landing = () => {
   const { actualTheme } = useTheme();
@@ -33,17 +42,24 @@ const Landing = () => {
   }, []);
 
   const demoImages = [
-    dashboardDemo, // Dashboard screenshot
-    dashboardDemo, // Profile screenshot  
-    dashboardDemo, // Analytics screenshot
-    dashboardDemo, // AI Coach screenshot
+    actualTheme === 'dark' ? dashboardDark : dashboardLight,
+    actualTheme === 'dark' ? analyticsDark : analyticsLight,
+    actualTheme === 'dark' ? aiMentorDark : aiMentorLight,
+    actualTheme === 'dark' ? aiAnalysisDark : aiAnalysisLight,
   ];
 
   const demoTitles = [
     "Dashboard Overview",
-    "Profile Management",
-    "Analytics & Insights",
-    "AI Coach Features"
+    "Analytics & Insights", 
+    "AI Mentor",
+    "AI Analysis"
+  ];
+
+  const demoCatchyLines = [
+    "Your coding journey at a glance - Track progress, view achievements, and stay motivated!",
+    "Deep dive into your performance with smart insights and trend analysis!",
+    "Get personalized guidance from AI - Your 24/7 coding companion that never sleeps!",
+    "Unlock patterns in your coding style with intelligent analysis and recommendations!"
   ];
 
   // Auto-advance carousel
@@ -137,10 +153,10 @@ const Landing = () => {
         <div className="max-w-4xl mx-auto relative z-10">
           {/* Animated Brand Logo */}
           <div className="mb-8 animate-scale-in animate-delay-100">
-            <CodeTrailLogo 
-              size="xl" 
-              animated={true} 
-              showText={true} 
+            <ScrambleLogo
+              size="hero"
+              animated={true}
+              autoScramble={true}
               variant="default"
               className="justify-center"
             />
@@ -225,8 +241,11 @@ const Landing = () => {
                 <h3 className="text-xl font-semibold terminal-text mb-1 font-brand" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                   [System] {demoTitles[currentDemo]}
                 </h3>
-                <p className="text-sm text-tech-gray font-brand">
+                <p className="text-sm text-tech-gray font-brand mb-2">
                   {currentDemo + 1} of {demoImages.length}
+                </p>
+                <p className="text-base text-tech-primary-green font-brand italic animate-pulse">
+                  {demoCatchyLines[currentDemo]}
                 </p>
               </div>
 

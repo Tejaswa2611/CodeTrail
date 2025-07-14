@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import CodeTrailLogo from "@/components/CodeTrailLogo";
+import ScrambleLogo from "@/components/ScrambleLogo";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -104,10 +104,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
                         navigate('/');
                     }}
                 >
-                    <CodeTrailLogo 
-                        size="md" 
+                    <ScrambleLogo 
+                        size="lg" 
                         animated={true} 
-                        showText={true} 
+                        autoScramble={false}
                         variant="compact"
                     />
                 </button>
@@ -121,10 +121,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
     return (
         <header className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
             <Link to="/" className="hover:opacity-80 transition-opacity">
-                <CodeTrailLogo 
+                <ScrambleLogo 
                     size="md" 
                     animated={true} 
-                    showText={true} 
+                    autoScramble={false}
                     variant="compact"
                 />
             </Link>
@@ -145,7 +145,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                     Demo
                 </button>
                 <ThemeToggle />
-                
+
                 {isAuthenticated ? (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -167,7 +167,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            
+
                             {/* Dashboard & Profile */}
                             <DropdownMenuItem onClick={() => navigate('/dashboard')} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <User className="mr-2 h-4 w-4" />
@@ -177,9 +177,9 @@ export function Navbar({ minimal = false }: NavbarProps) {
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Edit Profile</span>
                             </DropdownMenuItem>
-                            
+
                             <DropdownMenuSeparator />
-                            
+
                             {/* Settings & Preferences */}
                             <DropdownMenuItem onClick={handleSettings} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <Settings className="mr-2 h-4 w-4" />
@@ -193,17 +193,17 @@ export function Navbar({ minimal = false }: NavbarProps) {
                                 <Shield className="mr-2 h-4 w-4" />
                                 <span>Privacy & Security</span>
                             </DropdownMenuItem>
-                            
+
                             <DropdownMenuSeparator />
-                            
+
                             {/* Help & Support */}
                             <DropdownMenuItem onClick={handleHelp} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <HelpCircle className="mr-2 h-4 w-4" />
                                 <span>Help & Support</span>
                             </DropdownMenuItem>
-                            
+
                             <DropdownMenuSeparator />
-                            
+
                             {/* Sign Out */}
                             <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 <LogOut className="mr-2 h-4 w-4" />
