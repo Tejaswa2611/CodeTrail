@@ -9,6 +9,9 @@ import { generalLimiter } from './middleware/rateLimiter';
 
 const app = express();
 
+// Trust proxy for Railway deployment
+app.set('trust proxy', true);
+
 // Security middleware
 app.use(helmet({
     crossOriginEmbedderPolicy: false,

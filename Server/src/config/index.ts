@@ -5,6 +5,7 @@ dotenv.config();
 export const config = {
   port: process.env.PORT || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
+  serverUrl: process.env.SERVER_URL || 'http://localhost:3001',
   jwt: {
     secret: process.env.JWT_SECRET || 'fallback-secret-key',
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret',

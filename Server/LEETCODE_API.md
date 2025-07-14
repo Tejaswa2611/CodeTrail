@@ -175,19 +175,3 @@ curl -X POST "http://localhost:3000/api/leetcode/problems" \
     }
   }'
 ```
-
-## Integration with Frontend
-
-These endpoints can be used in the CodeTrail frontend to:
-
-1. **User Dashboard**: Display LeetCode stats and progress
-2. **Problem Browser**: Show problems with filtering
-3. **Daily Challenge**: Highlight today's problem
-4. **User Profiles**: Show LeetCode achievements and stats
-5. **Progress Tracking**: Visualize solving progress over time
-
-## Performance Considerations
-
-- **Caching**: Responses are cached to reduce API calls to LeetCode
-- **Rate Limiting**: Prevents abuse and ensures service availability
-- **Error Handling**: Graceful degradation when LeetCode API is unavailable

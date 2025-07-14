@@ -3,3 +3,21 @@ node_modules
 .env
 
 /src/generated/prisma
+
+# Ignore deployment and build artifacts
+/dist
+/build
+*.log
+
+# Ignore local development files
+.vscode
+.idea
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore deployment checklists and guides
+DEPLOYMENT_CHECKLIST.md
+RAILWAY_DEPLOYMENT_GUIDE.md
+RAILWAY_QUICK_START.md

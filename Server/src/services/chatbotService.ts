@@ -535,7 +535,7 @@ Remember: You're a specialized coding mentor who MUST analyze the user's actual 
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.OPENROUTER_API_KEY}`,
-                    'HTTP-Referer': 'http://localhost:3001',
+                    'HTTP-Referer': process.env.SERVER_URL || 'http://localhost:3001',
                     'X-Title': 'CodeTrail AI Mentor',
                     'Content-Type': 'application/json',
                 },
@@ -678,7 +678,7 @@ Remember: You're a specialized coding mentor who MUST analyze the user's actual 
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.OPENROUTER_API_KEY}`,
-                    'HTTP-Referer': 'http://localhost:3001',
+                    'HTTP-Referer': process.env.SERVER_URL || 'http://localhost:3001',
                     'X-Title': 'CodeTrail AI Mentor',
                     'Content-Type': 'application/json'
                 },
