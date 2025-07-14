@@ -209,18 +209,7 @@ const ScrambleLogo: React.FC<ScrambleLogoProps> = ({
             {/* Enhanced effects for hero size */}
             {size === 'hero' && animated && (
                 <>
-                    {/* Additional glow effects - enhanced with gradient colors */}
-                    <div className="absolute -inset-6 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 blur-2xl rounded-2xl animate-pulse"></div>
-                    <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/5 via-purple-400/5 to-indigo-400/5 blur-xl rounded-xl animate-pulse"></div>
-                    <div className="absolute -inset-2 border border-gradient-to-r from-blue-400/30 via-purple-400/30 to-indigo-400/30 rounded-lg animate-pulse shadow-lg shadow-blue-500/20"></div>
-                    
-                    {/* Corner brackets - enhanced with gradient colors */}
-                    <div className="absolute -top-3 -left-3 text-blue-500 dark:text-blue-400 text-2xl font-mono animate-pulse drop-shadow-lg">⌈</div>
-                    <div className="absolute -top-3 -right-3 text-purple-500 dark:text-purple-400 text-2xl font-mono animate-pulse drop-shadow-lg">⌉</div>
-                    <div className="absolute -bottom-3 -left-3 text-indigo-500 dark:text-indigo-400 text-2xl font-mono animate-pulse drop-shadow-lg">⌊</div>
-                    <div className="absolute -bottom-3 -right-3 text-violet-500 dark:text-violet-400 text-2xl font-mono animate-pulse drop-shadow-lg">⌋</div>
-                    
-                    {/* Floating particles effect */}
+                    {/* Floating particles effect (keep for subtle flair) */}
                     <div className="absolute -top-1 left-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping"></div>
                     <div className="absolute top-1/4 -right-1 w-1 h-1 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
                     <div className="absolute -bottom-1 right-1/4 w-1 h-1 bg-indigo-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>

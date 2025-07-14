@@ -731,3 +731,43 @@
     background-position: 100% 100%;
   }
 }
+
+/* Matrix rain animation for MatrixRain component */
+.animate-matrix-rain {
+  animation: matrix-rain 2.5s linear infinite;
+}
+@keyframes matrix-rain {
+  0% {
+    top: -2rem;
+    opacity: 0;
+    filter: blur(1px);
+  }
+  10% {
+    opacity: 1;
+    filter: blur(0.5px);
+  }
+  80% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+/* Matrix code column head animation */
+.animate-matrix-col-head {
+  animation: matrix-col-head-glow 1.2s ease-in-out infinite alternate;
+}
+@keyframes matrix-col-head-glow {
+  0% {
+    filter: brightness(2) blur(0.5px);
+    text-shadow: 0 0 8px #bbffbb, 0 0 16px #bbffbb;
+  }
+  100% {
+    filter: brightness(3) blur(1px);
+    text-shadow: 0 0 16px #bbffbb, 0 0 32px #bbffbb;
+  }
+}
