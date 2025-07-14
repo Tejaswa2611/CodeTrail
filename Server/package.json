@@ -6,6 +6,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:railway": "chmod +x scripts/railway-start.sh && ./scripts/railway-start.sh",
     "postinstall": "npx prisma generate",
     "railway:build": "npm install && npm run build && npx prisma generate",
     "railway:start": "npx prisma migrate deploy && npm start",
