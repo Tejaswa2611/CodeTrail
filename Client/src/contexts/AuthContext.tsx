@@ -94,6 +94,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Check if user is already authenticated on app start
     const checkAuth = async () => {
       console.log('🔍 AuthContext: Checking authentication on app start...');
+      console.log('🔍 AuthContext: Current environment:', {
+        apiUrl: import.meta.env.VITE_API_URL,
+        mode: import.meta.env.MODE,
+        isDev: import.meta.env.DEV,
+        isProd: import.meta.env.PROD
+      });
+      
       dispatch({ type: 'AUTH_START' });
       try {
         // Since we're using cookies, try to get the profile directly
@@ -111,13 +118,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       } catch (error) {
         console.log('❌ AuthContext: Authentication error:', error);
+        console.log('❌ AuthContext: Error details:', {
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : 'No stack trace'
+        });
         dispatch({ type: 'AUTH_LOGOUT' });
         // Don't show error toast on initial auth check - user might not be logged in
       }
     };
 
     checkAuth();
-  }, [toast]);
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     dispatch({ type: 'AUTH_START' });
