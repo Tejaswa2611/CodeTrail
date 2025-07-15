@@ -590,31 +590,44 @@ export class DashboardService {
         const topicAnalysis: { [topic: string]: { total: number; leetcode: number; codeforces: number; problems: string[]; category?: string } } = {};
 
         // First, analyze from submission data (for Codeforces and any other platforms)
-        submissions
-            .filter(sub => sub.verdict === 'AC')
-            .forEach(submission => {
-                submission.problem.tags.forEach((tag: string) => {
-                    if (!topicAnalysis[tag]) {
-                        topicAnalysis[tag] = {
-                            total: 0,
-                            leetcode: 0,
-                            codeforces: 0,
-                            problems: [],
-                        };
-                    }
-
-                    const problemKey = `${submission.platform}-${submission.problem.name}`;
-                    if (!topicAnalysis[tag].problems.includes(problemKey)) {
-                        topicAnalysis[tag].problems.push(problemKey);
-                        topicAnalysis[tag].total++;
-
-                        if (submission.platform === 'leetcode') {
-                            topicAnalysis[tag].leetcode++;
-                        } else {
-                            topicAnalysis[tag].codeforces++;
-                        }
-                    }
+        const acceptedSubmissions = submissions.filter(sub => sub.verdict === 'AC' || sub.verdict === 'OK');
+        console.log(`📊 Found ${acceptedSubmissions.length} accepted submissions to analyze`);
+        
+        acceptedSubmissions.forEach(submission => {
+                console.log(`🔍 Processing submission:`, {
+                    platform: submission.platform,
+                    verdict: submission.verdict,
+                    problemName: submission.problem?.name,
+                    hasTags: !!submission.problem?.tags,
+                    tagCount: submission.problem?.tags?.length || 0
                 });
+                
+                if (submission.problem?.tags && Array.isArray(submission.problem.tags)) {
+                    submission.problem.tags.forEach((tag: string) => {
+                        if (!topicAnalysis[tag]) {
+                            topicAnalysis[tag] = {
+                                total: 0,
+                                leetcode: 0,
+                                codeforces: 0,
+                                problems: [],
+                            };
+                        }
+
+                        const problemKey = `${submission.platform}-${submission.problem.name}`;
+                        if (!topicAnalysis[tag].problems.includes(problemKey)) {
+                            topicAnalysis[tag].problems.push(problemKey);
+                            topicAnalysis[tag].total++;
+
+                            if (submission.platform === 'leetcode') {
+                                topicAnalysis[tag].leetcode++;
+                            } else {
+                                topicAnalysis[tag].codeforces++;
+                            }
+                        }
+                    });
+                } else {
+                    console.log(`⚠️ Submission has no tags or tags not an array:`, submission.problem?.tags);
+                }
             });
 
         // Enhanced analysis: Use LeetCode Skills API for comprehensive LeetCode data
@@ -686,6 +699,75 @@ export class DashboardService {
             }
         }
 
+        // Enhanced analysis: Fetch fresh Codeforces data from API
+        const codeforcesProfile = platformProfiles.find(p => p.platform === 'codeforces');
+        if (codeforcesProfile?.handle) {
+            try {
+                console.log('🔍 Fetching fresh Codeforces data for topic analysis...');
+                
+                const { codeforcesService } = await import('./codeforcesService');
+                const statusResponse = await codeforcesService.getUserStatus(codeforcesProfile.handle);
+                
+                if (statusResponse?.result) {
+                    const acceptedSubmissions = statusResponse.result
+                        .filter((sub: any) => sub.verdict === 'OK'); // Codeforces uses 'OK' for accepted
+                    
+                    console.log(`📊 Found ${acceptedSubmissions.length} accepted Codeforces submissions from API`);
+                    
+                    // Track unique problems to avoid double counting
+                    const uniqueProblems = new Set();
+                    
+                    acceptedSubmissions.forEach((submission: any) => {
+                        const problemKey = `${submission.problem.contestId}-${submission.problem.index}`;
+                        
+                        // Skip if we've already processed this problem
+                        if (uniqueProblems.has(problemKey)) {
+                            return;
+                        }
+                        uniqueProblems.add(problemKey);
+                        
+                        console.log(`🏷️ Processing Codeforces problem:`, {
+                            name: submission.problem.name,
+                            tags: submission.problem.tags,
+                            contestId: submission.problem.contestId,
+                            index: submission.problem.index
+                        });
+                        
+                        if (submission.problem?.tags && Array.isArray(submission.problem.tags)) {
+                            submission.problem.tags.forEach((tag: string) => {
+                                if (!topicAnalysis[tag]) {
+                                    topicAnalysis[tag] = {
+                                        total: 0,
+                                        leetcode: 0,
+                                        codeforces: 0,
+                                        problems: [],
+                                        category: 'intermediate' // Default category for Codeforces tags
+                                    };
+                                }
+
+                                const fullProblemKey = `codeforces-${submission.problem.name}`;
+                                if (!topicAnalysis[tag].problems.includes(fullProblemKey)) {
+                                    topicAnalysis[tag].problems.push(fullProblemKey);
+                                    topicAnalysis[tag].total++;
+                                    topicAnalysis[tag].codeforces++;
+                                    
+                                    console.log(`✅ Added ${tag} topic from Codeforces problem: ${submission.problem.name}`);
+                                }
+                            });
+                        }
+                    });
+                    
+                    console.log(`✅ Enhanced DSA topic analysis with ${uniqueProblems.size} unique Codeforces problems`);
+                } else {
+                    console.log('⚠️ No Codeforces submission results found from API');
+                }
+            } catch (error) {
+                console.error('❌ Error fetching Codeforces data for topic analysis:', error);
+            }
+        } else {
+            console.log('ℹ️ No Codeforces profile found for topic analysis');
+        }
+
         // Filter out daily-activity topics before returning
         const filteredTopicAnalysis: { [topic: string]: { total: number; leetcode: number; codeforces: number; problems: string[]; category?: string } } = {};
         
@@ -694,6 +776,15 @@ export class DashboardService {
                 filteredTopicAnalysis[topic] = data;
             }
         });
+
+        // Final debugging log
+        const topicCount = Object.keys(filteredTopicAnalysis).length;
+        const codeforcesTopics = Object.entries(filteredTopicAnalysis).filter(([_, data]) => data.codeforces > 0);
+        
+        console.log(`🎯 Final DSA Topic Analysis Results:`);
+        console.log(`   • Total topics: ${topicCount}`);
+        console.log(`   • Topics with Codeforces problems: ${codeforcesTopics.length}`);
+        console.log(`   • Sample Codeforces topics:`, codeforcesTopics.slice(0, 5).map(([topic, data]) => `${topic} (${data.codeforces})`));
 
         return filteredTopicAnalysis;
     }

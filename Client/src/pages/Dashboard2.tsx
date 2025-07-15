@@ -784,14 +784,31 @@ const Dashboard2 = () => {
 
     const getTopicAnalysis = () => {
         try {
+            // Debug DSA topics
+            console.log('🔍 DSA Topic Analysis Debug:', {
+                hasData: !!data,
+                hasDSATopicAnalysis: !!data?.dsaTopicAnalysis,
+                topicCount: data?.dsaTopicAnalysis ? Object.keys(data.dsaTopicAnalysis).length : 0,
+                sampleTopics: data?.dsaTopicAnalysis ? Object.keys(data.dsaTopicAnalysis).slice(0, 10) : [],
+                codeforcesHandle: data?.userInfo?.connectedPlatforms?.codeforces?.handle,
+                codeforcesQuestions: data?.totalQuestions?.codeforces || 0
+            });
+
             if (data?.dsaTopicAnalysis) {
                 const processedTopics = Object.entries(data.dsaTopicAnalysis)
-                    .map(([topicName, stats]) => ({
-                        name: topicName,
-                        count: stats.total,
-                        category: stats.category || 'intermediate'
-                    }))
+                    .map(([topicName, stats]: [string, any]) => {
+                        console.log(`📊 Topic: ${topicName}`, stats);
+                        return {
+                            name: topicName,
+                            count: stats.total,
+                            category: stats.category || 'intermediate',
+                            leetcode: stats.leetcode || 0,
+                            codeforces: stats.codeforces || 0
+                        };
+                    })
                     .sort((a, b) => b.count - a.count);
+
+                console.log('📈 Processed Topics:', processedTopics.slice(0, 10));
 
                 // Only slice if we're not showing all topics - show more initially for better space utilization
                 const topicsToShow = showAllTopics ? processedTopics : processedTopics.slice(0, 20);
