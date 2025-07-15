@@ -25,6 +25,15 @@ router.use(authenticateToken);
 router.post('/message', chatbotLimiter, ChatbotController.sendMessageStream);
 router.post('/message-stream', chatbotLimiter, ChatbotController.sendMessageStream);
 
+// Handle GET requests to message-stream (to prevent 404s)
+router.get('/message-stream', (req, res) => {
+    res.status(405).json({
+        success: false,
+        message: 'Method not allowed. Use POST to send messages.',
+        error: 'METHOD_NOT_ALLOWED'
+    });
+});
+
 // Get suggested conversation starters
 router.get('/suggestions', ChatbotController.getSuggestedQuestions);
 
