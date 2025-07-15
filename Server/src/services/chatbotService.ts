@@ -506,6 +506,8 @@ Remember: You're a specialized coding mentor who MUST analyze the user's actual 
      */
     static async sendMessage(userId: string, message: string, chatHistory: ChatMessage[] = []): Promise<ChatbotResponse> {
         try {
+            // TEMP DEBUG: Log the OpenRouter API key (remove after debugging!)
+            console.log('🔑 [DEBUG] OpenRouter API key:', this.OPENROUTER_API_KEY || 'NOT SET');
             // Validate API key is configured
             if (!this.OPENROUTER_API_KEY) {
                 console.error('❌ OpenRouter API key not configured');
@@ -652,6 +654,8 @@ Remember: You're a specialized coding mentor who MUST analyze the user's actual 
      */
     static async sendMessageStream(userId: string, message: string, chatHistory: ChatMessage[] = []): Promise<Response> {
         try {
+            // TEMP DEBUG: Log the OpenRouter API key (remove after debugging!)
+            console.log('🔑 [DEBUG] OpenRouter API key:', this.OPENROUTER_API_KEY || 'NOT SET');
             // Validate API key is configured
             if (!this.OPENROUTER_API_KEY) {
                 console.error('❌ OpenRouter API key not configured');
