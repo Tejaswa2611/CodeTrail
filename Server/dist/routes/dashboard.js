@@ -125,4 +125,6 @@ router.post('/test-sync/:platform/:handle', auth_1.authenticateToken, async (req
         });
     }
 });
+// AI Coach Topic Analysis
+router.get('/ai-coach-topic-analysis', auth_1.authenticateToken, dashboardController_1.getAICoachTopicAnalysis);
 exports.default = router;

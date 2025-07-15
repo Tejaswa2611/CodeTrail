@@ -285,15 +285,51 @@ class DashboardService {
                 console.error('❌ Error fetching LeetCode calendar:', error);
             }
         }
-        // For Codeforces, use database submissions (since no calendar API available)
+        // For Codeforces, use database submissions and also create calendar cache
         const codeforcesSubmissions = submissions.filter(sub => sub.platform === 'codeforces' &&
-            sub.verdict === 'AC' &&
+            sub.verdict === 'OK' && // Fixed to use 'OK' instead of 'AC'
             !sub.problem.tags?.includes('daily-activity') // Exclude synthetic data
         );
+        console.log(`📊 Processing ${codeforcesSubmissions.length} Codeforces submissions for calendar cache`);
+        // Create Codeforces heatmap data from submissions
+        const codeforcesHeatmapData = {};
         codeforcesSubmissions.forEach(submission => {
             const dateKey = submission.timestamp.toISOString().split('T')[0];
-            heatmapData.codeforces[dateKey] = (heatmapData.codeforces[dateKey] || 0) + 1;
+            codeforcesHeatmapData[dateKey] = (codeforcesHeatmapData[dateKey] || 0) + 1;
+            heatmapData.codeforces[dateKey] = codeforcesHeatmapData[dateKey];
         });
+        // Cache Codeforces calendar data if we have submissions
+        if (Object.keys(codeforcesHeatmapData).length > 0) {
+            try {
+                console.log('🗄️ Caching Codeforces calendar data...');
+                // Delete existing Codeforces cache for this user
+                await prisma.calendarCache.deleteMany({
+                    where: {
+                        userId: userId,
+                        platform: 'codeforces'
+                    }
+                });
+                // Prepare Codeforces cache entries
+                const codeforcesCacheEntries = Object.entries(codeforcesHeatmapData).map(([date, count]) => ({
+                    userId: userId,
+                    platform: 'codeforces',
+                    handle: platformProfiles.find(p => p.platform === 'codeforces')?.handle || 'unknown',
+                    date: date,
+                    count: count
+                }));
+                // Insert fresh Codeforces cache data
+                await prisma.calendarCache.createMany({
+                    data: codeforcesCacheEntries
+                });
+                console.log(`✅ Successfully cached ${codeforcesCacheEntries.length} Codeforces calendar entries`);
+            }
+            catch (cacheError) {
+                console.error('❌ Failed to cache Codeforces calendar data:', cacheError);
+            }
+        }
+        else {
+            console.log('⚠️ No Codeforces submissions found for calendar cache');
+        }
         // Combine LeetCode (from calendar) + Codeforces (from database)
         const allDates = new Set([
             ...Object.keys(heatmapData.leetcode),
@@ -432,30 +468,42 @@ class DashboardService {
     async analyzeDSATopics(submissions, platformProfiles) {
         const topicAnalysis = {};
         // First, analyze from submission data (for Codeforces and any other platforms)
-        submissions
-            .filter(sub => sub.verdict === 'AC')
-            .forEach(submission => {
-            submission.problem.tags.forEach((tag) => {
-                if (!topicAnalysis[tag]) {
-                    topicAnalysis[tag] = {
-                        total: 0,
-                        leetcode: 0,
-                        codeforces: 0,
-                        problems: [],
-                    };
-                }
-                const problemKey = `${submission.platform}-${submission.problem.name}`;
-                if (!topicAnalysis[tag].problems.includes(problemKey)) {
-                    topicAnalysis[tag].problems.push(problemKey);
-                    topicAnalysis[tag].total++;
-                    if (submission.platform === 'leetcode') {
-                        topicAnalysis[tag].leetcode++;
-                    }
-                    else {
-                        topicAnalysis[tag].codeforces++;
-                    }
-                }
+        const acceptedSubmissions = submissions.filter(sub => sub.verdict === 'AC' || sub.verdict === 'OK');
+        console.log(`📊 Found ${acceptedSubmissions.length} accepted submissions to analyze`);
+        acceptedSubmissions.forEach(submission => {
+            console.log(`🔍 Processing submission:`, {
+                platform: submission.platform,
+                verdict: submission.verdict,
+                problemName: submission.problem?.name,
+                hasTags: !!submission.problem?.tags,
+                tagCount: submission.problem?.tags?.length || 0
             });
+            if (submission.problem?.tags && Array.isArray(submission.problem.tags)) {
+                submission.problem.tags.forEach((tag) => {
+                    if (!topicAnalysis[tag]) {
+                        topicAnalysis[tag] = {
+                            total: 0,
+                            leetcode: 0,
+                            codeforces: 0,
+                            problems: [],
+                        };
+                    }
+                    const problemKey = `${submission.platform}-${submission.problem.name}`;
+                    if (!topicAnalysis[tag].problems.includes(problemKey)) {
+                        topicAnalysis[tag].problems.push(problemKey);
+                        topicAnalysis[tag].total++;
+                        if (submission.platform === 'leetcode') {
+                            topicAnalysis[tag].leetcode++;
+                        }
+                        else {
+                            topicAnalysis[tag].codeforces++;
+                        }
+                    }
+                });
+            }
+            else {
+                console.log(`⚠️ Submission has no tags or tags not an array:`, submission.problem?.tags);
+            }
         });
         // Enhanced analysis: Use LeetCode Skills API for comprehensive LeetCode data
         const leetcodeProfile = platformProfiles.find(p => p.platform === 'leetcode');
@@ -516,6 +564,66 @@ class DashboardService {
                 console.log('📊 Falling back to submission-based topic analysis');
             }
         }
+        // Enhanced analysis: Fetch fresh Codeforces data from API
+        const codeforcesProfile = platformProfiles.find(p => p.platform === 'codeforces');
+        if (codeforcesProfile?.handle) {
+            try {
+                console.log('🔍 Fetching fresh Codeforces data for topic analysis...');
+                const { codeforcesService } = await Promise.resolve().then(() => __importStar(require('./codeforcesService')));
+                const statusResponse = await codeforcesService.getUserStatus(codeforcesProfile.handle);
+                if (statusResponse?.result) {
+                    const acceptedSubmissions = statusResponse.result
+                        .filter((sub) => sub.verdict === 'OK'); // Codeforces uses 'OK' for accepted
+                    console.log(`📊 Found ${acceptedSubmissions.length} accepted Codeforces submissions from API`);
+                    // Track unique problems to avoid double counting
+                    const uniqueProblems = new Set();
+                    acceptedSubmissions.forEach((submission) => {
+                        const problemKey = `${submission.problem.contestId}-${submission.problem.index}`;
+                        // Skip if we've already processed this problem
+                        if (uniqueProblems.has(problemKey)) {
+                            return;
+                        }
+                        uniqueProblems.add(problemKey);
+                        console.log(`🏷️ Processing Codeforces problem:`, {
+                            name: submission.problem.name,
+                            tags: submission.problem.tags,
+                            contestId: submission.problem.contestId,
+                            index: submission.problem.index
+                        });
+                        if (submission.problem?.tags && Array.isArray(submission.problem.tags)) {
+                            submission.problem.tags.forEach((tag) => {
+                                if (!topicAnalysis[tag]) {
+                                    topicAnalysis[tag] = {
+                                        total: 0,
+                                        leetcode: 0,
+                                        codeforces: 0,
+                                        problems: [],
+                                        category: 'intermediate' // Default category for Codeforces tags
+                                    };
+                                }
+                                const fullProblemKey = `codeforces-${submission.problem.name}`;
+                                if (!topicAnalysis[tag].problems.includes(fullProblemKey)) {
+                                    topicAnalysis[tag].problems.push(fullProblemKey);
+                                    topicAnalysis[tag].total++;
+                                    topicAnalysis[tag].codeforces++;
+                                    console.log(`✅ Added ${tag} topic from Codeforces problem: ${submission.problem.name}`);
+                                }
+                            });
+                        }
+                    });
+                    console.log(`✅ Enhanced DSA topic analysis with ${uniqueProblems.size} unique Codeforces problems`);
+                }
+                else {
+                    console.log('⚠️ No Codeforces submission results found from API');
+                }
+            }
+            catch (error) {
+                console.error('❌ Error fetching Codeforces data for topic analysis:', error);
+            }
+        }
+        else {
+            console.log('ℹ️ No Codeforces profile found for topic analysis');
+        }
         // Filter out daily-activity topics before returning
         const filteredTopicAnalysis = {};
         Object.entries(topicAnalysis).forEach(([topic, data]) => {
@@ -523,6 +631,13 @@ class DashboardService {
                 filteredTopicAnalysis[topic] = data;
             }
         });
+        // Final debugging log
+        const topicCount = Object.keys(filteredTopicAnalysis).length;
+        const codeforcesTopics = Object.entries(filteredTopicAnalysis).filter(([_, data]) => data.codeforces > 0);
+        console.log(`🎯 Final DSA Topic Analysis Results:`);
+        console.log(`   • Total topics: ${topicCount}`);
+        console.log(`   • Topics with Codeforces problems: ${codeforcesTopics.length}`);
+        console.log(`   • Sample Codeforces topics:`, codeforcesTopics.slice(0, 5).map(([topic, data]) => `${topic} (${data.codeforces})`));
         return filteredTopicAnalysis;
     }
     getUserInfo(userProfile, platformProfiles) {
@@ -655,52 +770,100 @@ class DashboardService {
                 orderBy: { date: 'asc' }
             });
             console.log(`📊 Found ${calendarData.length} calendar entries`);
-            // Transform data for chart format
-            const chartData = calendarData.map(entry => ({
-                date: entry.date,
-                submissions: entry.count,
-                platform: entry.platform
-            }));
-            // Group by date and combine platforms
-            const dailySubmissions = {};
-            chartData.forEach(entry => {
-                if (!dailySubmissions[entry.date]) {
-                    dailySubmissions[entry.date] = {
-                        date: entry.date,
-                        leetcode: 0,
-                        codeforces: 0,
-                        total: 0
-                    };
-                }
-                if (entry.platform === 'leetcode') {
-                    dailySubmissions[entry.date].leetcode = entry.submissions;
-                }
-                else if (entry.platform === 'codeforces') {
-                    dailySubmissions[entry.date].codeforces = entry.submissions;
-                }
-                dailySubmissions[entry.date].total =
-                    dailySubmissions[entry.date].leetcode + dailySubmissions[entry.date].codeforces;
+            console.log(`📊 Calendar entries by platform:`, {
+                leetcode: calendarData.filter(entry => entry.platform === 'leetcode').length,
+                codeforces: calendarData.filter(entry => entry.platform === 'codeforces').length
             });
-            // Convert to array and sort by date
-            const sortedData = Object.values(dailySubmissions).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-            // Get only last 30 days for better visualization
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            const recentData = sortedData.filter(entry => new Date(entry.date) >= thirtyDaysAgo);
-            console.log(`✅ Returning ${recentData.length} days of submission data`);
-            return {
-                dailySubmissions: recentData,
-                totalDays: recentData.length,
-                dateRange: {
-                    start: recentData[0]?.date || null,
-                    end: recentData[recentData.length - 1]?.date || null
+            // If no calendar cache data, try to generate it
+            if (calendarData.length === 0) {
+                console.log('⚠️ No calendar cache found, attempting to generate...');
+                // Get user's platform profiles
+                const platformProfiles = await prisma.platformProfile.findMany({
+                    where: { userId }
+                });
+                console.log(`📊 Found ${platformProfiles.length} platform profiles`);
+                if (platformProfiles.length > 0) {
+                    // Get user submissions
+                    const submissions = await prisma.submission.findMany({
+                        where: { userId },
+                        include: { problem: true }
+                    });
+                    console.log(`📊 Found ${submissions.length} submissions for calendar generation`);
+                    // Generate heatmap data which will also create calendar cache
+                    await this.generateHeatmapDataWithCalendar(submissions, platformProfiles, userId);
+                    // Fetch calendar data again after generation
+                    const newCalendarData = await prisma.calendarCache.findMany({
+                        where: { userId },
+                        orderBy: { date: 'asc' }
+                    });
+                    console.log(`📊 After generation, found ${newCalendarData.length} calendar entries`);
+                    return this.processCalendarData(newCalendarData);
                 }
-            };
+                else {
+                    console.log('⚠️ No platform profiles found for user');
+                    return this.getEmptyDailySubmissionsResponse();
+                }
+            }
+            return this.processCalendarData(calendarData);
         }
         catch (error) {
             console.error('❌ Error fetching daily submissions:', error);
             throw new Error('Failed to fetch daily submissions');
         }
+    }
+    processCalendarData(calendarData) {
+        // Transform data for chart format
+        const chartData = calendarData.map(entry => ({
+            date: entry.date,
+            submissions: entry.count,
+            platform: entry.platform
+        }));
+        // Group by date and combine platforms
+        const dailySubmissions = {};
+        chartData.forEach(entry => {
+            if (!dailySubmissions[entry.date]) {
+                dailySubmissions[entry.date] = {
+                    date: entry.date,
+                    leetcode: 0,
+                    codeforces: 0,
+                    total: 0
+                };
+            }
+            if (entry.platform === 'leetcode') {
+                dailySubmissions[entry.date].leetcode = entry.submissions;
+            }
+            else if (entry.platform === 'codeforces') {
+                dailySubmissions[entry.date].codeforces = entry.submissions;
+            }
+            dailySubmissions[entry.date].total =
+                dailySubmissions[entry.date].leetcode + dailySubmissions[entry.date].codeforces;
+        });
+        // Convert to array and sort by date
+        const sortedData = Object.values(dailySubmissions).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        // Get only last 30 days for better visualization
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const recentData = sortedData.filter(entry => new Date(entry.date) >= thirtyDaysAgo);
+        console.log(`✅ Returning ${recentData.length} days of submission data`);
+        console.log(`📊 Sample data:`, recentData.slice(0, 5));
+        return {
+            dailySubmissions: recentData,
+            totalDays: recentData.length,
+            dateRange: {
+                start: recentData[0]?.date || null,
+                end: recentData[recentData.length - 1]?.date || null
+            }
+        };
+    }
+    getEmptyDailySubmissionsResponse() {
+        return {
+            dailySubmissions: [],
+            totalDays: 0,
+            dateRange: {
+                start: null,
+                end: null
+            }
+        };
     }
     // Method to sync platform data to database
     async syncPlatformData(userId, platform, handle, platformData) {

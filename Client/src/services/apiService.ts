@@ -340,6 +340,64 @@ export const codeforcesApi = {
         apiCall<CodeforcesRating>(`/codeforces/user/rating/${handle}`),
 };
 
+// Dashboard API functions
+export const dashboardApi = {
+    getDashboardStats: (): Promise<DashboardStats | null> =>
+        apiCall<DashboardStats>('/dashboard/stats'),
+
+    getDailySubmissions: (): Promise<DailySubmissionsData | null> =>
+        apiCall<DailySubmissionsData>('/dashboard/daily-submissions'),
+
+    getUserPlatformProfiles: (): Promise<UserPlatformProfiles | null> =>
+        apiCall<UserPlatformProfiles>('/dashboard/user-profiles'),
+
+    updatePlatformHandle: async (platform: string, handle: string): Promise<any> => {
+        try {
+            console.log(`🔄 Updating platform handle: ${platform} -> ${handle}`);
+
+            const response = await fetch(`${API_BASE_URL}/dashboard/platform-handle`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ platform, handle }),
+            });
+
+            console.log('🔍 Response status:', response.status);
+            console.log('🔍 Response headers:', Object.fromEntries(response.headers.entries()));
+
+            if (!response.ok) {
+                let errorData;
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    errorData = await response.json();
+                } else {
+                    // If not JSON, get text content (likely HTML error page)
+                    const errorText = await response.text();
+                    console.error('Non-JSON error response:', errorText);
+                    errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+                }
+
+                console.error('API Error:', errorData);
+                throw new ApiError(errorData.message || 'Failed to update platform handle', response.status, errorData);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Network error in updatePlatformHandle:', error);
+            if (error instanceof ApiError) {
+                throw error;
+            }
+            throw new NetworkError('Network error while updating platform handle');
+        }
+    },
+
+    getAICoachTopicAnalysis: (): Promise<any | null> =>
+        apiCall<any>('/dashboard/ai-coach-topic-analysis'),
+};
+
 // New Dashboard API interfaces matching the backend
 export interface DashboardStats {
     totalQuestions: {
@@ -578,62 +636,6 @@ export interface AICoachAnalysis {
     totalTopics: number;
     lastUpdated: string;
 }
-
-// Dashboard API functions
-export const dashboardApi = {
-    getDashboardStats: (): Promise<DashboardStats | null> =>
-        apiCall<DashboardStats>('/dashboard/stats'),
-
-    getUserPlatformProfiles: (): Promise<UserPlatformProfiles | null> =>
-        apiCall<UserPlatformProfiles>('/dashboard/user-profiles'),
-
-    getDailySubmissions: (): Promise<DailySubmissionsData | null> =>
-        apiCall<DailySubmissionsData>('/dashboard/daily-submissions'),
-
-    getAICoachTopicAnalysis: (): Promise<AICoachAnalysis | null> =>
-        apiCall<AICoachAnalysis>('/dashboard/ai-coach-analysis'),
-
-    updatePlatformHandle: async (platform: string, handle: string): Promise<{ success: boolean; message: string; data?: unknown } | null> => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/dashboard/platform-handle`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({ platform, handle }),
-            });
-
-            console.log('🔍 Response status:', response.status);
-            console.log('🔍 Response headers:', Object.fromEntries(response.headers.entries()));
-
-            if (!response.ok) {
-                let errorData;
-                const contentType = response.headers.get('content-type');
-
-                if (contentType && contentType.includes('application/json')) {
-                    errorData = await response.json();
-                } else {
-                    // If not JSON, get text content (likely HTML error page)
-                    const errorText = await response.text();
-                    console.error('Non-JSON error response:', errorText);
-                    errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
-                }
-
-                console.error('API Error:', errorData);
-                throw new ApiError(errorData.message || 'Failed to update platform handle', response.status, errorData);
-            }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Network error in updatePlatformHandle:', error);
-            if (error instanceof ApiError) {
-                throw error;
-            }
-            throw new NetworkError('Network error while updating platform handle');
-        }
-    },
-};
 
 // Chatbot API interfaces
 export interface ChatMessage {

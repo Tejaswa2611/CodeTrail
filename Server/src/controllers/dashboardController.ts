@@ -49,19 +49,68 @@ export const getUserPlatformProfiles = async (req: Request, res: Response) => {
 
 export const getAICoachTopicAnalysis = async (req: Request, res: Response) => {
   try {
+    console.log('🤖 AI Coach endpoint called - starting analysis...');
     const userId = (req as any).user?.userId;
     
     if (!userId) {
+      console.log('❌ AI Coach - No userId found');
       return res.status(401).json(ResponseUtils.error('Unauthorized'));
     }
 
+    console.log(`🤖 AI Coach - Processing for user: ${userId}`);
+
     // Get the dashboard stats which includes DSA topic analysis
+    console.log('🤖 AI Coach - Getting dashboard stats...');
     const dashboardStats = await dashboardService.getDashboardStats(userId);
+    console.log(`🤖 AI Coach - Dashboard stats retrieved, topics: ${Object.keys(dashboardStats.dsaTopicAnalysis || {}).length}`);
     
-    // Import chatbot service for AI recommendations
-    const { ChatbotService } = await import('../services/chatbotService');
+    // Check if we have any topics to analyze
+    if (!dashboardStats.dsaTopicAnalysis || Object.keys(dashboardStats.dsaTopicAnalysis).length === 0) {
+      console.log('⚠️ AI Coach - No DSA topics found, returning empty analysis');
+      return res.status(200).json(ResponseUtils.success('AI Coach analysis retrieved (no topics found)', {
+        overallProgress: {
+          score: 0,
+          level: 'Beginner',
+          strongAreas: [],
+          weakAreas: [],
+          improvementTrend: 'Getting started',
+          recentProgress: {
+            lastWeekSolved: 0,
+            lastMonthSolved: 0,
+            averageWeeklySolved: 0,
+            consistencyScore: 0,
+            difficultyProgression: 'beginner',
+            ratingTrend: { codeforces: null, leetcode: null }
+          }
+        },
+        topicAnalysis: [],
+        suggestedQuestions: [],
+        totalTopics: 0,
+        lastUpdated: new Date().toISOString(),
+        debugInfo: {
+          isAIAvailable: false,
+          topicsProcessed: 0,
+          environment: process.env.NODE_ENV || 'development',
+          message: 'No DSA topics found - user may need to connect platforms or solve problems'
+        }
+      }));
+    }
     
-    console.log(`🤖 Starting AI Coach analysis for ${Object.keys(dashboardStats.dsaTopicAnalysis || {}).length} topics...`);
+    // Try to import chatbot service, but don't fail if it's not available
+    let ChatbotService = null;
+    let isAIAvailable = false;
+    
+    try {
+      const chatbotModule = await import('../services/chatbotService');
+      ChatbotService = chatbotModule.ChatbotService;
+      isAIAvailable = true;
+      console.log('🤖 AI Coach - ChatbotService imported successfully');
+    } catch (importError: any) {
+      console.warn('⚠️ AI Coach - ChatbotService not available:', importError?.message || 'Unknown error');
+      isAIAvailable = false;
+    }
+    
+    console.log(`🤖 Starting AI Coach analysis for ${Object.keys(dashboardStats.dsaTopicAnalysis || {}).length} topics... (AI Available: ${isAIAvailable})`);
     
     // Transform the raw DSA topic analysis into AI Coach format with real AI recommendations
     const topicAnalysisWithAI = await Promise.all(
@@ -107,11 +156,16 @@ NEXTSTEPS: Master sliding window technique|Practice two-pointer problems|Learn p
 PROBLEMS: Two Sum|https://leetcode.com/problems/two-sum/|Best Time to Buy and Sell Stock|https://leetcode.com/problems/best-time-to-buy-and-sell-stock/|Contains Duplicate|https://leetcode.com/problems/contains-duplicate/`;
 
           try {
-            // Get AI-powered recommendation
-            console.log(`🧠 Generating AI recommendation for ${topicName}...`);
-            const aiResponse = await ChatbotService.sendMessage(userId, aiPrompt, []);
-            console.log(`${aiResponse.isError ? '❌' : '✅'} AI response for ${topicName}: ${aiResponse.isError ? 'Error' : 'Success'}`);
+            let aiResponse = null;
             
+            // Only try AI if service is available
+            if (isAIAvailable && ChatbotService) {
+              console.log(`🧠 Generating AI recommendation for ${topicName}...`);
+              aiResponse = await ChatbotService.sendMessage(userId, aiPrompt, []);
+              console.log(`${aiResponse.isError ? '❌' : '✅'} AI response for ${topicName}: ${aiResponse.isError ? 'Error' : 'Success'}`);
+            } else {
+              console.log(`⚠️ Skipping AI generation for ${topicName} - service not available`);
+            }
             let recommendation = `Focus on strengthening ${topicName} fundamentals with consistent practice.`;
             let companyFrequency = 70;
             let nextSteps: Array<{text: string, url: string | null, type: 'link' | 'text'}> = [];
@@ -154,7 +208,7 @@ PROBLEMS: Two Sum|https://leetcode.com/problems/two-sum/|Best Time to Buy and Se
               ];
             }
 
-            if (!aiResponse.isError && aiResponse.message) {
+            if (aiResponse && !aiResponse.isError && aiResponse.message) {
               const response = aiResponse.message;
               console.log(`🔍 AI Response for ${topicName}:`, response.substring(0, 200) + '...');
               
@@ -469,11 +523,23 @@ PROBLEMS: Two Sum|https://leetcode.com/problems/two-sum/|Best Time to Buy and Se
       topicAnalysis: sortedTopicAnalysis,
       suggestedQuestions: suggestedQuestions,
       totalTopics: Object.keys(dashboardStats.dsaTopicAnalysis || {}).length,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
+      debugInfo: {
+        isAIAvailable,
+        topicsProcessed: sortedTopicAnalysis.length,
+        environment: process.env.NODE_ENV || 'development'
+      }
     }));
   } catch (error) {
-    console.error('Error fetching AI Coach topic analysis:', error);
-    return res.status(500).json(ResponseUtils.error('Internal server error'));
+    console.error('❌ AI Coach - Critical error in getAICoachTopicAnalysis:', error);
+    console.error('❌ AI Coach - Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('❌ AI Coach - Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      userId: (req as any).user?.userId,
+      environment: process.env.NODE_ENV || 'development'
+    });
+    
+    return res.status(500).json(ResponseUtils.error(`Internal server error: ${error instanceof Error ? error.message : 'Unknown error'}`));
   }
 };
 

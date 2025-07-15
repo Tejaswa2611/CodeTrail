@@ -12,6 +12,8 @@ const config_1 = __importDefault(require("./config"));
 const routes_1 = __importDefault(require("./routes"));
 const rateLimiter_1 = require("./middleware/rateLimiter");
 const app = (0, express_1.default)();
+// Trust proxy for Railway deployment
+app.set('trust proxy', true);
 // Security middleware
 app.use((0, helmet_1.default)({
     crossOriginEmbedderPolicy: false,

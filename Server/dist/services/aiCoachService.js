@@ -282,7 +282,8 @@ class AICoachService {
         const leetcodeProfile = platformProfiles.find(p => p.platform === 'leetcode');
         if (leetcodeProfile?.handle) {
             try {
-                const response = await fetch(`http://localhost:3001/api/leetcode/user/${leetcodeProfile.handle}/profile`);
+                const serverUrl = process.env.SERVER_URL || 'http://localhost:3001';
+                const response = await fetch(`${serverUrl}/api/leetcode/user/${leetcodeProfile.handle}/profile`);
                 if (response.ok) {
                     const profileData = await response.json();
                     const submissionCalendar = JSON.parse(profileData.data.matchedUser.submissionCalendar);

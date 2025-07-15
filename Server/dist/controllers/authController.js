@@ -23,13 +23,13 @@ class AuthController {
             res.cookie('accessToken', result.tokens.accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 maxAge: 15 * 60 * 1000, // 15 minutes
             });
             res.cookie('refreshToken', result.tokens.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
             res.status(201).json(response_1.ResponseUtils.success('User registered successfully', {
@@ -65,13 +65,13 @@ class AuthController {
             res.cookie('accessToken', result.tokens.accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 maxAge: 15 * 60 * 1000, // 15 minutes
             });
             res.cookie('refreshToken', result.tokens.refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             });
             res.status(200).json(response_1.ResponseUtils.success('Login successful', {
@@ -143,9 +143,17 @@ class AuthController {
             if (refreshToken) {
                 await authService_1.AuthService.logout(refreshToken);
             }
-            // Clear both cookies
-            res.clearCookie('accessToken');
-            res.clearCookie('refreshToken');
+            // Clear both cookies with same settings used when setting them
+            res.clearCookie('accessToken', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            });
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            });
             res.status(200).json(response_1.ResponseUtils.success('Logout successful'));
         }
         catch (error) {

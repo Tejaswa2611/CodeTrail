@@ -107,6 +107,6 @@ router.post('/test-sync/:platform/:handle', authenticateToken, async (req, res) 
 });
 
 // AI Coach Topic Analysis
-router.get('/ai-coach-analysis', authenticateToken, getAICoachTopicAnalysis);
+router.get('/ai-coach-topic-analysis', authenticateToken, getAICoachTopicAnalysis);
 
 export default router;
