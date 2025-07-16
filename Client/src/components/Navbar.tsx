@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import ScrambleLogo from "@/components/ScrambleLogo";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,6 +13,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import ScrambleLogo from "@/components/ScrambleLogo";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface NavbarProps {
     minimal?: boolean;
@@ -90,7 +91,10 @@ export function Navbar({ minimal = false }: NavbarProps) {
 
     const getUserInitials = () => {
         if (!user) return 'U';
-        return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+        const first = user.firstName && typeof user.firstName === 'string' && user.firstName.length > 0 ? user.firstName.charAt(0) : '';
+        const last = user.lastName && typeof user.lastName === 'string' && user.lastName.length > 0 ? user.lastName.charAt(0) : '';
+        const initials = `${first}${last}`.toUpperCase();
+        return initials || 'U';
     };
 
     // Minimal navbar for auth pages
@@ -104,12 +108,9 @@ export function Navbar({ minimal = false }: NavbarProps) {
                         navigate('/');
                     }}
                 >
-                    <ScrambleLogo 
-                        size="lg" 
-                        animated={true} 
-                        autoScramble={false}
-                        variant="compact"
-                    />
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border">
+                        <span className="text-2xl font-extrabold text-tech-primary-green font-mono select-none" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>C</span>
+                    </div>
                 </button>
 
                 <ThemeToggle />
@@ -119,17 +120,25 @@ export function Navbar({ minimal = false }: NavbarProps) {
 
     // Full navbar for landing page
     return (
-        <header className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-            <Link to="/" className="hover:opacity-80 transition-opacity">
-                <ScrambleLogo 
-                    size="md" 
-                    animated={true} 
-                    autoScramble={false}
-                    variant="compact"
-                />
+        <header className="w-full px-2 sm:px-6 py-3 flex items-center justify-between overflow-x-hidden bg-background z-50 border-b border-border" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <Link to="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
+                {/* Mobile: Circle C */}
+                <div className="block sm:hidden w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border">
+                  <span className="text-2xl font-extrabold text-tech-primary-green font-mono select-none" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>C</span>
+                </div>
+                {/* Desktop: Full CodeTrail */}
+                <div className="hidden sm:block">
+                  <ScrambleLogo 
+                      size="md"
+                      animated={true}
+                      autoScramble={false}
+                      variant="compact"
+                  />
+                </div>
             </Link>
 
-            <nav className="flex items-center space-x-2 md:space-x-8">
+            {/* Desktop nav */}
+            <nav className="hidden sm:flex items-center space-x-2 md:space-x-8">
                 <button
                     onClick={() => scrollToSection('features')}
                     className="hidden md:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer terminal-text"
@@ -226,6 +235,12 @@ export function Navbar({ minimal = false }: NavbarProps) {
                     </>
                 )}
             </nav>
+
+            {/* Mobile nav: only logo and theme toggle, add menu icon if needed */}
+            <div className="flex sm:hidden items-center gap-2">
+                <ThemeToggle />
+                {/* Optionally add a hamburger menu here for mobile nav */}
+            </div>
         </header>
     );
 }

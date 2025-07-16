@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, Target, Lightbulb, BookOpen, Clock, Star, ChevronRight, Play, ExternalLink, AlertCircle, CheckCircle, BarChart, Users, Zap, RefreshCw, HelpCircle } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 import TopicAnalysisCard from '../components/TopicAnalysisCard';
 import SuggestedQuestionCard from '../components/SuggestedQuestionCard';
 import AIChatbot from '../components/AIChatbotNew';
@@ -13,6 +14,7 @@ const AICoach = () => {
     const [analysisData, setAnalysisData] = useState<AICoachAnalysis | null>(null);
     const [error, setError] = useState<string | null>(null);
     const { actualTheme } = useTheme();
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         // Handle hash navigation
@@ -108,11 +110,11 @@ const AICoach = () => {
     }
 
     return (
-        <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen p-3 lg:p-6 gap-4 lg:gap-6">
+        <div className={`flex flex-col ${isMobile ? '' : 'lg:flex-row'} bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen ${isMobile ? 'p-2 gap-2' : 'p-3 lg:p-6 gap-4 lg:gap-6'}`}>
             {/* Main Content */}
-            <main className="flex-1 flex flex-col gap-4 lg:gap-6">
+            <main className={`flex-1 flex flex-col ${isMobile ? 'gap-2' : 'gap-4 lg:gap-6'}`}>
                 {/* Header */}
-                <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative flex-shrink-0">
+                <div className={`bg-card/70 backdrop-blur-sm border border-border rounded-lg ${isMobile ? 'p-2' : 'p-6'} relative flex-shrink-0`}>
                     <div className="absolute top-4 right-4">
                         <div className="group relative">
                             <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
@@ -130,7 +132,7 @@ const AICoach = () => {
                     </div>
                     
                     {/* Tab Navigation */}
-                    <div className="flex gap-2 border-b border-border flex-shrink-0">
+                    <div className={`flex ${isMobile ? 'flex-col gap-1' : 'gap-2'} border-b border-border flex-shrink-0`}>
                         <button
                             onClick={() => setActiveTab('mentor')}
                             className={`px-4 py-2 font-medium transition-colors ${
@@ -166,8 +168,8 @@ const AICoach = () => {
 
                 {/* Tab Content */}
                 {activeTab === 'topics' && (
-                    <div className="space-y-6">
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
+                    <div className={`${isMobile ? 'space-y-2' : 'space-y-6'}`}>
+                        <div className={`bg-card/70 backdrop-blur-sm border border-border rounded-lg ${isMobile ? 'p-2' : 'p-6'} relative`}>
                             <div className="absolute top-4 right-4">
                                 <div className="group relative">
                                     <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
@@ -180,7 +182,7 @@ const AICoach = () => {
                                 <BarChart className="w-5 h-5" />
                                 Topic Performance Summary
                             </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'md:grid-cols-3 gap-6'}`}>
                                 <div className="text-center">
                                     <div className="text-3xl font-bold text-green-500">
                                         {analysisData.overallProgress.strongAreas.length}
@@ -242,7 +244,7 @@ const AICoach = () => {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'lg:grid-cols-2 gap-6'}`}>
                             {analysisData.suggestedQuestions && analysisData.suggestedQuestions.length > 0 ? (
                                 analysisData.suggestedQuestions.map((question) => (
                                     <SuggestedQuestionCard key={question.id} question={question} />
@@ -270,7 +272,7 @@ const AICoach = () => {
                                 <Lightbulb className="w-5 h-5" />
                                 Study Plan Suggestion
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'md:grid-cols-2 gap-6'}`}>
                                 <div>
                                     <h4 className="font-medium mb-2 text-red-500">This Week (Priority Focus)</h4>
                                     <ul className="space-y-2 text-sm">

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Brain, TrendingUp, TrendingDown, Target, Lightbulb, BookOpen, Clock, Star, ChevronRight, Play, ExternalLink, AlertCircle, CheckCircle, BarChart, Users, Zap, RefreshCw, HelpCircle, MessageCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../contexts/ThemeContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { dashboardApi } from '../services/apiService';
 import { AnalyticsContentLoader } from '../components/MatrixContentLoader';
 
@@ -49,6 +50,7 @@ const Analytics = () => {
     }[]>([]);
     const [leetcodeHandle, setLeetcodeHandle] = useState<string | null>(null);
     const { actualTheme } = useTheme();
+    const isMobile = useIsMobile();
 
     // Function to calculate metrics from submission calendar
     const calculateProgressMetrics = (submissionCalendar: string) => {
@@ -298,11 +300,11 @@ const Analytics = () => {
     }
 
     return (
-        <div className="flex flex-col lg:flex-row bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen p-3 lg:p-6 gap-4 lg:gap-6">
+        <div className={`flex flex-col ${isMobile ? '' : 'lg:flex-row'} bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen ${isMobile ? 'p-2 gap-2' : 'p-3 lg:p-6 gap-4 lg:gap-6'}`}>
             {/* Main Content */}
-            <main className="flex-1 flex flex-col gap-4 lg:gap-6">
+            <main className={`flex-1 flex flex-col ${isMobile ? 'gap-2' : 'gap-4 lg:gap-6'}`}>
                 {/* Header */}
-                <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
+                <div className={`bg-card/70 backdrop-blur-sm border border-border rounded-lg ${isMobile ? 'p-2' : 'p-6'} relative`}>
                     <div className="absolute top-4 right-4">
                         <div className="group relative">
                             <HelpCircle className="w-4 h-4 text-muted-foreground hover:text-primary cursor-help" />
@@ -325,7 +327,7 @@ const Analytics = () => {
 
                 {/* Overview Section - Moved from AI Coach */}
                 <div className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'lg:grid-cols-3 gap-6'}`}>
                         {/* Overall Progress */}
                         <div className="lg:col-span-2 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-6 relative">
                             <div className="absolute top-4 right-4">

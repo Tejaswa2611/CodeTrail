@@ -6,6 +6,7 @@ import { getErrorToastConfig, logError, safeAsync } from '@/utils/errorHandling'
 import ContestRatingGraph from '../components/ContestRatingGraph';
 import MatrixLoader, { MatrixSpinner, MatrixSkeleton } from '../components/MatrixLoader';
 import { useTheme } from '../contexts/ThemeContext';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 // Import platform images
 import codeforcesDarkLogo from '../assets/codeforces_dark.png';
@@ -110,6 +111,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
     const [platformHandle, setPlatformHandle] = useState<string>('');
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const { actualTheme } = useTheme();
+    const isMobile = useIsMobile();
 
     // Get user profile data
     const getUserProfile = () => {
@@ -227,7 +229,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
     const codeforcesProfile = getCodeforcesProfile();
 
     return (
-        <aside className="w-full lg:w-80 hacker-terminal hacker-glow backdrop-blur-sm rounded-2xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh] font-mono">
+        <aside className={`w-full lg:w-80 hacker-terminal hacker-glow backdrop-blur-sm rounded-2xl ${isMobile ? 'p-2 gap-2 min-h-[30vh]' : 'p-4 lg:p-6 gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh]'} flex flex-col font-mono`}>
             {/* User Profile Section */}
             <div className="flex flex-col items-center gap-2">
                 <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-hacker-green via-hacker-green-bright to-hacker-green rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2 text-hacker-black hacker-glow">
@@ -447,6 +449,7 @@ const Dashboard2 = () => {
     const { toast } = useToast();
     const { actualTheme } = useTheme();
     const heatmapRef = useRef<HTMLDivElement>(null);
+    const isMobile = useIsMobile();
 
     // Extract fetchData function to be reusable with useCallback
     const fetchData = useCallback(async () => {
@@ -882,15 +885,15 @@ const Dashboard2 = () => {
     const topicAnalysis = getTopicAnalysis();
 
     return (
-        <div className="flex flex-col lg:flex-row matrix-bg min-h-screen p-3 lg:p-6 gap-4 lg:gap-6 font-mono">
+        <div className={`flex flex-col ${isMobile ? '' : 'lg:flex-row'} matrix-bg min-h-screen ${isMobile ? 'p-2 gap-2' : 'p-3 lg:p-6 gap-4 lg:gap-6'} font-mono w-full max-w-full overflow-x-hidden`}>
             {/* Sidebar */}
             <Sidebar data={data} isLoading={isLoading} refreshData={fetchData} />
             {/* Main Content */}
-            <main className="flex-1 flex flex-col gap-4 lg:gap-6">
+            <main className={`flex-1 flex flex-col ${isMobile ? 'gap-2' : 'gap-4 lg:gap-6'} w-full max-w-full min-w-0`}>
                 {/* Row 1: 2 squares + 1 rectangle */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6">
+                <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6'} w-full max-w-full min-w-0`}>
                     {/* Total Questions */}
-                    <div className="lg:col-span-2 hacker-terminal hacker-glow rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] hover:shadow-hacker-green/20 transition-shadow duration-300 relative">
+                    <div className={`lg:col-span-2 hacker-terminal hacker-glow rounded-lg ${isMobile ? 'p-2 min-h-[80px]' : 'p-4 lg:p-6 min-h-[110px]'} flex flex-col items-center justify-center hover:shadow-hacker-green/20 transition-shadow duration-300 relative w-full max-w-full min-w-0`}>
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined total from all connected platforms" />
                         </div>
@@ -902,7 +905,7 @@ const Dashboard2 = () => {
                         </div>
                     </div>
                     {/* Total Active Days */}
-                    <div className="lg:col-span-2 hacker-terminal hacker-glow rounded-xl p-4 lg:p-6 flex flex-col items-center justify-center min-h-[110px] hover:shadow-hacker-green/20 transition-shadow duration-300 relative">
+                    <div className={`lg:col-span-2 hacker-terminal hacker-glow rounded-lg ${isMobile ? 'p-2 min-h-[80px]' : 'p-4 lg:p-6 min-h-[110px]'} flex flex-col items-center justify-center hover:shadow-hacker-green/20 transition-shadow duration-300 relative w-full max-w-full min-w-0`}>
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined active days from all connected platforms" />
                         </div>
@@ -914,7 +917,7 @@ const Dashboard2 = () => {
                         </div>
                     </div>
                     {/* Heatmap */}
-                    <div className="md:col-span-2 lg:col-span-8 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300">
+                    <div className="md:col-span-2 lg:col-span-8 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0 overflow-x-auto">
                         <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-2 text-xs">
                             <span className="text-hacker-green-bright font-bold terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                 {isLoading ? 'Loading...' : '<> Activity Overview (All Platforms)'}
@@ -944,7 +947,7 @@ const Dashboard2 = () => {
                                 {/* Single continuous heatmap grid - GitHub style with horizontal scrolling */}
                                 <div 
                                     ref={heatmapRef}
-                                    className="overflow-x-auto pb-2 hide-scrollbar"
+                                    className="overflow-x-auto pb-2 hide-scrollbar min-w-0 w-full"
                                 >
                                     <div className="flex gap-2 min-w-max">
                                         {getHeatmapData().map((month, monthIndex) => (
@@ -1043,11 +1046,11 @@ const Dashboard2 = () => {
                     </div>
                 </div>
                 {/* Row 2: 2 columns */}
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6 flex-1">
+                <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'xl:grid-cols-12 gap-4 lg:gap-6'} flex-1 w-full max-w-full min-w-0`}>
                     {/* Column 1: 4 stacked blocks */}
-                    <div className="xl:col-span-7 flex flex-col gap-4 lg:gap-6">
+                    <div className={`xl:col-span-7 flex flex-col ${isMobile ? 'gap-2' : 'gap-4 lg:gap-6'} w-full max-w-full min-w-0`}>
                         {/* Total Contests */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col gap-4 min-h-[120px] shadow-card hover:shadow-soft transition-shadow duration-300">
+                        <div className={`bg-card/70 backdrop-blur-sm border border-border rounded-lg ${isMobile ? 'p-2 gap-2 min-h-[80px]' : 'p-4 lg:p-6 gap-4 min-h-[120px]'} flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0`}>
                             {/* Main Content Area */}
                             <div className="flex items-center justify-between gap-6">
                                 {/* Left Side - Total Number */}
@@ -1143,7 +1146,7 @@ const Dashboard2 = () => {
                         </div>
                         
                         {/* Contest Rating Graph - Full Width */}
-                        <div className="col-span-1 lg:col-span-2">
+                        <div className="col-span-1 lg:col-span-2 w-full max-w-full min-w-0">
                             <ContestRatingGraph 
                                 contestHistory={data?.contestHistory || { leetcode: [], codeforces: [], combined: [] }}
                                 isLoading={isLoading}
@@ -1152,7 +1155,7 @@ const Dashboard2 = () => {
                         </div>
                         
                         {/* Contest Rankings */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[260px] max-h-[360px] shadow-card hover:shadow-soft transition-shadow duration-300">
+                        <div className={`bg-card/70 backdrop-blur-sm border border-border rounded-lg ${isMobile ? 'p-2 min-h-[160px]' : 'p-4 lg:p-6 min-h-[260px] max-h-[360px]'} flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0`}>
                             <div>
                                 <h3 className="text-lg font-bold mb-4 text-center text-hacker-green-bright terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                     {'<>'} Contest Rankings
@@ -1236,9 +1239,9 @@ const Dashboard2 = () => {
                         </div>
                     </div>
                     {/* Column 2: 2 stacked blocks */}
-                    <div className="xl:col-span-5 flex flex-col gap-4 lg:gap-6">
+                    <div className="xl:col-span-5 flex flex-col gap-4 lg:gap-6 w-full max-w-full min-w-0">
                         {/* Problems Solved + Competitive Programming Donut */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 h-auto lg:h-60 flex flex-col gap-4 lg:gap-6 shadow-card hover:shadow-soft transition-shadow duration-300">
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 h-auto lg:h-60 flex flex-col gap-4 lg:gap-6 shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0">
                             <div>
                                 <div className="text-lg font-bold mb-2 terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                                     {'>'} Problems Solved
@@ -1332,7 +1335,7 @@ const Dashboard2 = () => {
                             </div>
                         </div>
                         {/* DSA Topic Analysis */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 min-h-[540px] max-h-[758px] relative">
+                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 min-h-[540px] max-h-[758px] relative w-full max-w-full min-w-0 overflow-x-auto">
                             <div className="absolute top-4 right-4">
                                 <InfoTooltip message="Topic analysis based on problems solved across all platforms" />
                             </div>

@@ -83,12 +83,19 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
         
         {/* Logo */}
         <div className="flex items-center">
-          <ScrambleLogo 
-            size="md" 
-            animated={true} 
-            autoScramble={false}
-            variant="compact"
-          />
+          {/* Mobile: Circle C */}
+          <div className="block sm:hidden w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border">
+            <span className="text-2xl font-extrabold text-tech-primary-green font-mono select-none" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>C</span>
+          </div>
+          {/* Desktop: Full CodeTrail */}
+          <div className="hidden sm:block">
+            <ScrambleLogo 
+              size="md"
+              animated={true}
+              autoScramble={false}
+              variant="compact"
+            />
+          </div>
         </div>
         
       </div>

@@ -28,6 +28,9 @@ import gfgLogo from "@/assets/gfg.png";
 import interviewbitLogo from "@/assets/interviewbit.png";
 import { useRef } from "react";
 
+// Utility to detect mobile
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
 // MatrixRain animation for hero section
 const MatrixRain = () => {
   const [drops, setDrops] = useState<Array<{ id: number; left: number; delay: number; duration: number; char: string }>>([]);
@@ -42,6 +45,7 @@ const MatrixRain = () => {
     }));
     setDrops(newDrops);
   }, []);
+  if (isMobile) return null;
   return (
     <div className="pointer-events-none absolute inset-0 z-0">
       {drops.map(drop => (
@@ -83,6 +87,10 @@ const Landing = () => {
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (isMobile) {
+      setRevealedText(targetText);
+      return;
+    }
     let frame = 0;
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=|<>?";
     function reveal() {
@@ -215,7 +223,7 @@ const Landing = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-20 text-center relative overflow-hidden flex flex-col items-center justify-center">
+      <section className="container mx-auto px-3 sm:px-6 py-16 sm:py-20 text-center relative overflow-hidden flex flex-col items-center justify-center">
         {/* Matrix Rain Animation */}
         <MatrixRain />
         {/* Optionally keep scanline effect below if desired */}
@@ -226,9 +234,9 @@ const Landing = () => {
             <div className="w-full h-px bg-gradient-to-r from-transparent via-tech-accent-green to-transparent animate-pulse opacity-60" style={{ top: '60%' }} />
           </div>
         </div>
-        <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-4xl mx-auto relative z-10 w-full">
           {/* Animated Brand Logo */}
-          <div className="mb-8 animate-scale-in animate-delay-100">
+          <div className="mb-6 sm:mb-8 animate-scale-in animate-delay-100 flex justify-center">
             <ScrambleLogo
               size="hero"
               animated={true}
@@ -238,15 +246,15 @@ const Landing = () => {
             />
           </div>
 
-          <div className="mb-6">
-            <h1 className="text-5xl md:text-7xl font-bold leading-tight terminal-text neon-text-bright animate-fade-in-up animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace", letterSpacing: "0.03em" }}>
+          <div className="mb-4 sm:mb-6 px-1">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl font-bold leading-tight terminal-text neon-text-bright animate-fade-in-up animate-glow-pulse break-words" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace", letterSpacing: "0.03em" }}>
               {revealedText}
             </h1>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center mb-8 animate-fade-in-up animate-delay-200">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center mb-6 sm:mb-8 animate-fade-in-up animate-delay-200 w-full">
             <Link to="/signup" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto group tech-button tech-transition animate-glow-pulse btn-primary-glow">
+              <Button size="lg" className="w-full sm:w-auto group tech-button tech-transition animate-glow-pulse btn-primary-glow text-base xs:text-lg">
                 Start Tracking Free
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -254,7 +262,7 @@ const Landing = () => {
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto group tech-transition border-hacker-green text-hacker-green hover:bg-hacker-green-muted hover:text-hacker-green-bright font-brand glow-primary"
+              className="w-full sm:w-auto group tech-transition border-hacker-green text-hacker-green hover:bg-hacker-green-muted hover:text-hacker-green-bright font-brand glow-primary text-base xs:text-lg"
               onClick={() => window.open('https://github.com/Tejaswa2611/CodeTrail', '_blank')}
             >
               <Github className="mr-2 w-4 h-4" />
@@ -263,20 +271,20 @@ const Landing = () => {
           </div>
 
           {/* Supported Platforms */}
-          <div className="text-center mb-8 animate-fade-in-up animate-delay-300">
-            <h3 className="text-2xl md:text-3xl font-bold mb-2 terminal-text neon-text-bright animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-              {'<>'} _Supported Platforms_
+          <div className="text-center mb-4 sm:mb-8 animate-fade-in-up animate-delay-300">
+            <h3 className="text-xl xs:text-2xl md:text-3xl font-bold mb-2 terminal-text neon-text-bright animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+              {'<> '} _Supported Platforms_
             </h3>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 justify-center items-center max-w-4xl mx-auto animate-fade-in-up animate-delay-400">
+          <div className="grid grid-cols-2 xs:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 justify-center items-center max-w-4xl mx-auto animate-fade-in-up animate-delay-400">
             {platforms.map((platform, index) => (
-              <div key={index} className="tech-card-enhanced animate-float p-4 rounded-tech card-hover transition-all duration-300 hover:scale-105 hacker-glow flex flex-col items-center space-y-3">
+              <div key={index} className="tech-card-enhanced animate-float p-2 xs:p-4 rounded-tech card-hover transition-all duration-300 hover:scale-105 hacker-glow flex flex-col items-center space-y-2 xs:space-y-3">
                 <img
                   src={platform.logo}
                   alt={platform.alt}
-                  className="w-10 h-10 object-contain animate-tech-glow"
+                  className="w-8 h-8 xs:w-10 xs:h-10 object-contain animate-tech-glow"
                 />
-                <span className="font-bold text-hacker-green font-brand text-xs neon-text animate-glow-pulse">{platform.name}</span>
+                <span className="font-bold text-hacker-green font-brand text-[10px] xs:text-xs neon-text animate-glow-pulse">{platform.name}</span>
               </div>
             ))}
           </div>
@@ -284,61 +292,61 @@ const Landing = () => {
       </section>
 
       {/* Demo Section */}
-      <section id="demo" className="container mx-auto px-6 py-16 relative animate-fade-in-up animate-delay-500">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+      <section id="demo" className="container mx-auto px-3 sm:px-6 py-10 sm:py-16 relative animate-fade-in-up animate-delay-500">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl xs:text-3xl md:text-5xl font-bold mb-2 sm:mb-4 neon-text-bright font-brand terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
             {'>'} See CodeTrail in Action
           </h2>
-          <p className="text-xl text-tech-gray max-w-2xl mx-auto font-brand">
+          <p className="text-base xs:text-lg text-tech-gray max-w-2xl mx-auto font-brand">
             Experience the power of AI-driven coding progress tracking
           </p>
         </div>
 
-        <div className="max-w-5xl mx-auto animate-scale-in animate-delay-300">
+        <div className="max-w-full sm:max-w-5xl mx-auto animate-scale-in animate-delay-300">
           <Card className="tech-card-enhanced overflow-hidden hacker-glow animate-pulse-glow">
-            <CardContent className="p-6 relative">
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-semibold terminal-text mb-1 font-brand neon-text-bright animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+            <CardContent className="p-2 xs:p-4 sm:p-6 relative">
+              <div className="text-center mb-2 sm:mb-4">
+                <h3 className="text-base xs:text-lg sm:text-xl font-semibold terminal-text mb-1 font-brand neon-text-bright animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                   [System] {demoTitles[currentDemo]}
                 </h3>
-                <p className="text-sm text-tech-gray font-brand mb-2">
+                <p className="text-xs xs:text-sm text-tech-gray font-brand mb-1 sm:mb-2">
                   {currentDemo + 1} of {demoImages.length}
                 </p>
-                <p className="text-base text-hacker-green font-brand italic animate-pulse animate-glow-pulse">
+                <p className="text-xs xs:text-base text-hacker-green font-brand italic animate-pulse animate-glow-pulse">
                   {demoCatchyLines[currentDemo]}
                 </p>
               </div>
 
-              <div className="relative group">
+              <div className="relative group flex justify-center items-center">
                 <div className="absolute inset-0 bg-hacker-green/20 rounded-tech blur-xl group-hover:opacity-30 transition-opacity animate-glow-pulse"></div>
                 <img
                   src={demoImages[currentDemo]}
                   alt={demoTitles[currentDemo]}
-                  className="w-full h-auto max-h-[400px] object-cover rounded-tech transition-all duration-700 hover:scale-[1.02] relative z-10 shadow-glow"
+                  className={`w-full h-auto max-h-[180px] xs:max-h-[250px] sm:max-h-[400px] object-cover rounded-tech ${isMobile ? '' : 'transition-all duration-700 hover:scale-[1.02] shadow-glow'} relative z-10`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-hacker-black/40 to-transparent rounded-tech z-20" />
 
                 {/* Navigation arrows */}
                 <button
                   onClick={() => setCurrentDemo((prev) => (prev - 1 + demoImages.length) % demoImages.length)}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 tech-card-enhanced text-hacker-green rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 tech-transition z-30 terminal-text neon-text-bright animate-glow-pulse"
+                  className="absolute left-1 xs:left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 xs:w-10 xs:h-10 tech-card-enhanced text-hacker-green rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 tech-transition z-30 terminal-text neon-text-bright animate-glow-pulse text-lg xs:text-xl"
                 >
                   ←
                 </button>
                 <button
                   onClick={() => setCurrentDemo((prev) => (prev + 1) % demoImages.length)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 tech-card-enhanced text-hacker-green rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 tech-transition z-30 terminal-text neon-text-bright animate-glow-pulse"
+                  className="absolute right-1 xs:right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 xs:w-10 xs:h-10 tech-card-enhanced text-hacker-green rounded-full flex items-center justify-center opacity-80 group-hover:opacity-100 tech-transition z-30 terminal-text neon-text-bright animate-glow-pulse text-lg xs:text-xl"
                 >
                   →
                 </button>
               </div>
 
-              <div className="flex justify-center gap-2 mt-4">
+              <div className="flex justify-center gap-1 xs:gap-2 mt-2 xs:mt-4">
                 {demoImages.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentDemo(index)}
-                    className={`w-3 h-3 rounded-full tech-transition ${currentDemo === index
+                    className={`w-2 h-2 xs:w-3 xs:h-3 rounded-full tech-transition ${currentDemo === index
                         ? 'bg-hacker-green glow-primary scale-125 animate-glow-pulse'
                         : 'bg-hacker-green-muted hover:bg-hacker-green hover:scale-110'
                       }`}
@@ -351,25 +359,25 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="container mx-auto px-6 py-20 relative animate-fade-in-up animate-delay-700">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright font-brand terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+      <section id="features" className="container mx-auto px-3 sm:px-6 py-10 sm:py-20 relative animate-fade-in-up animate-delay-700">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="text-2xl xs:text-3xl md:text-5xl font-bold mb-2 sm:mb-4 neon-text-bright font-brand terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
             {'<>'} Powerful Features
           </h2>
-          <p className="text-xl text-tech-gray max-w-2xl mx-auto font-brand">
+          <p className="text-base xs:text-lg text-tech-gray max-w-2xl mx-auto font-brand">
             Everything you need to accelerate your coding journey
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
           {features.map((feature, index) => (
-            <Card key={index} className="tech-card-enhanced hacker-glow animate-fade-in-up animate-float flex flex-col items-center text-center p-8" style={{ animationDelay: `${index * 0.2}s` }}>
+            <Card key={index} className={`tech-card-enhanced hacker-glow flex flex-col items-center text-center p-4 xs:p-8 ${isMobile ? '' : 'animate-fade-in-up animate-float'}`} style={isMobile ? {} : { animationDelay: `${index * 0.2}s` }}>
               <CardContent className="flex flex-col items-center">
-                <div className="w-16 h-16 flex items-center justify-center mb-4">
-                  <feature.icon className="w-10 h-10 text-hacker-green animate-glow-pulse" />
+                <div className="w-12 h-12 xs:w-16 xs:h-16 flex items-center justify-center mb-2 xs:mb-4">
+                  <feature.icon className="w-8 h-8 xs:w-10 xs:h-10 text-hacker-green animate-glow-pulse" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-hacker-green font-brand neon-text terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>{feature.title}</h3>
-                <p className="text-tech-gray leading-relaxed font-brand animate-fade-in-up animate-delay-200">{feature.description}</p>
+                <h3 className="text-lg xs:text-xl font-semibold mb-1 xs:mb-2 text-hacker-green font-brand neon-text terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>{feature.title}</h3>
+                <p className="text-tech-gray leading-relaxed font-brand animate-fade-in-up animate-delay-200 text-sm xs:text-base">{feature.description}</p>
               </CardContent>
             </Card>
           ))}
@@ -377,18 +385,18 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-6 py-16 animate-fade-in-up animate-delay-900">
+      <section className="container mx-auto px-3 sm:px-6 py-10 sm:py-16 animate-fade-in-up animate-delay-900">
         <Card className="tech-card-enhanced animate-scale-in relative overflow-hidden glow-primary hacker-glow animate-glow-pulse">
           <div className="absolute inset-0 bg-gradient-to-r from-hacker-green/10 via-hacker-green-bright/10 to-hacker-green/10 animate-glow-pulse"></div>
-          <CardContent className="p-12 text-center relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 neon-text-bright animate-fade-in-up font-brand terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+          <CardContent className="p-6 xs:p-12 text-center relative z-10">
+            <h2 className="text-2xl xs:text-4xl md:text-5xl font-bold mb-2 xs:mb-4 neon-text-bright animate-fade-in-up font-brand terminal-text animate-glow-pulse" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
               {'<>'} Ready to level up your coding?
             </h2>
-            <p className="text-xl text-tech-gray mb-8 max-w-2xl mx-auto animate-fade-in-up animate-delay-200 font-brand">
+            <p className="text-base xs:text-xl text-tech-gray mb-4 xs:mb-8 max-w-2xl mx-auto animate-fade-in-up animate-delay-200 font-brand">
               Join thousands of developers who are already tracking their progress with CodeTrail.
             </p>
             <Link to="/signup" className="inline-block animate-scale-in animate-delay-300">
-              <Button size="lg" variant="secondary" className="group tech-button tech-transition animate-glow-pulse btn-primary-glow">
+              <Button size="lg" variant="secondary" className="group tech-button tech-transition animate-glow-pulse btn-primary-glow text-base xs:text-lg">
                 Get Started for Free
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
