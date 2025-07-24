@@ -120,16 +120,11 @@ export interface DashboardStats {
 
 export class DashboardService {
     async getDashboardStats(userId: string): Promise<DashboardStats> {
-        console.log(`🔍 Getting dashboard stats for user: ${userId}`);
-
         // Check cache first
         const cached = await CacheService.getDashboardStats(userId);
         if (cached) {
-            console.log(`🚀 Dashboard Stats Cache HIT for user: ${userId}`);
             return cached;
         }
-
-        console.log(`🔄 Dashboard Stats Cache MISS for user: ${userId}, computing from database...`);
 
         // Get user profile data
         const userProfile = await prisma.user.findUnique({
@@ -147,14 +142,10 @@ export class DashboardService {
             throw new Error('User not found');
         }
 
-        console.log(`✅ User profile found: ${userProfile.email}`);
-
         // Get user's platform profiles
         const platformProfiles = await prisma.platformProfile.findMany({
             where: { userId },
         });
-
-        console.log(`📊 Found ${platformProfiles.length} platform profiles:`, platformProfiles.map(p => `${p.platform}: ${p.handle}`));
 
         // Get all user submissions
         const submissions = await prisma.submission.findMany({
@@ -165,38 +156,20 @@ export class DashboardService {
             orderBy: { timestamp: 'desc' },
         });
 
-        console.log(`📝 Found ${submissions.length} submissions for user`);
-        console.log(`📝 Submission sample:`, submissions.slice(0, 3).map(s => ({
-            platform: s.platform,
-            verdict: s.verdict,
-            problem: s.problem.name,
-            timestamp: s.timestamp
-        })));
-
         // Get contest participations
         const contestParticipations = await prisma.contestParticipation.findMany({
             where: { userId },
             orderBy: { timestamp: 'desc' },
         });
 
-        console.log(`🏆 Found ${contestParticipations.length} contest participations`);
-
         // Calculate total questions solved
         const totalQuestions = this.calculateTotalQuestions(submissions);
-        console.log(`🧮 Calculated total questions:`, totalQuestions);
 
         // Calculate active days
         const totalActiveDays = this.calculateActiveDays(submissions);
-        console.log(`📅 Calculated active days:`, totalActiveDays);
 
         // Generate heatmap data with real calendar data if available
         const heatmapData = await this.generateHeatmapDataWithCalendar(submissions, platformProfiles, userId);
-        console.log('📊 Generated heatmap data sample:', {
-            totalDates: Object.keys(heatmapData.combined).length,
-            sampleCombined: Object.entries(heatmapData.combined).slice(0, 5),
-            sampleLeetcode: Object.entries(heatmapData.leetcode).slice(0, 5),
-            sampleCodeforces: Object.entries(heatmapData.codeforces).slice(0, 5)
-        });
 
         // Calculate contest stats
         const totalContests = this.calculateContestStats(contestParticipations);
@@ -219,14 +192,13 @@ export class DashboardService {
             heatmapData,
             totalContests,
             contestRankings,
-            contestHistory,
             dsaTopicAnalysis,
             userInfo,
+            contestHistory,
         };
 
-        // Cache the computed result
+        // Cache the result
         await CacheService.setDashboardStats(userId, result);
-        console.log(`💾 Dashboard stats cached for user: ${userId}`);
 
         return result;
     }
@@ -312,8 +284,6 @@ export class DashboardService {
     }
 
     private async generateHeatmapDataWithCalendar(submissions: any[], platformProfiles: any[], userId: string) {
-        console.log('�️ Generating heatmap with FRESH calendar data (ignoring database submissions)...');
-        
         // Initialize empty heatmap - we'll populate it ONLY with fresh API data
         const heatmapData = {
             leetcode: {} as { [date: string]: number },
@@ -325,35 +295,14 @@ export class DashboardService {
         const leetcodeProfile = platformProfiles.find(p => p.platform === 'leetcode');
         if (leetcodeProfile?.handle) {
             try {
-                console.log(`� Fetching FRESH LeetCode calendar for: ${leetcodeProfile.handle}`);
                 const { LeetCodeService } = await import('./leetcodeService');
                 const leetcodeService = new LeetCodeService();
                 
                 const profile = await leetcodeService.getUserProfile(leetcodeProfile.handle);
                 
                 if (profile?.matchedUser?.submissionCalendar) {
-                    console.log('🎯 Processing FRESH calendar data (ignoring all database submissions)...');
                     
                     const submissionCalendar = JSON.parse(profile.matchedUser.submissionCalendar);
-                    
-                    console.log('📊 Raw calendar data sample:', 
-                        Object.entries(submissionCalendar).slice(0, 10).map(([ts, count]) => {
-                            const originalDate = new Date(parseInt(ts) * 1000);
-                            const shiftedDate = new Date(parseInt(ts) * 1000);
-                            shiftedDate.setDate(shiftedDate.getDate() - 1);
-                            
-                            const year = shiftedDate.getFullYear();
-                            const month = String(shiftedDate.getMonth() + 1).padStart(2, '0');
-                            const day = String(shiftedDate.getDate()).padStart(2, '0');
-                            return {
-                                timestamp: ts,
-                                count,
-                                originalDate: originalDate.toDateString(),
-                                shiftedDate: `${year}-${month}-${day}`,
-                                finalDate: `${year}-${month}-${day}`
-                            };
-                        })
-                    );
                     
                     // Convert calendar timestamps to date strings and populate LeetCode heatmap
                     Object.entries(submissionCalendar).forEach(([timestamp, count]) => {
@@ -368,16 +317,8 @@ export class DashboardService {
                         heatmapData.leetcode[dateKey] = count as number;
                     });
                     
-                    console.log(`✅ LeetCode calendar processed: ${Object.keys(heatmapData.leetcode).length} active days`);
-                    console.log('📅 July 2025 LeetCode data:', 
-                        Object.entries(heatmapData.leetcode)
-                            .filter(([date]) => date.startsWith('2025-07'))
-                            .map(([date, count]) => `${date}: ${count}`)
-                    );
-                    
                     // Cache this fresh data for future requests
                     try {
-                        console.log(`💾 Caching calendar data for future requests...`);
                         
                         // Clear old cache for this user/platform
                         await prisma.calendarCache.deleteMany({
@@ -401,12 +342,9 @@ export class DashboardService {
                             data: cacheEntries
                         });
                         
-                        console.log(`✅ Successfully cached ${cacheEntries.length} calendar entries`);
                     } catch (cacheError) {
                         console.error('❌ Failed to cache calendar data:', cacheError);
                     }
-                } else {
-                    console.log('⚠️ No submission calendar found in LeetCode profile');
                 }
             } catch (error) {
                 console.error('❌ Error fetching LeetCode calendar:', error);
@@ -420,8 +358,6 @@ export class DashboardService {
             !sub.problem.tags?.includes('daily-activity') // Exclude synthetic data
         );
         
-        console.log(`📊 Processing ${codeforcesSubmissions.length} Codeforces submissions for calendar cache`);
-        
         // Create Codeforces heatmap data from submissions
         const codeforcesHeatmapData: { [date: string]: number } = {};
         codeforcesSubmissions.forEach(submission => {
@@ -433,7 +369,6 @@ export class DashboardService {
         // Cache Codeforces calendar data if we have submissions
         if (Object.keys(codeforcesHeatmapData).length > 0) {
             try {
-                console.log('🗄️ Caching Codeforces calendar data...');
                 
                 // Delete existing Codeforces cache for this user
                 await prisma.calendarCache.deleteMany({
@@ -457,12 +392,9 @@ export class DashboardService {
                     data: codeforcesCacheEntries
                 });
                 
-                console.log(`✅ Successfully cached ${codeforcesCacheEntries.length} Codeforces calendar entries`);
             } catch (cacheError) {
                 console.error('❌ Failed to cache Codeforces calendar data:', cacheError);
             }
-        } else {
-            console.log('⚠️ No Codeforces submissions found for calendar cache');
         }
         
         // Combine LeetCode (from calendar) + Codeforces (from database)
@@ -477,15 +409,6 @@ export class DashboardService {
             heatmapData.combined[date] = leetcodeCount + codeforcesCount;
         });
         
-        console.log('📊 Final heatmap summary:', {
-            leetcodeDays: Object.keys(heatmapData.leetcode).length,
-            codeforcesDays: Object.keys(heatmapData.codeforces).length,
-            combinedDays: Object.keys(heatmapData.combined).length,
-            july2025Sample: Object.entries(heatmapData.combined)
-                .filter(([date]) => date.startsWith('2025-07'))
-                .slice(0, 10)
-        });
-        
         return heatmapData;
     }
 
@@ -494,13 +417,9 @@ export class DashboardService {
         const codeforcesHeatmap: { [date: string]: number } = {};
         const combinedHeatmap: { [date: string]: number } = {};
 
-        console.log(`🔍 Processing ${submissions.length} submissions for heatmap...`);
-        
         // Separate real submissions from daily-activity synthetic ones
         const realSubmissions = submissions.filter(sub => !sub.problem.tags?.includes('daily-activity'));
         const dailyActivitySubmissions = submissions.filter(sub => sub.problem.tags?.includes('daily-activity'));
-        
-        console.log(`📊 Submission breakdown: Real: ${realSubmissions.length}, Daily Activity: ${dailyActivitySubmissions.length}`);
         
         // Process real submissions first (exclude daily activity)
         realSubmissions.forEach(submission => {
@@ -519,20 +438,8 @@ export class DashboardService {
 
         // For LeetCode, prioritize calendar data if available
         // This will override the counts from summary problems with real calendar data
-        console.log('🔍 Checking for calendar data to override LeetCode heatmap...');
-        
-        // TODO: Get calendar data from latest sync and apply it here
-        // For now, just process daily activity to maintain the 1-per-day pattern from calendar
 
         // Log some sample data to verify counts
-        const sampleDates = Object.keys(combinedHeatmap).slice(0, 10);
-        console.log('📈 Sample heatmap data (real submissions only):', sampleDates.map(date => ({
-            date,
-            combined: combinedHeatmap[date],
-            leetcode: leetcodeHeatmap[date] || 0,
-            codeforces: codeforcesHeatmap[date] || 0
-        })));
-
         return {
             leetcode: leetcodeHeatmap,
             codeforces: codeforcesHeatmap,
@@ -546,14 +453,6 @@ export class DashboardService {
         
         const leetcodeContests = validParticipations.filter(p => p.platform === 'leetcode');
         const codeforcesContests = validParticipations.filter(p => p.platform === 'codeforces');
-
-        console.log(`📊 Contest stats: Total valid participations: ${validParticipations.length} (LeetCode: ${leetcodeContests.length}, Codeforces: ${codeforcesContests.length})`);
-        console.log(`📊 Sample contests:`, validParticipations.slice(0, 3).map(p => ({
-            platform: p.platform,
-            contestId: p.contestId,
-            rank: p.rank,
-            timestamp: p.timestamp
-        })));
 
         return {
             total: validParticipations.length,
@@ -628,16 +527,8 @@ export class DashboardService {
 
         // First, analyze from submission data (for Codeforces and any other platforms)
         const acceptedSubmissions = submissions.filter(sub => sub.verdict === 'AC' || sub.verdict === 'OK');
-        console.log(`📊 Found ${acceptedSubmissions.length} accepted submissions to analyze`);
         
         acceptedSubmissions.forEach(submission => {
-                console.log(`🔍 Processing submission:`, {
-                    platform: submission.platform,
-                    verdict: submission.verdict,
-                    problemName: submission.problem?.name,
-                    hasTags: !!submission.problem?.tags,
-                    tagCount: submission.problem?.tags?.length || 0
-                });
                 
                 if (submission.problem?.tags && Array.isArray(submission.problem.tags)) {
                     submission.problem.tags.forEach((tag: string) => {
@@ -663,7 +554,7 @@ export class DashboardService {
                         }
                     });
                 } else {
-                    console.log(`⚠️ Submission has no tags or tags not an array:`, submission.problem?.tags);
+    
                 }
             });
 
@@ -671,9 +562,6 @@ export class DashboardService {
         const leetcodeProfile = platformProfiles.find(p => p.platform === 'leetcode');
         if (leetcodeProfile?.handle) {
             try {
-                console.log('🔍 Fetching LeetCode skills data for comprehensive topic analysis...');
-                
-                // Import LeetCode service and fetch skills data
                 const { LeetCodeService } = await import('./leetcodeService');
                 const leetcodeService = new LeetCodeService();
                 
@@ -718,21 +606,12 @@ export class DashboardService {
                         }
                     });
                     
-                    console.log('✅ Enhanced DSA topic analysis with LeetCode skills data');
-                    
-                    // Log all topics for debugging
-                    const allTopics = Object.keys(topicAnalysis)
-                        .filter(topic => !topic.includes('daily-activity'))
-                        .sort();
-                    console.log(`📊 Total DSA topics found: ${allTopics.length}`);
-                    console.log(`📋 All topics:`, allTopics.slice(0, 20).join(', ') + (allTopics.length > 20 ? '...' : ''));
-                    
                 } else {
                     console.log('⚠️ No LeetCode skills data available, using submission-based analysis');
                 }
             } catch (error) {
                 console.warn('⚠️ Error fetching LeetCode skills data:', error);
-                console.log('📊 Falling back to submission-based topic analysis');
+
             }
         }
 
@@ -740,16 +619,12 @@ export class DashboardService {
         const codeforcesProfile = platformProfiles.find(p => p.platform === 'codeforces');
         if (codeforcesProfile?.handle) {
             try {
-                console.log('🔍 Fetching fresh Codeforces data for topic analysis...');
-                
                 const { codeforcesService } = await import('./codeforcesService');
                 const statusResponse = await codeforcesService.getUserStatus(codeforcesProfile.handle);
                 
                 if (statusResponse?.result) {
                     const acceptedSubmissions = statusResponse.result
                         .filter((sub: any) => sub.verdict === 'OK'); // Codeforces uses 'OK' for accepted
-                    
-                    console.log(`📊 Found ${acceptedSubmissions.length} accepted Codeforces submissions from API`);
                     
                     // Track unique problems to avoid double counting
                     const uniqueProblems = new Set();
@@ -762,13 +637,6 @@ export class DashboardService {
                             return;
                         }
                         uniqueProblems.add(problemKey);
-                        
-                        console.log(`🏷️ Processing Codeforces problem:`, {
-                            name: submission.problem.name,
-                            tags: submission.problem.tags,
-                            contestId: submission.problem.contestId,
-                            index: submission.problem.index
-                        });
                         
                         if (submission.problem?.tags && Array.isArray(submission.problem.tags)) {
                             submission.problem.tags.forEach((tag: string) => {
@@ -788,13 +656,11 @@ export class DashboardService {
                                     topicAnalysis[tag].total++;
                                     topicAnalysis[tag].codeforces++;
                                     
-                                    console.log(`✅ Added ${tag} topic from Codeforces problem: ${submission.problem.name}`);
                                 }
                             });
                         }
                     });
                     
-                    console.log(`✅ Enhanced DSA topic analysis with ${uniqueProblems.size} unique Codeforces problems`);
                 } else {
                     console.log('⚠️ No Codeforces submission results found from API');
                 }
@@ -818,11 +684,6 @@ export class DashboardService {
         const topicCount = Object.keys(filteredTopicAnalysis).length;
         const codeforcesTopics = Object.entries(filteredTopicAnalysis).filter(([_, data]) => data.codeforces > 0);
         
-        console.log(`🎯 Final DSA Topic Analysis Results:`);
-        console.log(`   • Total topics: ${topicCount}`);
-        console.log(`   • Topics with Codeforces problems: ${codeforcesTopics.length}`);
-        console.log(`   • Sample Codeforces topics:`, codeforcesTopics.slice(0, 5).map(([topic, data]) => `${topic} (${data.codeforces})`));
-
         return filteredTopicAnalysis;
     }
 
@@ -853,16 +714,10 @@ export class DashboardService {
     }
 
     async updatePlatformHandle(userId: string, platform: string, handle: string) {
-        console.log('🔧 DashboardService.updatePlatformHandle called with:', { userId, platform, handle });
-
         // Validate platform
         if (!['leetcode', 'codeforces'].includes(platform)) {
-            console.log('❌ Invalid platform:', platform);
             throw new Error('Invalid platform. Only leetcode and codeforces are supported.');
         }
-
-        // Validate the handle and fetch platform data
-        console.log('🔍 Validating handle and fetching platform data...');
 
         let platformData: any = {};
 
@@ -873,17 +728,13 @@ export class DashboardService {
                 const leetcodeService = new LeetCodeService();
 
                 // Try to fetch user profile to validate handle
-                console.log('🔄 Fetching LeetCode profile to validate handle...');
                 const profile = await leetcodeService.getUserProfile(handle);
 
                 if (!profile?.matchedUser) {
                     throw new Error(`LeetCode user '${handle}' not found. Please check the username.`);
                 }
 
-                console.log('✅ LeetCode handle validated successfully');
-
                 // Fetch additional data for comprehensive sync
-                console.log('📥 Fetching additional LeetCode data...');
                 const [calendar, contest] = await Promise.all([
                     leetcodeService.getUserCalendar(handle, new Date().getFullYear()).catch(() => null),
                     leetcodeService.getUserContestRanking(handle).catch(() => null)
@@ -894,31 +745,23 @@ export class DashboardService {
                     calendar,
                     contest
                 };
-                console.log('📊 LeetCode data fetched successfully');
 
             } else if (platform === 'codeforces') {
                 // Import and use Codeforces service to validate handle and fetch data
                 const { codeforcesService } = await import('./codeforcesService');
 
                 // Try to fetch user info to validate handle
-                console.log('🔄 Fetching Codeforces profile to validate handle...');
                 const userInfo = await codeforcesService.getUserInfo(handle);
 
                 if (!userInfo?.result || userInfo.result.length === 0) {
                     throw new Error(`Codeforces user '${handle}' not found. Please check the username.`);
                 }
 
-                console.log('✅ Codeforces handle validated successfully');
-
                 platformData = { userInfo: userInfo.result[0] };
-                console.log('📊 Codeforces data fetched successfully');
             }
         } catch (error) {
-            console.log('❌ Handle validation/data fetch failed:', error);
             throw new Error(`Failed to validate ${platform} handle '${handle}': ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-
-        console.log('🔄 Updating platform profile...');
 
         // Update or create platform profile with additional metadata
         const updatedProfile = await prisma.platformProfile.upsert({
@@ -948,22 +791,16 @@ export class DashboardService {
             }
         });
 
-        console.log('✅ Platform profile updated:', updatedProfile);
-
         // Now sync the actual submission and contest data
-        console.log('🔄 Starting comprehensive data synchronization...');
         await this.syncPlatformData(userId, platform, handle, platformData);
 
         // Invalidate relevant caches after successful sync
-        console.log('🗑️ Invalidating caches after platform handle update...');
         await Promise.all([
             CacheService.invalidateUserCache(userId),
             CacheService.invalidatePlatformCache(platform as 'leetcode' | 'codeforces', handle),
             // Also invalidate analytics cache since platform data changed
             this.invalidateAnalyticsCache(userId),
         ]);
-
-        console.log('💡 Platform handle updated and data synchronized successfully!');
 
         // Return updated profile with sync info
         return {
@@ -978,19 +815,13 @@ export class DashboardService {
     }
 
     async getDailySubmissions(userId: string) {
-        console.log(`🔍 Getting daily submissions for user: ${userId}`);
+
 
         try {
             // Get calendar cache data for the user
             const calendarData = await prisma.calendarCache.findMany({
                 where: { userId },
                 orderBy: { date: 'asc' }
-            });
-
-            console.log(`📊 Found ${calendarData.length} calendar entries`);
-            console.log(`📊 Calendar entries by platform:`, {
-                leetcode: calendarData.filter(entry => entry.platform === 'leetcode').length,
-                codeforces: calendarData.filter(entry => entry.platform === 'codeforces').length
             });
 
             // If no calendar cache data, try to generate it
@@ -1002,16 +833,12 @@ export class DashboardService {
                     where: { userId }
                 });
                 
-                console.log(`📊 Found ${platformProfiles.length} platform profiles`);
-                
                 if (platformProfiles.length > 0) {
                     // Get user submissions
                     const submissions = await prisma.submission.findMany({
                         where: { userId },
                         include: { problem: true }
                     });
-                    
-                    console.log(`📊 Found ${submissions.length} submissions for calendar generation`);
                     
                     // Generate heatmap data which will also create calendar cache
                     await this.generateHeatmapDataWithCalendar(submissions, platformProfiles, userId);
@@ -1022,10 +849,8 @@ export class DashboardService {
                         orderBy: { date: 'asc' }
                     });
                     
-                    console.log(`📊 After generation, found ${newCalendarData.length} calendar entries`);
                     return this.processCalendarData(newCalendarData);
                 } else {
-                    console.log('⚠️ No platform profiles found for user');
                     return this.getEmptyDailySubmissionsResponse();
                 }
             }
@@ -1081,9 +906,6 @@ export class DashboardService {
             new Date(entry.date) >= thirtyDaysAgo
         );
 
-        console.log(`✅ Returning ${recentData.length} days of submission data`);
-        console.log(`📊 Sample data:`, recentData.slice(0, 5));
-
         return {
             dailySubmissions: recentData,
             totalDays: recentData.length,
@@ -1107,16 +929,12 @@ export class DashboardService {
 
     // Method to sync platform data to database
     private async syncPlatformData(userId: string, platform: string, handle: string, platformData: any) {
-        console.log(`🔄 Syncing ${platform} data for user ${userId}...`);
-
         try {
             if (platform === 'leetcode') {
                 await this.syncLeetCodeData(userId, handle, platformData);
             } else if (platform === 'codeforces') {
                 await this.syncCodeforcesData(userId, handle, platformData);
             }
-
-            console.log(`✅ ${platform} data sync completed successfully`);
         } catch (error) {
             console.error(`❌ Error syncing ${platform} data:`, error);
             throw error; // Re-throw to let caller handle the error
@@ -1126,7 +944,6 @@ export class DashboardService {
     // NOTE: Commented out sample data method - was adding dummy data to database
     /*
     private async addSampleData(userId: string, platform: string, handle: string) {
-        console.log(`📊 Adding sample data for ${platform}...`);
 
         try {
             // Create sample problems and submissions
@@ -1189,7 +1006,6 @@ export class DashboardService {
                                 language: platform === 'leetcode' ? 'python' : 'cpp'
                             }
                         });
-                        console.log(`✅ Added sample submission: ${sample.name} on ${submissionDate.toDateString()}`);
                     }
                 }
             }
@@ -1222,13 +1038,11 @@ export class DashboardService {
                             timestamp: contestDate
                         }
                     });
-                    console.log(`✅ Added sample contest: ${contestId}`);
                 } catch (error) {
                     console.warn(`⚠️ Error adding sample contest ${contestId}:`, error);
                 }
             }
 
-            console.log(`✅ Sample data added successfully for ${platform}`);
         } catch (error) {
             console.error(`❌ Error adding sample data for ${platform}:`, error);
         }
@@ -1236,55 +1050,24 @@ export class DashboardService {
     */
 
     private async syncLeetCodeData(userId: string, handle: string, data: any) {
-        console.log('🔄 Syncing LeetCode data...');
-        
-        // Debug: Log what data we actually received
-        console.log('🔍 Debug - LeetCode data structure:');
-        console.log('📋 data.profile exists:', !!data.profile);
-        console.log('📋 data.calendar exists:', !!data.calendar);
-        console.log('📋 data.contest exists:', !!data.contest);
         
         if (data.profile) {
-            console.log('📋 data.profile.matchedUser exists:', !!data.profile.matchedUser);
-            console.log('📋 data.profile.recentSubmissionList exists:', !!data.profile.recentSubmissionList);
-            console.log('📋 data.profile.recentSubmissionList length:', data.profile.recentSubmissionList?.length || 0);
             
             if (data.profile.matchedUser) {
-                console.log('📋 data.profile.matchedUser.submitStats exists:', !!data.profile.matchedUser.submitStats);
-                console.log('📋 data.profile.matchedUser.submissionCalendar exists:', !!data.profile.matchedUser.submissionCalendar);
+                
             }
         }
         
         if (data.calendar) {
-            console.log('📋 submissionCalendar exists:', !!data.calendar.submissionCalendar);
+            
         }
 
         try {
             // Process submissions from calendar data if available
             if (data.profile?.matchedUser?.submissionCalendar) {
-                console.log('📅 Processing LeetCode calendar submissions...');
                 
                 // Calendar contains daily submission counts - create synthetic submissions for active days
                 const submissionCalendar = JSON.parse(data.profile.matchedUser.submissionCalendar);
-                
-                console.log('📊 Calendar data analysis:', {
-                    totalDates: Object.keys(submissionCalendar).length,
-                    sampleEntries: Object.entries(submissionCalendar).slice(0, 10).map(([ts, count]) => ({
-                        timestamp: ts,
-                        count: count,
-                        date: new Date(parseInt(ts) * 1000).toDateString()
-                    })),
-                    july2025Entries: Object.entries(submissionCalendar)
-                        .filter(([ts]) => {
-                            const date = new Date(parseInt(ts) * 1000);
-                            return date.getFullYear() === 2025 && date.getMonth() === 6; // July = month 6
-                        })
-                        .map(([ts, count]) => ({
-                            timestamp: ts,
-                            count: count,
-                            date: new Date(parseInt(ts) * 1000).toDateString()
-                        }))
-                });
                 
                 let totalSubmissions = 0;
                 let activeDays = 0;
@@ -1320,7 +1103,6 @@ export class DashboardService {
                             const neededSubmissions = dailyCount - existingCount;
 
                             if (neededSubmissions > 0) {
-                                console.log(`📅 Creating ${neededSubmissions} submissions for ${activityDate.toDateString()} (target: ${dailyCount}, existing: ${existingCount})`);
                                 
                                 // Create multiple problems and submissions for this day to match the count
                                 for (let submissionIndex = 0; submissionIndex < neededSubmissions; submissionIndex++) {
@@ -1363,9 +1145,8 @@ export class DashboardService {
                                     });
                                 }
                                 
-                                console.log(`✅ Added ${neededSubmissions} submissions for ${activityDate.toDateString()} (total: ${dailyCount})`);
                             } else {
-                                console.log(`⏭️ Skipping ${activityDate.toDateString()} - already has ${existingCount} submissions (target: ${dailyCount})`);
+                                
                             }
                         } catch (error) {
                             console.warn(`⚠️ Error creating daily activity for ${activityDate.toDateString()}:`, error);
@@ -1373,7 +1154,6 @@ export class DashboardService {
                     }
                 }
                 
-                console.log(`📊 Calendar summary: ${totalSubmissions} total submissions across ${activeDays} active days`);
             } else {
                 console.log('⚠️ No calendar submission data available');
             }
@@ -1385,7 +1165,7 @@ export class DashboardService {
             // Process actual recent submissions from profile if available  
             if (data.profile?.recentSubmissionList) {
                 const recentSubmissions = data.profile.recentSubmissionList;
-                console.log(`📊 Processing ${recentSubmissions.length} recent submissions...`);
+
 
                 for (const submission of recentSubmissions) {
                     try {
@@ -1432,7 +1212,7 @@ export class DashboardService {
                                     language: submission.lang || 'unknown'
                                 }
                             });
-                            console.log(`✅ Added LeetCode submission: ${submission.title}`);
+
                         }
                     } catch (error) {
                         console.warn(`⚠️ Error syncing LeetCode submission ${submission.title}:`, error);
@@ -1445,9 +1225,8 @@ export class DashboardService {
             console.log('✅ Skipped recent submissions processing to maintain accurate count (252 problems from stats)');
 
             // Create summary records based on submission statistics instead of trying to fetch all individual problems
-            console.log('🔍 Creating summary records based on submission statistics...');
+
             const totalSolved = data.profile?.matchedUser?.submitStats?.acSubmissionNum?.find((s: any) => s.difficulty === 'All')?.count || 0;
-            console.log('📊 User has solved', totalSolved, 'total problems');
             
             // Instead of trying to fetch all individual problems (which is complex), 
             // let's create summary problems for now and focus on recent submissions
@@ -1457,8 +1236,7 @@ export class DashboardService {
 
             // Process contest data
             if (data.contest?.userContestRankingHistory) {
-                console.log(`🏆 Processing ${data.contest.userContestRankingHistory.length} contest participations...`);
-
+                
                 // Process ALL contests instead of just the last 10
                 const allContests = data.contest.userContestRankingHistory;
 
@@ -1484,13 +1262,11 @@ export class DashboardService {
                                 timestamp: contestTimestamp
                             }
                         });
-                        console.log(`✅ Added LeetCode contest: ${contest.contest.title} (Rank: ${contest.ranking})`);
                     } catch (error) {
                         console.warn(`⚠️ Error syncing LeetCode contest ${contest.contest.title}:`, error);
                     }
                 }
                 
-                console.log(`🏆 Successfully processed ${allContests.length} total contest participations`);
             } else {
                 console.log('⚠️ No contest data available');
             }
@@ -1503,7 +1279,7 @@ export class DashboardService {
     // Create summary problems based on user statistics - a more practical approach
     private async createSummaryProblemsFromStats(userId: string, handle: string, submitStats: any) {
         try {
-            console.log('📊 Creating summary problems from submission statistics...');
+
             
             if (!submitStats?.acSubmissionNum) {
                 console.log('⚠️ No submission statistics available');
@@ -1517,7 +1293,7 @@ export class DashboardService {
                 const difficultyStats = submitStats.acSubmissionNum.find((s: any) => s.difficulty === difficulty);
                 if (difficultyStats && difficultyStats.count > 0) {
                     const count = difficultyStats.count;
-                    console.log(`📈 Creating ${count} ${difficulty} summary problems...`);
+    
                     
                     // Create summary problems for this difficulty level
                     for (let i = 1; i <= count; i++) {
@@ -1568,12 +1344,9 @@ export class DashboardService {
                         }
                     }
                     
-                    console.log(`✅ Created ${count} ${difficulty} problems and submissions`);
                 }
             }
 
-            console.log('🎉 Summary problems creation completed!');
-            
         } catch (error) {
             console.error('❌ Error creating summary problems:', error);
         }
@@ -1585,7 +1358,7 @@ export class DashboardService {
             const { LeetCodeService } = await import('./leetcodeService');
             const leetcodeService = new LeetCodeService();
 
-            console.log('🔄 Fetching user profile with all solved problems data...');
+
             
             // Get the user's complete profile including solved problems
             const userProfile = await leetcodeService.getUserProfile(handle);
@@ -1598,27 +1371,19 @@ export class DashboardService {
             // Get submission statistics which includes all solved problems count
             const submitStats = userProfile.matchedUser.submitStats;
             if (submitStats?.acSubmissionNum) {
-                console.log('📊 Found submission stats:', {
-                    totalSolved: submitStats.acSubmissionNum.reduce((sum: number, stat: any) => sum + stat.count, 0),
-                    easy: submitStats.acSubmissionNum.find((s: any) => s.difficulty === 'Easy')?.count || 0,
-                    medium: submitStats.acSubmissionNum.find((s: any) => s.difficulty === 'Medium')?.count || 0,
-                    hard: submitStats.acSubmissionNum.find((s: any) => s.difficulty === 'Hard')?.count || 0
-                });
+
             }
 
             // Try to get solved problems using a different approach - fetch user's question progress
-            console.log('� Attempting to fetch user question progress...');
+
             
             try {
                 const questionProgress = await leetcodeService.getUserQuestionProgress(handle);
-                console.log('📋 Question progress data:', questionProgress ? 'Found' : 'Not found');
                 
                 if (questionProgress?.userProfileUserQuestionProgressV2?.userQuestionStatus) {
                     const solvedQuestions = questionProgress.userProfileUserQuestionProgressV2.userQuestionStatus.filter(
                         (q: any) => q.status === 'ACCEPTED' || q.status === 'AC'
                     );
-                    
-                    console.log(`✅ Found ${solvedQuestions.length} solved problems from question progress`);
                     
                     // Process each solved question
                     for (const solvedQ of solvedQuestions) {
@@ -1632,7 +1397,7 @@ export class DashboardService {
             }
 
             // Fallback: Use brute force approach - check all problems against user profile
-            console.log('🔄 Using fallback method: checking all problems for solved status...');
+            
             await this.bruteForceCheckSolvedProblems(userId, handle);
 
         } catch (error) {
@@ -1697,7 +1462,6 @@ export class DashboardService {
                         language: 'unknown'
                     }
                 });
-                console.log(`✅ Added solved problem: ${title}`);
             }
         } catch (error) {
             console.warn(`⚠️ Error creating problem/submission:`, error);
@@ -1710,8 +1474,6 @@ export class DashboardService {
             const { LeetCodeService } = await import('./leetcodeService');
             const leetcodeService = new LeetCodeService();
             
-            console.log('🔄 Brute force checking all problems for solved status...');
-            
             let skip = 0;
             const limit = 50; // Smaller batches to avoid overwhelming
             let totalProcessed = 0;
@@ -1719,18 +1481,15 @@ export class DashboardService {
 
             while (skip < 1000) { // Limit to first 1000 problems to avoid infinite loop
                 try {
-                    console.log(`📥 Fetching problems batch: skip=${skip}, limit=${limit}`);
                     
                     // Fetch problems without any filter first
                     const problemsData = await leetcodeService.getProblems('', limit, skip, {});
                     
                     if (!problemsData?.problemsetQuestionList?.questions || problemsData.problemsetQuestionList.questions.length === 0) {
-                        console.log('📋 No more problems to fetch');
                         break;
                     }
 
                     const problems = problemsData.problemsetQuestionList.questions;
-                    console.log(`📥 Got ${problems.length} problems in batch`);
 
                     // Check each problem individually for solved status
                     for (const problem of problems) {
@@ -1744,7 +1503,6 @@ export class DashboardService {
                             problem.status.toLowerCase().includes('accept')
                         )) {
                             solvedFound++;
-                            console.log(`🎯 Found solved problem: ${problem.title} (status: ${problem.status})`);
                             
                             await this.createProblemAndSubmission(userId, handle, {
                                 titleSlug: problem.titleSlug,
@@ -1765,23 +1523,19 @@ export class DashboardService {
                 }
             }
 
-            console.log(`🎉 Brute force check completed!`);
-            console.log(`📊 Total problems checked: ${totalProcessed}`);
-            console.log(`✅ Solved problems found: ${solvedFound}`);
-
         } catch (error) {
             console.error('❌ Error in brute force check:', error);
         }
     }
 
     private async syncCodeforcesData(userId: string, handle: string, data: any) {
-        console.log('🔄 Syncing Codeforces data...');
+
 
         try {
             const { codeforcesService } = await import('./codeforcesService');
 
             // Get user submissions
-            console.log('📥 Fetching Codeforces submissions...');
+
             const submissions = await codeforcesService.getUserStatus(handle).catch(() => null);
 
             if (submissions?.result) {
@@ -1789,8 +1543,6 @@ export class DashboardService {
                 const recentAccepted = submissions.result
                     .filter((sub: any) => sub.verdict === 'OK')
                     .slice(0, 50);
-
-                console.log(`📊 Processing ${recentAccepted.length} recent accepted submissions...`);
 
                 for (const submission of recentAccepted) {
                     try {
@@ -1842,7 +1594,6 @@ export class DashboardService {
                                     language: submission.programmingLanguage
                                 }
                             });
-                            console.log(`✅ Added Codeforces submission: ${submission.problem.name}`);
                         }
                     } catch (error) {
                         console.warn(`⚠️ Error syncing Codeforces submission ${submission.problem.name}:`, error);
@@ -1851,12 +1602,11 @@ export class DashboardService {
             }
 
             // Get contest rating history
-            console.log('🏆 Fetching Codeforces contest rating history...');
+
             const ratingData = await codeforcesService.getUserRating(handle).catch(() => null);
 
             if (ratingData?.result) {
-                console.log(`🏆 Processing ${ratingData.result.length} contest participations...`);
-
+                
                 for (const contest of ratingData.result) {
                     try {
                         const contestTimestamp = new Date(contest.ratingUpdateTimeSeconds * 1000);
@@ -1881,7 +1631,6 @@ export class DashboardService {
                                 timestamp: contestTimestamp
                             }
                         });
-                        console.log(`✅ Added Codeforces contest: ${contest.contestName || contest.contestId}`);
                     } catch (error) {
                         console.warn(`⚠️ Error syncing Codeforces contest ${contest.contestId}:`, error);
                     }

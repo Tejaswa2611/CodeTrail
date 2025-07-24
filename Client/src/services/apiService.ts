@@ -66,7 +66,7 @@ async function apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<
 
         const result: ApiResponse<T> = await response.json();
 
-        if (result.success && result.data) {
+        if (result.success && result.data !== undefined) {
             return result.data;
         } else {
             throw new ApiError(

@@ -61,8 +61,8 @@ const Analytics = () => {
             const analyticsData = await analyticsApi.getAnalyticsData();
             console.log('📊 Analytics: Response received:', analyticsData);
 
-            if (analyticsData?.data) {
-                const data = analyticsData.data;
+            if (analyticsData) {
+                const data = analyticsData;
 
                 // Set LeetCode handle
                 setLeetcodeHandle(data.userProfiles.leetcodeHandle);
