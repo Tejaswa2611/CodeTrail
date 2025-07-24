@@ -71,12 +71,14 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
             onClick={() => onMobileClose?.()} // Close mobile menu when navigating
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors relative group",
-                "hover:bg-accent hover:text-accent-foreground",
-                isActive ? "bg-tech-primary-green text-tech-deep-black" : "text-muted-foreground",
+                "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 relative group",
+                "hover:bg-gradient-to-r hover:from-[#E64373]/10 hover:to-[#644EC9]/10",
+                isActive 
+                  ? "bg-gradient-to-r from-[#E64373]/20 to-[#644EC9]/20 text-[#E64373] border border-[#E64373]/30 shadow-lg" 
+                  : "text-muted-foreground hover:text-foreground",
                 isCollapsed && "justify-center",
                 // Special styling for AI Coach
-                item.name === "AI Coach" && !isActive && "hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20"
+                item.name === "AI Coach" && !isActive && "hover:bg-gradient-to-r hover:from-[#644EC9]/20 hover:to-[#5D3B87]/20"
               )
             }
           >
@@ -116,7 +118,7 @@ export function Sidebar({ className, onMobileClose }: SidebarProps) {
       {/* User Profile Section */}
       <div className="border-t border-border p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-tech-primary-green text-tech-deep-black rounded-full flex items-center justify-center text-sm font-bold">
+          <div className="w-8 h-8 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg">
             {getUserInitials()}
           </div>
           {!isCollapsed && (

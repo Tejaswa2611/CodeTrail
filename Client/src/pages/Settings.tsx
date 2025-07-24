@@ -146,8 +146,8 @@ export default function Settings() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
-      <div className="animate-slide-in-left">
+            <div className="space-y-6">
+          <div>
         <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
           Settings
         </h1>
@@ -158,7 +158,7 @@ export default function Settings() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card className="animate-scale-in animate-delay-200 hover-lift shadow-soft">
+                      <Card className="hover-lift shadow-soft">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
                 <Link2 className="h-5 w-5" />
@@ -252,7 +252,7 @@ export default function Settings() {
           </Card>
         </div>
 
-        <div className="space-y-6 animate-slide-in-right animate-delay-200">
+                  <div className="space-y-6">
           <Card className="hover-lift shadow-soft glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>

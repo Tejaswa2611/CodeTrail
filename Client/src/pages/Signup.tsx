@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Github, Mail, ArrowRight, User, Eye, EyeOff } from "lucide-react";
+import { Github, Mail, ArrowRight, User, Eye, EyeOff, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -91,26 +91,26 @@ export default function Signup() {
     };
 
     return (
-        <div className="min-h-screen bg-background page-enter">
+        <div className="min-h-screen bg-background no-page-animation">
             <Navbar minimal={true} />
 
             <div className="flex items-center justify-center p-4 min-h-[calc(100vh-100px)] sm:min-h-[calc(100vh-80px)]">
-                <div className="w-full max-w-md space-y-8 animate-slide-down relative z-10">
-                    <div className="text-center animate-scale-in animate-delay-200">
+                <div className="w-full max-w-md space-y-8 relative z-10">
+                    <div className="text-center">
                         <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center shadow-lg animate-floating">
-                                <span className="text-primary-foreground font-bold text-2xl">&lt;&gt;</span>
+                            <div className="w-16 h-16 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-2xl flex items-center justify-center shadow-lg">
+                                <Code className="text-white font-bold text-2xl h-8 w-8" />
                             </div>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold mb-2 animate-fade-in-up animate-delay-300 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                        <h1 className="text-3xl md:text-4xl font-bold mb-2">
                             Join CodeTrail
                         </h1>
-                        <p className="text-muted-foreground text-lg animate-fade-in-up animate-delay-500">
+                        <p className="text-muted-foreground text-lg">
                             Start tracking your coding journey today
                         </p>
                     </div>
 
-                    <Card className="shadow-glow glass animate-scale-in animate-delay-300 hover-lift tech-card-enhanced">
+                    <Card className="shadow-glow glass hover-lift tech-card-enhanced">
                         <CardHeader className="text-center">
                             <CardTitle className="text-xl font-semibold terminal-text text-tech-primary-green" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>Create your account</CardTitle>
                             <CardDescription className="text-tech-gray">

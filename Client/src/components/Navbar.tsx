@@ -13,8 +13,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import ScrambleLogo from "@/components/ScrambleLogo";
-import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface NavbarProps {
     minimal?: boolean;
@@ -40,29 +38,24 @@ export function Navbar({ minimal = false }: NavbarProps) {
     };
 
     const handleEditProfile = () => {
-        // TODO: Navigate to edit profile page when implemented
         navigate('/profile');
         console.log('📝 Edit Profile clicked - redirecting to profile page');
     };
 
     const handleSettings = () => {
-        // TODO: Navigate to settings page when implemented  
         navigate('/settings');
         console.log('⚙️ Settings clicked - redirecting to settings page');
     };
 
     const handleNotifications = () => {
-        // TODO: Open notifications panel when implemented
         console.log('🔔 Notifications clicked - feature coming soon');
     };
 
     const handleHelp = () => {
-        // TODO: Navigate to help/support page when implemented
         console.log('❓ Help clicked - feature coming soon');
     };
 
     const handlePrivacy = () => {
-        // TODO: Navigate to privacy/security page when implemented
         console.log('🔒 Privacy & Security clicked - feature coming soon');
     };
 
@@ -103,13 +96,16 @@ export function Navbar({ minimal = false }: NavbarProps) {
             <header className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
                 <button
                     type="button"
-                    className="hover:opacity-80 transition-opacity cursor-pointer select-none bg-transparent border-none p-0"
+                    className="hover:opacity-80 transition-opacity duration-150 cursor-pointer select-none bg-transparent border-none p-0"
                     onClick={() => {
                         navigate('/');
                     }}
                 >
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border">
-                        <span className="text-2xl font-extrabold text-tech-primary-green font-mono select-none" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>C</span>
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-lg flex items-center justify-center shadow-lg">
+                            <Code className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="text-xl font-bold text-foreground">CodeTrail</span>
                     </div>
                 </button>
 
@@ -120,39 +116,35 @@ export function Navbar({ minimal = false }: NavbarProps) {
 
     // Full navbar for landing page
     return (
-        <header className="w-full px-2 sm:px-6 py-3 flex items-center justify-between overflow-x-hidden bg-background z-50 border-b border-border" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <Link to="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
-                {/* Mobile: Circle C */}
-                <div className="block sm:hidden w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border">
-                  <span className="text-2xl font-extrabold text-tech-primary-green font-mono select-none" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>C</span>
-                </div>
-                {/* Desktop: Full CodeTrail */}
-                <div className="hidden sm:block">
-                  <ScrambleLogo 
-                      size="md"
-                      animated={true}
-                      autoScramble={false}
-                      variant="compact"
-                  />
+        <header className="w-full px-2 sm:px-6 py-3 flex items-center justify-between overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <Link to="/" className="flex-shrink-0 hover:opacity-80 transition-opacity duration-200">
+                <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-200 will-change-auto">
+                        <Code className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-xl font-bold bg-gradient-to-r from-[#E64373] to-[#644EC9] bg-clip-text text-transparent hidden sm:block will-change-auto">CodeTrail</span>
                 </div>
             </Link>
 
             {/* Desktop nav */}
             <nav className="hidden sm:flex items-center space-x-2 md:space-x-8">
-                <button
-                    onClick={() => scrollToSection('features')}
-                    className="hidden md:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer terminal-text"
-                    style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}
-                >
-                    Features
-                </button>
-                <button
-                    onClick={() => scrollToSection('demo')}
-                    className="hidden md:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer terminal-text"
-                    style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}
-                >
-                    Demo
-                </button>
+                <div className="hidden md:block relative">
+                    {/* Simplified shining border */}
+                    <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] p-[1px] opacity-60">
+                        <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] opacity-10 blur-sm"></div>
+                    </div>
+                    
+                    <Link
+                        to="/engineering"
+                        className="relative block px-4 py-2 bg-background/90 backdrop-blur-sm rounded-lg text-[#E64373] hover:text-[#644EC9] transition-all duration-200 font-semibold group hover:bg-background will-change-auto"
+                    >
+                        <span className="relative z-10 flex items-center gap-2">
+                            <span className="animate-bounce-subtle">✨</span>
+                            Engineering
+                        </span>
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#E64373] to-[#644EC9] transition-all duration-200 group-hover:w-full"></span>
+                    </Link>
+                </div>
                 <ThemeToggle />
 
                 {isAuthenticated ? (
@@ -160,17 +152,19 @@ export function Navbar({ minimal = false }: NavbarProps) {
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                                 <Avatar className="h-8 w-8">
-                                    <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                                    <AvatarFallback className="bg-gradient-to-r from-[#E64373] to-[#644EC9] text-white font-semibold">
+                                        {getUserInitials()}
+                                    </AvatarFallback>
                                 </Avatar>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56" align="end" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                    <p className="text-sm font-medium leading-none">
                                         {user?.firstName} {user?.lastName}
                                     </p>
-                                    <p className="text-xs leading-none text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                    <p className="text-xs leading-none text-muted-foreground">
                                         {user?.email}
                                     </p>
                                 </div>
@@ -178,11 +172,11 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
 
                             {/* Dashboard & Profile */}
-                            <DropdownMenuItem onClick={() => navigate('/dashboard')} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Dashboard</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleEditProfile} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            <DropdownMenuItem onClick={handleEditProfile}>
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Edit Profile</span>
                             </DropdownMenuItem>
@@ -190,15 +184,15 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
 
                             {/* Settings & Preferences */}
-                            <DropdownMenuItem onClick={handleSettings} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            <DropdownMenuItem onClick={handleSettings}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Settings</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handleNotifications} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            <DropdownMenuItem onClick={handleNotifications}>
                                 <Bell className="mr-2 h-4 w-4" />
                                 <span>Notifications</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={handlePrivacy} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            <DropdownMenuItem onClick={handlePrivacy}>
                                 <Shield className="mr-2 h-4 w-4" />
                                 <span>Privacy & Security</span>
                             </DropdownMenuItem>
@@ -206,7 +200,7 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
 
                             {/* Help & Support */}
-                            <DropdownMenuItem onClick={handleHelp} className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            <DropdownMenuItem onClick={handleHelp}>
                                 <HelpCircle className="mr-2 h-4 w-4" />
                                 <span>Help & Support</span>
                             </DropdownMenuItem>
@@ -214,32 +208,24 @@ export function Navbar({ minimal = false }: NavbarProps) {
                             <DropdownMenuSeparator />
 
                             {/* Sign Out */}
-                            <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                            <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
                                 <LogOut className="mr-2 h-4 w-4" />
                                 <span>Sign Out</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 ) : (
-                    <>
-                        <Link to="/login">
-                            <Button variant="gradient" size="sm" className="text-xs px-2 py-1 sm:text-sm sm:px-3 sm:py-2 terminal-text text-white" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                Login
-                            </Button>
-                        </Link>
-                        <Link to="/signup" replace>
-                            <Button variant="gradient" size="sm" className="text-xs px-2 py-1 sm:text-sm sm:px-3 sm:py-2 terminal-text text-white" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                Get Started
-                            </Button>
-                        </Link>
-                    </>
+                    <Link to="/login">
+                        <Button variant="outline" size="sm" className="text-sm font-medium border-[#644EC9] text-[#644EC9] hover:bg-[#644EC9]/10 hover:border-[#E64373] hover:text-[#E64373] transition-all duration-200 will-change-auto">
+                            Login
+                        </Button>
+                    </Link>
                 )}
             </nav>
 
-            {/* Mobile nav: only logo and theme toggle, add menu icon if needed */}
+            {/* Mobile nav: only logo and theme toggle */}
             <div className="flex sm:hidden items-center gap-2">
                 <ThemeToggle />
-                {/* Optionally add a hamburger menu here for mobile nav */}
             </div>
         </header>
     );

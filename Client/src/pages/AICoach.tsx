@@ -110,7 +110,11 @@ const AICoach = () => {
     }
 
     return (
-        <div className={`flex flex-col ${isMobile ? '' : 'lg:flex-row'} bg-gradient-to-br from-background via-background to-secondary/20 min-h-screen ${isMobile ? 'p-2 gap-2' : 'p-3 lg:p-6 gap-4 lg:gap-6'}`}>
+        <div className={`flex flex-col ${isMobile ? '' : 'lg:flex-row'} bg-gradient-hero min-h-screen ${isMobile ? 'p-2 gap-2' : 'p-3 lg:p-6 gap-4 lg:gap-6'} relative`}>
+            {/* Background Elements - Consistent with Landing Page */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+            <div className="absolute top-20 left-10 w-72 h-72 bg-[#E64373]/10 rounded-full blur-3xl animate-pulse pointer-events-none" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#644EC9]/10 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDelay: '2s' }} />
             {/* Main Content */}
             <main className={`flex-1 flex flex-col ${isMobile ? 'gap-2' : 'gap-4 lg:gap-6'}`}>
                 {/* Header */}
@@ -124,9 +128,11 @@ const AICoach = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-3 mb-4">
-                        <Brain className="w-8 h-8 text-primary" />
+                        <div className="w-12 h-12 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-2xl flex items-center justify-center shadow-lg">
+                            <Brain className="w-6 h-6 text-white" />
+                        </div>
                         <div>
-                            <h1 className="text-2xl font-bold">AI Coach</h1>
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent">AI Coach</h1>
                             <p className="text-muted-foreground">Personalized analysis and recommendations</p>
                         </div>
                     </div>

@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Layout } from "./components/Layout";
+import { ThemeFavicon } from "./components/ThemeFavicon";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard2";
@@ -15,6 +16,7 @@ import AICoach from "./pages/AICoach";
 import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Engineering from "./pages/Engineering";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -35,15 +37,18 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <ThemeFavicon />
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <Routes>
+              <div className="page-transition-wrapper">
+                <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/engineering" element={<Engineering />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Layout>
@@ -62,7 +67,9 @@ const App = () => (
               <Route path="/settings" element={
                 <ProtectedRoute>
                   <Layout>
-                    <Settings />
+                    <div className="no-page-animation">
+                      <Settings />
+                    </div>
                   </Layout>
                 </ProtectedRoute>
               } />
@@ -83,8 +90,9 @@ const App = () => (
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+                </Routes>
+              </div>
+            </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
     </ThemeProvider>

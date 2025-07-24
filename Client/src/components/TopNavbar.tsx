@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Bell, Search, Sun, Moon, User, Settings, LogOut, Menu } from "lucide-react";
+import { Bell, Search, Sun, Moon, User, Settings, LogOut, Menu, Code } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import ScrambleLogo from "@/components/ScrambleLogo";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -81,23 +80,15 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
           <Menu className="h-5 w-5" />
         </Button>
         
-        {/* Logo */}
-        <div className="flex items-center">
-          {/* Mobile: Circle C */}
-          <div className="block sm:hidden w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border">
-            <span className="text-2xl font-extrabold text-tech-primary-green font-mono select-none" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>C</span>
+        {/* Logo - Consistent with Landing Page */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-2xl flex items-center justify-center shadow-lg">
+            <Code className="h-6 w-6 text-white font-bold" />
           </div>
-          {/* Desktop: Full CodeTrail */}
-          <div className="hidden sm:block">
-            <ScrambleLogo 
-              size="md"
-              animated={true}
-              autoScramble={false}
-              variant="compact"
-            />
-          </div>
+          <span className="text-xl font-bold bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent hidden sm:block">
+            CodeTrail
+          </span>
         </div>
-        
       </div>
 
       <div className="flex items-center gap-4">
@@ -114,13 +105,12 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
           )}
         </Button>
 
-
         <div className="flex items-center gap-3">
-          <div className="text-right">
-            <p className="text-sm font-medium text-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-medium text-foreground">
               {getGreeting()}
             </p>
-            <p className="text-xs text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+            <p className="text-xs text-muted-foreground">
               Ready to practice?
             </p>
           </div>
@@ -130,7 +120,7 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center hover:bg-gradient-primary/90 transition-colors cursor-pointer"
+                className="w-10 h-10 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-full flex items-center justify-center hover:from-[#E64373]/90 hover:to-[#644EC9]/90 transition-all duration-300 cursor-pointer shadow-lg"
                 onClick={() => console.log('🖱️ Profile button clicked in TopNavbar')}
               >
                 <span className="text-white font-semibold">{getUserInitials()}</span>
@@ -139,10 +129,10 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                  <p className="text-sm font-medium leading-none">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                  <p className="text-xs leading-none text-muted-foreground">
                     {user?.email}
                   </p>
                 </div>
@@ -152,15 +142,11 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
               {/* Profile & Settings */}
               <DropdownMenuItem onClick={handleEditProfile}>
                 <User className="mr-2 h-4 w-4" />
-                <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                  Edit Profile
-                </span>
+                <span>Edit Profile</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSettings}>
                 <Settings className="mr-2 h-4 w-4" />
-                <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                  Settings
-                </span>
+                <span>Settings</span>
               </DropdownMenuItem>
               
               <DropdownMenuSeparator />
@@ -168,9 +154,7 @@ export function TopNavbar({ onThemeToggle, theme = 'light', onMobileMenuToggle }
               {/* Sign Out */}
               <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950">
                 <LogOut className="mr-2 h-4 w-4" />
-                <span className="terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                  Sign Out
-                </span>
+                <span>Sign Out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

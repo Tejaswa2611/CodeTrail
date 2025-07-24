@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, HelpCircle } from 'lucide-react';
+import { Mail, Linkedin, Twitter, Globe, Calendar, Lock, ExternalLink, AlertTriangle, Plus, BarChart3, HelpCircle, User, Code, Target, Flame, Trophy } from 'lucide-react';
 import { fetchDashboardData, DashboardStats, dashboardApi } from '../services/apiService';
 import { useToast } from '@/hooks/use-toast';
 import { getErrorToastConfig, logError, safeAsync } from '@/utils/errorHandling';
 import ContestRatingGraph from '../components/ContestRatingGraph';
-import MatrixLoader, { MatrixSpinner, MatrixSkeleton } from '../components/MatrixLoader';
 import { useTheme } from '../contexts/ThemeContext';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 
 // Import platform images
 import codeforcesDarkLogo from '../assets/codeforces_dark.png';
@@ -36,13 +39,31 @@ const InfoTooltip = ({ message }: { message: string }) => {
     );
 };
 
-// Helper function to get difficulty colors with hacker theme
+// Loading skeleton component
+const LoadingSkeleton = ({ className = "h-4 w-20" }: { className?: string }) => (
+    <div className={`animate-pulse bg-muted rounded ${className}`}></div>
+);
+
+// Loading spinner component
+const LoadingSpinner = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
+    const sizeClasses = {
+        sm: "w-4 h-4",
+        md: "w-6 h-6", 
+        lg: "w-8 h-8"
+    };
+    
+    return (
+        <div className={`animate-spin rounded-full border-2 border-muted border-t-primary ${sizeClasses[size]}`}></div>
+    );
+};
+
+// Helper function to get difficulty colors
 const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
-        case 'easy': return 'text-hacker-success'; /* Hacker green for easy */
-        case 'medium': return 'text-hacker-warning'; /* Orange for medium */
-        case 'hard': return 'text-red-400'; /* Red for hard */
-        default: return 'text-hacker-green-dark'; /* Dark green for unknown */
+        case 'easy': return 'text-success';
+        case 'medium': return 'text-warning';
+        case 'hard': return 'text-destructive';
+        default: return 'text-muted-foreground';
     }
 };
 
@@ -229,47 +250,50 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
     const codeforcesProfile = getCodeforcesProfile();
 
     return (
-        <aside className={`w-full lg:w-80 hacker-terminal hacker-glow backdrop-blur-sm rounded-2xl ${isMobile ? 'p-2 gap-2 min-h-[30vh]' : 'p-4 lg:p-6 gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh]'} flex flex-col font-mono`}>
+        <Card className={`w-full lg:w-80 modern-card shadow-medium ${isMobile ? 'p-2 gap-2 min-h-[30vh]' : 'p-4 lg:p-6 gap-4 lg:gap-6 min-h-[50vh] lg:min-h-[90vh]'} flex flex-col`}>
             {/* User Profile Section */}
-            <div className="flex flex-col items-center gap-2">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-hacker-green via-hacker-green-bright to-hacker-green rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold mb-2 text-hacker-black hacker-glow">
+            <div className="flex flex-col items-center gap-3 pb-6 border-b border-border">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold text-white shadow-lg">
                     {isLoading ? (
-                        <MatrixLoader size="md" />
+                        <LoadingSpinner size="sm" />
                     ) : (
-                        userProfile?.firstName?.[0]?.toUpperCase() || 'U'
+                        userProfile?.firstName?.[0]?.toUpperCase() || <User className="w-8 h-8" />
                     )}
                 </div>
-                <h2 className="text-lg lg:text-xl font-semibold text-center text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                    {isLoading ? (
-                        <MatrixSkeleton lines={1} className="w-32 mx-auto" />
-                    ) : (
-                        userProfile ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim() : 'User'
-                    )}
-                </h2>
-                <p className="text-hacker-green text-sm terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                    {isLoading ? (
-                        <MatrixSkeleton lines={1} className="w-24 mx-auto" />
-                    ) : (
-                        userProfile?.email || 'No email'
-                    )}
-                </p>
-                <p className="text-xs text-hacker-green-dark terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                    {'>'} Joined: {isLoading ? (
-                        <MatrixSkeleton lines={1} className="w-20 inline-block" />
-                    ) : (
-                        userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Unknown'
-                    )}
-                </p>
+                <div className="text-center">
+                    <h2 className="text-lg lg:text-xl font-semibold text-foreground">
+                        {isLoading ? (
+                            <LoadingSkeleton className="w-32 h-5 mx-auto" />
+                        ) : (
+                            userProfile ? `${userProfile.firstName} ${userProfile.lastName || ''}`.trim() : 'User'
+                        )}
+                    </h2>
+                    <p className="text-muted-foreground text-sm mt-1">
+                        {isLoading ? (
+                            <LoadingSkeleton className="w-24 h-4 mx-auto" />
+                        ) : (
+                            userProfile?.email || 'No email'
+                        )}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                        Joined: {isLoading ? (
+                            <LoadingSkeleton className="w-20 h-3 inline-block" />
+                        ) : (
+                            userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Unknown'
+                        )}
+                    </p>
+                </div>
             </div>
 
             {/* Platform Profiles Section */}
-            <div>
-                <h3 className="text-sm font-bold mb-3 text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                    {'<>'} Connected Platforms
+            <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Code className="w-4 h-4" />
+                    Connected Platforms
                 </h3>
                 <div className="space-y-3">
                     {/* LeetCode */}
-                    <div className="p-3 rounded-lg bg-hacker-green-muted/30 border border-hacker-green-dark hover:border-hacker-green transition-colors">
+                    <Card className="p-3 hover:shadow-medium transition-all duration-200">
                         <div className="flex items-center gap-3 mb-2">
                             <img 
                                 src={getPlatformLogo('leetcode', actualTheme)} 
@@ -278,54 +302,57 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                             />
 
                             {editingPlatform === 'leetcode' ? (
-                                <div className="flex-1 text-sm font-medium text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                    {'>'} Edit LeetCode Handle
+                                <div className="flex-1 text-sm font-medium text-foreground">
+                                    Edit LeetCode Handle
                                 </div>
                             ) : (
                                 <>
                                     <button
                                         onClick={() => handlePlatformEdit('leetcode')}
-                                        className="flex-1 text-left text-sm hover:text-hacker-green-bright transition-colors font-mono"
+                                        className="flex-1 text-left text-sm hover:text-primary transition-colors"
                                     >
                                         LeetCode {leetcodeProfile?.handle ? `(@${leetcodeProfile.handle})` : ''}
                                     </button>
-                                    <div className={`w-2 h-2 rounded-full hacker-pulse ${leetcodeProfile ? 'bg-hacker-success' : 'bg-red-500'}`}></div>
+                                    <div className={`w-2 h-2 rounded-full ${leetcodeProfile ? 'bg-success animate-pulse' : 'bg-destructive'}`}></div>
                                 </>
                             )}
                         </div>
 
                         {editingPlatform === 'leetcode' && (
-                            <div className="space-y-2 pl-9">
-                                <input
+                            <div className="space-y-3 ml-8">
+                                <Input
                                     type="text"
                                     value={platformHandle}
                                     onChange={(e) => setPlatformHandle(e.target.value)}
-                                    className="w-full px-3 py-2 text-sm bg-hacker-black border border-hacker-green-dark rounded-md focus:outline-none focus:ring-2 focus:ring-hacker-green focus:border-transparent text-hacker-green placeholder-hacker-green-dark font-mono"
                                     placeholder="Enter LeetCode handle"
+                                    className="text-sm"
                                     autoFocus
                                 />
                                 <div className="flex gap-2">
-                                    <button
+                                    <Button
                                         onClick={handlePlatformSave}
                                         disabled={isSaving}
-                                        className="flex-1 px-3 py-2 bg-hacker-success text-hacker-black text-xs rounded-md hover:bg-hacker-success/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium font-mono hacker-glow"
+                                        size="sm"
+                                        className="flex-1"
                                     >
-                                        {isSaving && <MatrixSpinner size="sm" />}
+                                        {isSaving && <LoadingSpinner size="sm" />}
                                         {isSaving ? 'Syncing...' : 'Save & Sync'}
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={() => setEditingPlatform(null)}
-                                        className="flex-1 px-3 py-2 bg-hacker-green-muted text-hacker-green text-xs rounded-md hover:bg-hacker-green-muted/80 font-medium font-mono border border-hacker-green-dark"
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex-1"
                                     >
                                         Cancel
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         )}
-                    </div>
+                    </Card>
 
                     {/* Codeforces */}
-                    <div className="p-3 rounded-lg bg-hacker-green-muted/30 border border-hacker-green-dark hover:border-hacker-green transition-colors">
+                    <Card className="p-3 hover:shadow-medium transition-all duration-200">
                         <div className="flex items-center gap-3 mb-2">
                             <img 
                                 src={getPlatformLogo('codeforces', actualTheme)} 
@@ -334,107 +361,118 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
                             />
 
                             {editingPlatform === 'codeforces' ? (
-                                <div className="flex-1 text-sm font-medium text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                    {'>'} Edit Codeforces Handle
+                                <div className="flex-1 text-sm font-medium text-foreground">
+                                    Edit Codeforces Handle
                                 </div>
                             ) : (
                                 <>
                                     <button
                                         onClick={() => handlePlatformEdit('codeforces')}
-                                        className="flex-1 text-left text-sm hover:text-hacker-green-bright transition-colors font-mono"
+                                        className="flex-1 text-left text-sm hover:text-primary transition-colors"
                                     >
                                         Codeforces {codeforcesProfile?.handle ? `(@${codeforcesProfile.handle})` : ''}
                                     </button>
-                                    <div className={`w-2 h-2 rounded-full hacker-pulse ${codeforcesProfile ? 'bg-hacker-success' : 'bg-red-500'}`}></div>
+                                    <div className={`w-2 h-2 rounded-full ${codeforcesProfile ? 'bg-success animate-pulse' : 'bg-destructive'}`}></div>
                                 </>
                             )}
                         </div>
 
                         {editingPlatform === 'codeforces' && (
-                            <div className="space-y-2 pl-9">
-                                <input
+                            <div className="space-y-3 ml-8">
+                                <Input
                                     type="text"
                                     value={platformHandle}
                                     onChange={(e) => setPlatformHandle(e.target.value)}
-                                    className="w-full px-3 py-2 text-sm bg-hacker-black border border-hacker-green-dark rounded-md focus:outline-none focus:ring-2 focus:ring-hacker-green focus:border-transparent text-hacker-green placeholder-hacker-green-dark font-mono"
                                     placeholder="Enter Codeforces handle"
+                                    className="text-sm"
                                     autoFocus
                                 />
                                 <div className="flex gap-2">
-                                    <button
+                                    <Button
                                         onClick={handlePlatformSave}
                                         disabled={isSaving}
-                                        className="flex-1 px-3 py-2 bg-hacker-success text-hacker-black text-xs rounded-md hover:bg-hacker-success/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1 font-medium font-mono hacker-glow"
+                                        size="sm"
+                                        className="flex-1"
                                     >
-                                        {isSaving && <MatrixSpinner size="sm" />}
+                                        {isSaving && <LoadingSpinner size="sm" />}
                                         {isSaving ? 'Saving...' : 'Save'}
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={() => setEditingPlatform(null)}
-                                        className="flex-1 px-3 py-2 bg-hacker-green-muted text-hacker-green text-xs rounded-md hover:bg-hacker-green-muted/80 font-medium font-mono border border-hacker-green-dark"
+                                        variant="outline"
+                                        size="sm"
+                                        className="flex-1"
                                     >
                                         Cancel
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         )}
-                    </div>
 
-                    {/* Rating info for Codeforces if available */}
-                    {codeforcesProfile && codeforcesProfile.currentRating && (
-                        <div className="text-xs text-hacker-green-dark pl-9 font-mono">
-                            Rating: {codeforcesProfile.currentRating} ({codeforcesProfile.rank || 'Unrated'})
-                            {codeforcesProfile.maxRating && (
-                                <span> • Max: {codeforcesProfile.maxRating}</span>
-                            )}
-                        </div>
-                    )}
+                        {/* Rating info for Codeforces if available */}
+                        {codeforcesProfile && codeforcesProfile.currentRating && (
+                            <div className="text-xs text-muted-foreground ml-8 mt-2">
+                                Rating: {codeforcesProfile.currentRating} ({codeforcesProfile.rank || 'Unrated'})
+                                {codeforcesProfile.maxRating && (
+                                    <span> • Max: {codeforcesProfile.maxRating}</span>
+                                )}
+                            </div>
+                        )}
+                    </Card>
                 </div>
             </div>
 
             {/* Quick Stats */}
-            <div>
-                <h3 className="text-sm font-bold mb-3 text-hacker-green-bright terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                    {'<>'} Quick Stats
+            <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4" />
+                    Quick Stats
                 </h3>
-                <div className="space-y-2 text-sm font-mono">
-                    <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
-                        <span className="text-hacker-green-dark">Problems Solved:</span>
-                        <span className="font-medium text-hacker-green">
-                            {isLoading ? <MatrixSkeleton lines={1} className="w-8 h-3" /> : (data?.totalQuestions?.total || 0)}
+                <div className="space-y-3 text-sm">
+                    <div className="flex justify-between items-center py-2 border-b border-border">
+                        <span className="text-muted-foreground flex items-center gap-2">
+                            <Target className="w-3 h-3" />
+                            Problems Solved
+                        </span>
+                        <span className="font-medium text-foreground">
+                            {isLoading ? <LoadingSkeleton className="w-8 h-4" /> : (data?.totalQuestions?.total || 0)}
                         </span>
                     </div>
-                    <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
-                        <span className="text-hacker-green-dark">Active Days:</span>
-                        <span className="font-medium text-hacker-green">
-                            {isLoading ? <MatrixSkeleton lines={1} className="w-8 h-3" /> : (data?.totalActiveDays?.total || 0)}
+                    <div className="flex justify-between items-center py-2 border-b border-border">
+                        <span className="text-muted-foreground flex items-center gap-2">
+                            <Flame className="w-3 h-3" />
+                            Active Days
+                        </span>
+                        <span className="font-medium text-foreground">
+                            {isLoading ? <LoadingSkeleton className="w-8 h-4" /> : (data?.totalActiveDays?.total || 0)}
                         </span>
                     </div>
-                    <div className="flex justify-between border-b border-hacker-green-dark/30 pb-1">
-                        <span className="text-hacker-green-dark">Contests:</span>
-                        <span className="font-medium text-hacker-green">
-                            {isLoading ? <MatrixSkeleton lines={1} className="w-8 h-3" /> : (data?.totalContests?.total || 0)}
+                    <div className="flex justify-between items-center py-2 border-b border-border">
+                        <span className="text-muted-foreground flex items-center gap-2">
+                            <Trophy className="w-3 h-3" />
+                            Contests
+                        </span>
+                        <span className="font-medium text-foreground">
+                            {isLoading ? <LoadingSkeleton className="w-8 h-4" /> : (data?.totalContests?.total || 0)}
                         </span>
                     </div>
                 </div>
             </div>
 
             {/* Footer */}
-            <div className="text-xs text-hacker-green-dark space-y-1 mt-auto font-mono">
-                <div className="flex justify-between border-b border-hacker-green-dark/20 pb-1">
-                    <span>Profile Views:</span>
-                    <span>0</span>
-                </div>
-                <div className="flex justify-between border-b border-hacker-green-dark/20 pb-1">
+            <div className="text-xs text-muted-foreground space-y-2 mt-auto pt-4 border-t border-border">
+                <div className="flex justify-between items-center">
                     <span>Last Refresh:</span>
                     <span>{new Date().toLocaleDateString()}</span>
                 </div>
-                <div className="flex justify-between">
-                    <span>Profile Visibility:</span>
-                    <span className="text-hacker-success">Public</span>
+                <div className="flex justify-between items-center">
+                    <span>Profile Status:</span>
+                    <span className="text-xs px-2 py-1 bg-success/10 text-success rounded-full">
+                        Active
+                    </span>
                 </div>
             </div>
-        </aside>
+        </Card>
     );
 };
 
@@ -850,7 +888,7 @@ const Dashboard2 = () => {
                                 Retrying automatically... ({retryCount}/{maxRetries})
                             </p>
                             <div className="flex items-center justify-center">
-                                <MatrixSpinner size="sm" className="mr-2" />
+                                <LoadingSpinner size="sm" className="mr-2" />
                                 <span className="text-sm">Please wait</span>
                             </div>
                         </div>
@@ -885,7 +923,11 @@ const Dashboard2 = () => {
     const topicAnalysis = getTopicAnalysis();
 
     return (
-        <div className={`flex flex-col ${isMobile ? '' : 'lg:flex-row'} matrix-bg min-h-screen ${isMobile ? 'p-2 gap-2' : 'p-3 lg:p-6 gap-4 lg:gap-6'} font-mono w-full max-w-full overflow-x-hidden`}>
+        <div className={`flex flex-col ${isMobile ? '' : 'lg:flex-row'} bg-gradient-hero min-h-screen ${isMobile ? 'p-2 gap-2' : 'p-3 lg:p-6 gap-4 lg:gap-6'} w-full max-w-full overflow-x-hidden relative`}>
+            {/* Background Elements - Consistent with Landing Page */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+            <div className="absolute top-20 left-10 w-72 h-72 bg-[#E64373]/10 rounded-full blur-3xl animate-pulse pointer-events-none" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#644EC9]/10 rounded-full blur-3xl animate-pulse pointer-events-none" style={{ animationDelay: '2s' }} />
             {/* Sidebar */}
             <Sidebar data={data} isLoading={isLoading} refreshData={fetchData} />
             {/* Main Content */}
@@ -893,34 +935,37 @@ const Dashboard2 = () => {
                 {/* Row 1: 2 squares + 1 rectangle */}
                 <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'md:grid-cols-2 lg:grid-cols-12 gap-4 lg:gap-6'} w-full max-w-full min-w-0`}>
                     {/* Total Questions */}
-                    <div className={`lg:col-span-2 hacker-terminal hacker-glow rounded-lg ${isMobile ? 'p-2 min-h-[80px]' : 'p-4 lg:p-6 min-h-[110px]'} flex flex-col items-center justify-center hover:shadow-hacker-green/20 transition-shadow duration-300 relative w-full max-w-full min-w-0`}>
+                    <Card className={`lg:col-span-2 modern-card hover-lift ${isMobile ? 'p-3 min-h-[100px]' : 'p-4 lg:p-6 min-h-[120px]'} flex flex-col items-center justify-center relative w-full max-w-full min-w-0 border-l-4 border-l-[#E64373] hover:shadow-[#E64373]/20`}>
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined total from all connected platforms" />
                         </div>
-                        <div className="text-sm text-hacker-green-dark mb-2 uppercase tracking-wider terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                            {'>'} Total Questions
+                        <div className="text-sm text-muted-foreground mb-2 uppercase tracking-wider font-medium flex items-center gap-2">
+                            <Target className="w-4 h-4 text-[#E64373]" />
+                            Total Questions
                         </div>
-                        <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
-                            {isLoading ? <MatrixLoader size="md" /> : formatNumber(getTotalQuestions())}
+                        <div className="text-3xl lg:text-4xl font-bold text-foreground">
+                            {isLoading ? <LoadingSpinner size="md" /> : formatNumber(getTotalQuestions())}
                         </div>
-                    </div>
+                    </Card>
                     {/* Total Active Days */}
-                    <div className={`lg:col-span-2 hacker-terminal hacker-glow rounded-lg ${isMobile ? 'p-2 min-h-[80px]' : 'p-4 lg:p-6 min-h-[110px]'} flex flex-col items-center justify-center hover:shadow-hacker-green/20 transition-shadow duration-300 relative w-full max-w-full min-w-0`}>
+                    <Card className={`lg:col-span-2 modern-card hover-lift ${isMobile ? 'p-3 min-h-[100px]' : 'p-4 lg:p-6 min-h-[120px]'} flex flex-col items-center justify-center relative w-full max-w-full min-w-0`}>
                         <div className="absolute top-3 right-3">
                             <InfoTooltip message="Combined active days from all connected platforms" />
                         </div>
-                        <div className="text-sm text-hacker-green-dark mb-2 uppercase tracking-wider terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                            {'>'} Active Days
+                        <div className="text-sm text-muted-foreground mb-2 uppercase tracking-wider font-medium flex items-center gap-2">
+                            <Flame className="w-4 h-4" />
+                            Active Days
                         </div>
-                        <div className="text-3xl lg:text-4xl font-bold text-hacker-green-bright font-mono">
-                            {isLoading ? <MatrixLoader size="md" /> : formatNumber(getTotalActiveDays())}
+                        <div className="text-3xl lg:text-4xl font-bold text-foreground">
+                            {isLoading ? <LoadingSpinner size="md" /> : formatNumber(getTotalActiveDays())}
                         </div>
-                    </div>
+                    </Card>
                     {/* Heatmap */}
-                    <div className="md:col-span-2 lg:col-span-8 bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col min-h-[110px] shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0 overflow-x-auto">
-                        <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-2 text-xs">
-                            <span className="text-hacker-green-bright font-bold terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                {isLoading ? 'Loading...' : '<> Activity Overview (All Platforms)'}
+                    <Card className="md:col-span-2 lg:col-span-8 modern-card hover-lift p-4 lg:p-6 flex flex-col min-h-[120px] w-full max-w-full min-w-0 overflow-x-auto">
+                        <div className="flex flex-wrap items-center gap-2 lg:gap-4 mb-3 text-sm">
+                            <span className="text-foreground font-semibold flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                {isLoading ? 'Loading...' : 'Activity Overview (All Platforms)'}
                             </span>
                             <span className="text-muted-foreground">
                                 {(() => {
@@ -940,90 +985,78 @@ const Dashboard2 = () => {
                         {/* Monthly Heatmap */}
                         {isLoading ? (
                             <div className="flex items-center justify-center h-24">
-                                <MatrixLoader size="md" text="Loading heatmap..." />
+                                <LoadingSpinner size="md" />
                             </div>
                         ) : (
                             <div className="space-y-1">
-                                {/* Single continuous heatmap grid - GitHub style with horizontal scrolling */}
+                                {/* Heatmap Container */}
                                 <div 
                                     ref={heatmapRef}
                                     className="overflow-x-auto pb-2 hide-scrollbar min-w-0 w-full"
                                 >
                                     <div className="flex gap-2 min-w-max">
-                                        {getHeatmapData().map((month, monthIndex) => (
-                                            <div key={`${month.year}-${month.name}`} className="flex flex-col">
-                                                {/* Month label */}
-                                                <div className="text-xs text-muted-foreground mb-1 text-center min-w-[50px] terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                                    {month.name}
-                                                </div>
-                                                
-                                                {/* Days grid in vertical columns */}
-                                                <div className="flex gap-[2px]">
-                                                    {month.weeks.map((week, weekIndex) => (
-                                                        <div key={weekIndex} className="flex flex-col gap-[2px]">
-                                                            {week.map((day, dayIndex) => {
-                                                                if (!day) {
-                                                                    // Empty padding days
-                                                                    return <div key={`empty-${dayIndex}`} className="w-[11px] h-[11px]"></div>;
-                                                                }
-
-                                                                // Dynamic color intensity based on submission count
-                                                                let bgColor = 'bg-gray-200 dark:bg-gray-800'; // Default for 0 submissions
-                                                                if (day.count > 0) {
-                                                                    if (day.count >= 10) bgColor = 'bg-green-800'; // Very active - darkest green
-                                                                    else if (day.count >= 5) bgColor = 'bg-green-700'; // Highly active - dark green
-                                                                    else if (day.count >= 3) bgColor = 'bg-green-600'; // Moderately active - medium green
-                                                                    else if (day.count >= 2) bgColor = 'bg-green-400'; // Lightly active - light green
-                                                                    else bgColor = 'bg-green-300'; // Minimal activity - very light green
-                                                                }
-
-                                                                const tooltipText = day.count > 0 
-                                                                    ? (() => {
-                                                                        const parts = [];
-                                                                        if (day.count === 1) {
-                                                                            parts.push(`${day.count} submission`);
-                                                                        } else {
-                                                                            parts.push(`${day.count} submissions`);
-                                                                        }
-                                                                        
-                                                                        // Add platform breakdown if available
-                                                                        const breakdown = [];
-                                                                        if (day.leetcodeCount > 0) breakdown.push(`LeetCode: ${day.leetcodeCount}`);
-                                                                        if (day.codeforcesCount > 0) breakdown.push(`Codeforces: ${day.codeforcesCount}`);
-                                                                        
-                                                                        if (breakdown.length > 0) {
-                                                                            parts.push(`(${breakdown.join(', ')})`);
-                                                                        }
-                                                                        
-                                                                        parts.push(`on ${day.formattedDate}`);
-                                                                        return parts.join(' ');
-                                                                    })()
-                                                                    : `No submissions on ${day.formattedDate}`;
-
+                                        {(() => {
+                                            const monthsData = getHeatmapData();
+                                            return monthsData.map((month, monthIndex) => {
+                                                return (
+                                                    <div key={`${month.year}-${month.name}`} className="flex flex-col">
+                                                        {/* Month label */}
+                                                        <div className="text-xs text-muted-foreground mb-1 text-center min-w-[50px]">
+                                                            {month.name}
+                                                        </div>
+                                                        
+                                                        {/* Days grid */}
+                                                        <div className="flex gap-[2px]">
+                                                            {month.weeks.map((week, weekIndex) => {
                                                                 return (
-                                                                    <div
-                                                                        key={day.dateString}
-                                                                        className={`w-[11px] h-[11px] rounded-[2px] cursor-pointer transition-all duration-200 hover:ring-1 hover:ring-blue-400 ${bgColor}`}
-                                                                        title={tooltipText}
-                                                                    />
+                                                                    <div key={weekIndex} className="flex flex-col gap-[2px]">
+                                                                        {week.map((day, dayIndex) => {
+                                                                            if (!day) {
+                                                                                return <div key={`empty-${dayIndex}`} className="w-[11px] h-[11px]"></div>;
+                                                                            }
+
+                                                                            // Color logic
+                                                                            let bgColor = 'bg-gray-200 dark:bg-gray-800';
+                                                                            if (day.count > 0) {
+                                                                                if (day.count >= 10) bgColor = 'bg-green-800';
+                                                                                else if (day.count >= 5) bgColor = 'bg-green-700';
+                                                                                else if (day.count >= 3) bgColor = 'bg-green-600';
+                                                                                else if (day.count >= 2) bgColor = 'bg-green-400';
+                                                                                else bgColor = 'bg-green-300';
+                                                                            }
+
+                                                                            // Tooltip text
+                                                                            const tooltipText = day.count > 0 
+                                                                                ? `${day.count} submission${day.count === 1 ? '' : 's'} on ${day.formattedDate}`
+                                                                                : `No submissions on ${day.formattedDate}`;
+
+                                                                            return (
+                                                                                <div
+                                                                                    key={day.dateString}
+                                                                                    className={`w-[11px] h-[11px] rounded-[2px] cursor-pointer transition-all duration-200 hover:ring-1 hover:ring-blue-400 ${bgColor}`}
+                                                                                    title={tooltipText}
+                                                                                />
+                                                                            );
+                                                                        })}
+                                                                    </div>
                                                                 );
                                                             })}
                                                         </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
+                                                    </div>
+                                                );
+                                            });
+                                        })()}
                                     </div>
                                 </div>
                                 
-                                {/* Day labels at the bottom */}
+                                {/* Day labels */}
                                 <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-                                    <div className="flex items-center gap-6 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                    <div className="flex items-center gap-6">
                                         <span>Mon</span>
                                         <span>Wed</span>
                                         <span>Fri</span>
                                     </div>
-                                    <div className="text-xs text-muted-foreground opacity-70 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                                    <div className="text-xs text-muted-foreground opacity-70">
                                         ← Drag to see full year →
                                     </div>
                                 </div>
@@ -1031,7 +1064,7 @@ const Dashboard2 = () => {
                         )}
                         
                         {/* Activity level legend */}
-                        <div className="flex justify-end items-center gap-1 text-xs mt-1 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
+                        <div className="flex justify-end items-center gap-1 text-xs mt-1">
                             <span className="text-muted-foreground">Less</span>
                             <div className="flex gap-[2px]">
                                 <div className="w-[11px] h-[11px] rounded-[2px] bg-gray-200 dark:bg-gray-800" title="No activity"></div>
@@ -1043,24 +1076,25 @@ const Dashboard2 = () => {
                             </div>
                             <span className="text-muted-foreground">More</span>
                         </div>
-                    </div>
+                    </Card>
                 </div>
                 {/* Row 2: 2 columns */}
                 <div className={`grid grid-cols-1 ${isMobile ? 'gap-2' : 'xl:grid-cols-12 gap-4 lg:gap-6'} flex-1 w-full max-w-full min-w-0`}>
                     {/* Column 1: 4 stacked blocks */}
                     <div className={`xl:col-span-7 flex flex-col ${isMobile ? 'gap-2' : 'gap-4 lg:gap-6'} w-full max-w-full min-w-0`}>
                         {/* Total Contests */}
-                        <div className={`bg-card/70 backdrop-blur-sm border border-border rounded-lg ${isMobile ? 'p-2 gap-2 min-h-[80px]' : 'p-4 lg:p-6 gap-4 min-h-[120px]'} flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0`}>
+                        <Card className={`modern-card hover-lift ${isMobile ? 'p-3 gap-2 min-h-[80px]' : 'p-4 lg:p-6 gap-4 min-h-[120px]'} flex flex-col w-full max-w-full min-w-0`}>
                             {/* Main Content Area */}
                             <div className="flex items-center justify-between gap-6">
                                 {/* Left Side - Total Number */}
                                 <div className="flex flex-col items-center justify-center">
-                                    <div className="text-lg font-bold mb-2 terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                        {'>'} Total Contests
+                                    <div className="text-lg font-semibold mb-2 text-foreground flex items-center gap-2">
+                                        <Trophy className="w-5 h-5" />
+                                        Total Contests
                                     </div>
                                     <div className="text-4xl lg:text-5xl font-bold text-foreground">
                                         {isLoading ? (
-                                            <MatrixLoader size="lg" />
+                                            <LoadingSpinner size="lg" />
                                         ) : (
                                             (() => {
                                                 try {
@@ -1143,7 +1177,7 @@ const Dashboard2 = () => {
                                     })()}
                                 </div>
                             </div>
-                        </div>
+                        </Card>
                         
                         {/* Contest Rating Graph - Full Width */}
                         <div className="col-span-1 lg:col-span-2 w-full max-w-full min-w-0">
@@ -1155,14 +1189,15 @@ const Dashboard2 = () => {
                         </div>
                         
                         {/* Contest Rankings */}
-                        <div className={`bg-card/70 backdrop-blur-sm border border-border rounded-lg ${isMobile ? 'p-2 min-h-[160px]' : 'p-4 lg:p-6 min-h-[260px] max-h-[360px]'} flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0`}>
+                        <Card className={`modern-card hover-lift ${isMobile ? 'p-3 min-h-[160px]' : 'p-4 lg:p-6 min-h-[260px] max-h-[360px]'} flex flex-col w-full max-w-full min-w-0`}>
                             <div>
-                                <h3 className="text-lg font-bold mb-4 text-center text-hacker-green-bright terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                    {'<>'} Contest Rankings
+                                <h3 className="text-lg font-semibold mb-4 text-center text-foreground flex items-center justify-center gap-2">
+                                    <Trophy className="w-5 h-5" />
+                                    Contest Rankings
                                 </h3>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
-                                        <MatrixLoader size="md" text="Loading rankings..." />
+                                        <LoadingSpinner size="md" text="Loading rankings..." />
                                     </div>
                                 ) : (
                                     <>
@@ -1236,19 +1271,20 @@ const Dashboard2 = () => {
                                     </>
                                 )}
                             </div>
-                        </div>
+                        </Card>
                     </div>
                     {/* Column 2: 2 stacked blocks */}
                     <div className="xl:col-span-5 flex flex-col gap-4 lg:gap-6 w-full max-w-full min-w-0">
                         {/* Problems Solved + Competitive Programming Donut */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 h-auto lg:h-60 flex flex-col gap-4 lg:gap-6 shadow-card hover:shadow-soft transition-shadow duration-300 w-full max-w-full min-w-0">
+                        <Card className="modern-card hover-lift p-4 lg:p-6 h-auto lg:h-60 flex flex-col gap-4 lg:gap-6 w-full max-w-full min-w-0">
                             <div>
-                                <div className="text-lg font-bold mb-2 terminal-text neon-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-                                    {'>'} Problems Solved
+                                <div className="text-lg font-semibold mb-2 text-foreground flex items-center gap-2">
+                                    <Target className="w-5 h-5" />
+                                    Problems Solved
                                 </div>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
-                                        <MatrixLoader size="md" text="Loading problems..." />
+                                        <LoadingSpinner size="md" text="Loading problems..." />
                                     </div>
                                 ) : (
                                     <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center">
@@ -1333,16 +1369,16 @@ const Dashboard2 = () => {
                                     </div>
                                 )}
                             </div>
-                        </div>
+                        </Card>
                         {/* DSA Topic Analysis */}
-                        <div className="bg-card/70 backdrop-blur-sm border border-border rounded-xl p-4 lg:p-6 flex flex-col shadow-card hover:shadow-soft transition-shadow duration-300 min-h-[540px] max-h-[758px] relative w-full max-w-full min-w-0 overflow-x-auto">
+                        <Card className="modern-card hover-lift p-4 lg:p-6 flex flex-col min-h-[540px] max-h-[758px] relative w-full max-w-full min-w-0 overflow-x-auto">
                             <div className="absolute top-4 right-4">
                                 <InfoTooltip message="Topic analysis based on problems solved across all platforms" />
                             </div>
                             <div className="flex items-center justify-between mb-4 flex-shrink-0">
                                 <span className="text-lg font-semibold">DSA Topic Analysis</span>
                                 <div className="flex items-center gap-2">
-                                    {isLoading && <MatrixSpinner size="sm" />}
+                                    {isLoading && <LoadingSpinner size="sm" />}
                                     {(() => {
                                         try {
                                             const analysisResult = topicAnalysis;
@@ -1460,7 +1496,7 @@ const Dashboard2 = () => {
                                     return null;
                                 }
                             })()}
-                        </div>
+                        </Card>
                     </div>
                 </div>
             </main>
