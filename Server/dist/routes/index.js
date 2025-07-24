@@ -9,6 +9,7 @@ const leetcode_1 = __importDefault(require("./leetcode"));
 const codeforces_1 = __importDefault(require("./codeforces"));
 const dashboard_1 = __importDefault(require("./dashboard"));
 const chatbot_1 = __importDefault(require("./chatbot"));
+const analytics_1 = __importDefault(require("./analytics"));
 const router = (0, express_1.Router)();
 // API routes
 router.use('/auth', auth_1.default);
@@ -16,6 +17,7 @@ router.use('/leetcode', leetcode_1.default);
 router.use('/codeforces', codeforces_1.default);
 router.use('/dashboard', dashboard_1.default);
 router.use('/chatbot', chatbot_1.default);
+router.use('/analytics', analytics_1.default);
 // Health check for the entire API
 router.get('/health', (req, res) => {
     res.status(200).json({

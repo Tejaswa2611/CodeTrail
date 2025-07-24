@@ -14,7 +14,6 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
     console.log('🎫 Token preview:', token ? token.substring(0, 20) + '...' : 'None');
 
     if (!token) {
-      console.log('❌ No access token provided');
       res.status(401).json(ResponseUtils.error('Access token required'));
       return;
     }
@@ -44,7 +43,6 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
         return;
       }
       if (error.name === 'JsonWebTokenError') {
-        console.log('❌ Invalid token format');
         res.status(401).json(ResponseUtils.error('Invalid token'));
         return;
       }

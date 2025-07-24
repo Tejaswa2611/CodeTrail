@@ -3,7 +3,7 @@ import { Brain, TrendingUp, TrendingDown, Target, Lightbulb, BookOpen, Clock, St
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../contexts/ThemeContext';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { dashboardApi } from '../services/apiService';
+import { dashboardApi, analyticsApi } from '../services/apiService';
 import { AnalyticsContentLoader } from '../components/MatrixContentLoader';
 
 // Mock data - will be replaced with real API data later
@@ -52,244 +52,69 @@ const Analytics = () => {
     const { actualTheme } = useTheme();
     const isMobile = useIsMobile();
 
-    // Function to calculate metrics from submission calendar
-    const calculateProgressMetrics = (submissionCalendar: string) => {
-        const calendar = JSON.parse(submissionCalendar);
-        const now = new Date();
+    // Progress metrics are now calculated on the backend for better performance and caching
 
-        console.log('🔍 DEBUG: Current date:', now.toISOString());
-        console.log('🔍 DEBUG: Day of week (0=Sunday):', now.getDay());
-
-        // Calculate week boundaries - Let's try last 7 days instead of Sunday-based week
-        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        console.log('🔍 DEBUG: Seven days ago:', sevenDaysAgo.toISOString());
-
-        // Also keep Sunday-based week for comparison
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay()); // Go to Sunday
-        startOfWeek.setHours(0, 0, 0, 0);
-        console.log('🔍 DEBUG: Start of week (Sunday):', startOfWeek.toISOString());
-
-        // Calculate month boundaries
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        console.log('🔍 DEBUG: Start of month:', startOfMonth.toISOString());
-
-        // Calculate last 4 weeks for average
-        const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000);
-
-        // Calculate last 30 days for consistency
-        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-        let thisWeekSolved = 0;
-        let last7DaysSolved = 0;
-        let thisMonthSolved = 0;
-        let last4WeeksSolved = 0;
-        let activeDaysLast30 = 0;
-
-        console.log('🔍 DEBUG: Calendar entries count:', Object.keys(calendar).length);
-
-        Object.entries(calendar).forEach(([timestamp, count]) => {
-            const originalDate = new Date(parseInt(timestamp) * 1000);
-            // Subtract 1 day to fix the date shifting issue (same as dashboard)
-            const adjustedDate = new Date(originalDate);
-            adjustedDate.setDate(originalDate.getDate() - 1);
-            const submissionCount = count as number;
-
-            // Debug recent entries
-            if (adjustedDate >= thirtyDaysAgo) {
-                console.log('🔍 DEBUG: Recent entry:', {
-                    originalTimestamp: timestamp,
-                    originalDate: originalDate.toISOString(),
-                    adjustedDate: adjustedDate.toISOString(),
-                    dateString: adjustedDate.toDateString(),
-                    count: submissionCount,
-                    isThisWeekSunday: adjustedDate >= startOfWeek,
-                    isLast7Days: adjustedDate >= sevenDaysAgo,
-                    isThisMonth: adjustedDate >= startOfMonth
-                });
-            }
-
-            // This week calculations (Sunday-based)
-            if (adjustedDate >= startOfWeek) {
-                thisWeekSolved += submissionCount;
-            }
-
-            // Last 7 days calculation
-            if (adjustedDate >= sevenDaysAgo) {
-                last7DaysSolved += submissionCount;
-            }
-
-            // This month calculations
-            if (adjustedDate >= startOfMonth) {
-                thisMonthSolved += submissionCount;
-            }
-
-            // Last 4 weeks for average
-            if (adjustedDate >= fourWeeksAgo) {
-                last4WeeksSolved += submissionCount;
-            }
-
-            // Active days in last 30 days for consistency
-            if (adjustedDate >= thirtyDaysAgo && submissionCount > 0) {
-                activeDaysLast30++;
-            }
-        });
-
-        // Calculate metrics
-        const weeklyAverage = Math.round(last4WeeksSolved / 4);
-        const consistencyScore = Math.round((activeDaysLast30 / 30) * 100);
-
-        console.log('🔍 DEBUG: Final calculations:', {
-            thisWeekSolved: thisWeekSolved,
-            last7DaysSolved: last7DaysSolved,
-            thisMonthSolved,
-            weeklyAverage,
-            consistencyScore,
-            last4WeeksSolved,
-            activeDaysLast30
-        });
-
-        // Use last 7 days instead of Sunday-based week
-        return {
-            thisWeekSolved: last7DaysSolved, // Using last 7 days for more accurate "this week"
-            thisMonthSolved,
-            weeklyAverage,
-            consistencyScore
-        };
-    };
-
-    // Fetch user's platform profiles to get LeetCode handle and ratings
-    const fetchUserProfiles = useCallback(async () => {
+    // Fetch all analytics data from the new cached endpoint
+    const fetchAnalyticsData = useCallback(async () => {
         try {
-            console.log('🔍 DEBUG: Fetching user platform profiles...');
-            const profiles = await dashboardApi.getUserPlatformProfiles();
-            console.log('🔍 DEBUG: Platform profiles response:', profiles);
+            console.log('📊 Analytics: Fetching all analytics data from cached endpoint...');
+            const analyticsData = await analyticsApi.getAnalyticsData();
+            console.log('📊 Analytics: Response received:', analyticsData);
 
-            // Extract LeetCode handle
-            let leetcodeHandle = null;
-            if (profiles?.connectedPlatforms?.leetcode?.handle) {
-                leetcodeHandle = profiles.connectedPlatforms.leetcode.handle;
-                console.log('🔍 DEBUG: Found LeetCode handle:', leetcodeHandle);
-                setLeetcodeHandle(leetcodeHandle);
-            } else {
-                console.warn('🔍 DEBUG: No LeetCode handle found in user profiles');
-            }
+            if (analyticsData?.data) {
+                const data = analyticsData.data;
 
-            // Extract contest ratings from platform profiles (same logic as dashboard)
-            const codeforcesRating = profiles?.connectedPlatforms?.codeforces?.currentRating || null;
-            const codeforcesRank = profiles?.connectedPlatforms?.codeforces?.rank || 'unrated';
+                // Set LeetCode handle
+                setLeetcodeHandle(data.userProfiles.leetcodeHandle);
+                console.log('📊 Analytics: LeetCode handle set:', data.userProfiles.leetcodeHandle);
 
-            // For LeetCode rating, we'll need to get it from dashboard stats
-            // Let's fetch dashboard stats to get contest rankings
-            const dashboardStats = await dashboardApi.getDashboardStats();
-            const leetcodeRating = dashboardStats?.contestRankings?.latest?.leetcode?.rank || null;
+                // Set progress metrics
+                setRecentProgressData(data.progressMetrics);
+                console.log('📊 Analytics: Progress metrics set:', data.progressMetrics);
 
-            console.log('🔍 DEBUG: Contest ratings:', {
-                codeforces: codeforcesRating,
-                codeforcesRank,
-                leetcode: leetcodeRating
-            });
+                // Set contest ratings
+                setContestRatings(data.contestRatings);
+                console.log('📊 Analytics: Contest ratings set:', data.contestRatings);
 
-            setContestRatings({
-                codeforces: codeforcesRating,
-                leetcode: leetcodeRating,
-                codeforcesRank: String(codeforcesRank)
-            });
+                // Set daily submissions data
+                setDailySubmissionsData(data.dailySubmissions);
+                console.log('📊 Analytics: Daily submissions data set:', data.dailySubmissions.length, 'entries');
 
-            return leetcodeHandle;
-        } catch (error) {
-            console.error('Error fetching user profiles:', error);
-            return null;
-        }
-    }, []);
-
-    // Fetch daily submissions data for the chart
-    const fetchDailySubmissions = useCallback(async () => {
-        try {
-            console.log('🔍 DEBUG: Fetching daily submissions data...');
-            const data = await dashboardApi.getDailySubmissions();
-            console.log('🔍 DEBUG: Daily submissions response:', data);
-
-            if (data?.dailySubmissions) {
-                // Format data for the chart with proper date formatting
-                const formattedData = data.dailySubmissions.map(entry => ({
-                    date: entry.date,
-                    displayDate: new Date(entry.date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                    }),
-                    leetcode: entry.leetcode,
-                    codeforces: entry.codeforces,
-                    total: entry.total
-                }));
-
-                setDailySubmissionsData(formattedData);
-                console.log('🔍 DEBUG: Formatted daily submissions data:', formattedData.length, 'entries');
-            } else {
-                console.warn('🔍 DEBUG: No daily submissions data found');
-                setDailySubmissionsData([]);
-            }
-        } catch (error) {
-            console.error('Error fetching daily submissions:', error);
-            setDailySubmissionsData([]);
-        }
-    }, []);
-
-    // Fetch real progress data
-    const fetchProgressData = useCallback(async (handle: string) => {
-        try {
-            console.log('🔍 DEBUG: Fetching progress data for handle:', handle);
-            const response = await fetch(`http://localhost:3001/api/leetcode/user/${handle}/profile`);
-            console.log('🔍 DEBUG: API response status:', response.status);
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('🔍 DEBUG: API response data keys:', Object.keys(data));
-
-                if (data.data?.matchedUser?.submissionCalendar) {
-                    console.log('🔍 DEBUG: Found submission calendar, length:', data.data.matchedUser.submissionCalendar.length);
-                    const metrics = calculateProgressMetrics(data.data.matchedUser.submissionCalendar);
-                    setRecentProgressData(metrics);
+                // Log cache performance
+                if (data.cacheHit) {
+                    console.log('🚀 Analytics: Data served from cache! ⚡');
                 } else {
-                    console.warn('🔍 DEBUG: No submission calendar found in response');
-                    console.log('🔍 DEBUG: Response structure:', JSON.stringify(data, null, 2));
+                    console.log('🔄 Analytics: Data computed fresh and cached for next time');
                 }
+                
+                return true;
             } else {
-                console.warn('Failed to fetch LeetCode profile data, status:', response.status);
-                const errorText = await response.text();
-                console.warn('Error response:', errorText);
+                console.warn('📊 Analytics: No data received from analytics API');
+                return false;
             }
         } catch (error) {
-            console.error('Error fetching progress data:', error);
+            console.error('❌ Analytics: Error fetching analytics data:', error);
+            return false;
         }
     }, []);
 
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
+            console.log('📊 Analytics: Starting to load data...');
 
-            console.log('🔍 DEBUG: Starting to load Analytics data...');
-
-            // First get the user's LeetCode handle
-            const handle = await fetchUserProfiles();
-
-            // Fetch daily submissions data
-            await fetchDailySubmissions();
-
-            // Then fetch progress data if handle exists
-            if (handle) {
-                console.log('🔍 DEBUG: LeetCode handle found, fetching progress data...');
-                await fetchProgressData(handle);
-            } else {
-                console.log('🔍 DEBUG: No LeetCode handle found, skipping progress data fetch');
+            const success = await fetchAnalyticsData();
+            
+            if (!success) {
+                console.warn('📊 Analytics: Failed to load data, using defaults');
             }
 
-            // Simulate additional loading time
-            setTimeout(() => setIsLoading(false), 1000);
+            // Small delay to show loading state briefly
+            setTimeout(() => setIsLoading(false), 500);
         };
 
         loadData();
-    }, [fetchUserProfiles, fetchDailySubmissions, fetchProgressData]);
+    }, [fetchAnalyticsData]);
 
     if (isLoading) {
         return (

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getDashboardStats, getUserPlatformProfiles, updatePlatformHandle, getDailySubmissions, getAICoachTopicAnalysis } from '../controllers/dashboardController';
 import { authenticateToken } from '../middleware/auth';
+import { CacheService } from '../services/cacheService';
 
 const router = Router();
 
@@ -36,29 +37,48 @@ router.get('/test-public/:userId', async (req, res) => {
   }
 });
 
-// Debug endpoint to list all users (for testing)
-router.get('/debug/users', async (req, res) => {
+// Cache health check endpoint
+router.get('/cache/health', async (req, res) => {
   try {
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
+    const healthStatus = await CacheService.healthCheck();
+    const cacheStats = await CacheService.getCacheStats();
     
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-      }
-    });
-    
-    res.json({ 
-      success: true, 
-      users 
+    res.json({
+      success: true,
+      message: 'Cache health check completed',
+      health: healthStatus,
+      stats: cacheStats,
+      timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
-    res.status(500).json({ 
-      success: false, 
-      error: error.message 
+    console.error('❌ Cache health check failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Cache health check failed',
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+// Cache statistics endpoint (protected)
+router.get('/cache/stats', authenticateToken, async (req, res) => {
+  try {
+    const cacheStats = await CacheService.getCacheStats();
+    
+    res.json({
+      success: true,
+      message: 'Cache statistics retrieved',
+      stats: cacheStats,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error: any) {
+    console.error('❌ Failed to get cache stats:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve cache statistics',
+      error: error.message,
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -72,41 +92,10 @@ router.get('/user-profiles', authenticateToken, getUserPlatformProfiles);
 // Get daily submissions for chart
 router.get('/daily-submissions', authenticateToken, getDailySubmissions);
 
-// Update platform handle
+// Update platform handle (e.g., LeetCode username, Codeforces handle)
 router.put('/platform-handle', authenticateToken, updatePlatformHandle);
-console.log('🔧 Dashboard PUT /platform-handle route registered');
 
-// Test endpoint to manually sync data (for debugging)
-router.post('/test-sync/:platform/:handle', authenticateToken, async (req, res) => {
-    try {
-        const { platform, handle } = req.params;
-        const userId = (req as any).user?.id;
-        
-        if (!userId) {
-            return res.status(401).json({ success: false, message: 'User not authenticated' });
-        }
-
-        console.log(`🧪 Test sync triggered for ${platform}:${handle} by user ${userId}`);
-        
-        const { dashboardService } = await import('../services/dashboardService');
-        const result = await dashboardService.updatePlatformHandle(userId, platform, handle);
-        
-        res.json({ 
-            success: true, 
-            message: `Test sync completed for ${platform}:${handle}`,
-            result 
-        });
-    } catch (error: any) {
-        console.error('❌ Test sync failed:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Test sync failed', 
-            error: error.message 
-        });
-    }
-});
-
-// AI Coach Topic Analysis
-router.get('/ai-coach-topic-analysis', authenticateToken, getAICoachTopicAnalysis);
+// Get AI Coach topic analysis
+router.get('/ai-coach-analysis', authenticateToken, getAICoachTopicAnalysis);
 
 export default router;

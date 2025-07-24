@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const dashboardController_1 = require("../controllers/dashboardController");
 const auth_1 = require("../middleware/auth");
+const cacheService_1 = require("../services/cacheService");
 const router = (0, express_1.Router)();
 console.log('🔧 Dashboard routes module loaded');
 // Test endpoint for debugging
@@ -65,28 +66,47 @@ router.get('/test-public/:userId', async (req, res) => {
         });
     }
 });
-// Debug endpoint to list all users (for testing)
-router.get('/debug/users', async (req, res) => {
+// Cache health check endpoint
+router.get('/cache/health', async (req, res) => {
     try {
-        const { PrismaClient } = await Promise.resolve().then(() => __importStar(require('@prisma/client')));
-        const prisma = new PrismaClient();
-        const users = await prisma.user.findMany({
-            select: {
-                id: true,
-                email: true,
-                firstName: true,
-                lastName: true,
-            }
-        });
+        const healthStatus = await cacheService_1.CacheService.healthCheck();
+        const cacheStats = await cacheService_1.CacheService.getCacheStats();
         res.json({
             success: true,
-            users
+            message: 'Cache health check completed',
+            health: healthStatus,
+            stats: cacheStats,
+            timestamp: new Date().toISOString(),
         });
     }
     catch (error) {
+        console.error('❌ Cache health check failed:', error);
         res.status(500).json({
             success: false,
-            error: error.message
+            message: 'Cache health check failed',
+            error: error.message,
+            timestamp: new Date().toISOString(),
+        });
+    }
+});
+// Cache statistics endpoint (protected)
+router.get('/cache/stats', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const cacheStats = await cacheService_1.CacheService.getCacheStats();
+        res.json({
+            success: true,
+            message: 'Cache statistics retrieved',
+            stats: cacheStats,
+            timestamp: new Date().toISOString(),
+        });
+    }
+    catch (error) {
+        console.error('❌ Failed to get cache stats:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve cache statistics',
+            error: error.message,
+            timestamp: new Date().toISOString(),
         });
     }
 });
@@ -96,35 +116,8 @@ router.get('/stats', auth_1.authenticateToken, dashboardController_1.getDashboar
 router.get('/user-profiles', auth_1.authenticateToken, dashboardController_1.getUserPlatformProfiles);
 // Get daily submissions for chart
 router.get('/daily-submissions', auth_1.authenticateToken, dashboardController_1.getDailySubmissions);
-// Update platform handle
+// Update platform handle (e.g., LeetCode username, Codeforces handle)
 router.put('/platform-handle', auth_1.authenticateToken, dashboardController_1.updatePlatformHandle);
-console.log('🔧 Dashboard PUT /platform-handle route registered');
-// Test endpoint to manually sync data (for debugging)
-router.post('/test-sync/:platform/:handle', auth_1.authenticateToken, async (req, res) => {
-    try {
-        const { platform, handle } = req.params;
-        const userId = req.user?.id;
-        if (!userId) {
-            return res.status(401).json({ success: false, message: 'User not authenticated' });
-        }
-        console.log(`🧪 Test sync triggered for ${platform}:${handle} by user ${userId}`);
-        const { dashboardService } = await Promise.resolve().then(() => __importStar(require('../services/dashboardService')));
-        const result = await dashboardService.updatePlatformHandle(userId, platform, handle);
-        res.json({
-            success: true,
-            message: `Test sync completed for ${platform}:${handle}`,
-            result
-        });
-    }
-    catch (error) {
-        console.error('❌ Test sync failed:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Test sync failed',
-            error: error.message
-        });
-    }
-});
-// AI Coach Topic Analysis
-router.get('/ai-coach-topic-analysis', auth_1.authenticateToken, dashboardController_1.getAICoachTopicAnalysis);
+// Get AI Coach topic analysis
+router.get('/ai-coach-analysis', auth_1.authenticateToken, dashboardController_1.getAICoachTopicAnalysis);
 exports.default = router;

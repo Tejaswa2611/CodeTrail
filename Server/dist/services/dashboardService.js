@@ -35,10 +35,18 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dashboardService = exports.DashboardService = void 0;
 const client_1 = require("@prisma/client");
+const cacheService_1 = require("./cacheService");
 const prisma = new client_1.PrismaClient();
 class DashboardService {
     async getDashboardStats(userId) {
         console.log(`🔍 Getting dashboard stats for user: ${userId}`);
+        // Check cache first
+        const cached = await cacheService_1.CacheService.getDashboardStats(userId);
+        if (cached) {
+            console.log(`🚀 Dashboard Stats Cache HIT for user: ${userId}`);
+            return cached;
+        }
+        console.log(`🔄 Dashboard Stats Cache MISS for user: ${userId}, computing from database...`);
         // Get user profile data
         const userProfile = await prisma.user.findUnique({
             where: { id: userId },
@@ -114,18 +122,9 @@ class DashboardService {
             dsaTopicAnalysis,
             userInfo,
         };
-        console.log(`✅ Dashboard stats calculated successfully:`, {
-            totalQuestions: result.totalQuestions.total,
-            totalActiveDays: result.totalActiveDays.total,
-            totalContests: result.totalContests.total,
-            dsaTopicsCount: Object.keys(result.dsaTopicAnalysis).length
-        });
-        // Log top DSA topics for debugging
-        const topTopics = Object.entries(result.dsaTopicAnalysis)
-            .filter(([topic]) => !topic.includes('daily-activity'))
-            .sort((a, b) => b[1].total - a[1].total)
-            .slice(0, 10);
-        console.log(`🏆 Top 10 DSA Topics:`, topTopics.map(([topic, data]) => `${topic}: ${data.total} (${data.category || 'unknown'})`));
+        // Cache the computed result
+        await cacheService_1.CacheService.setDashboardStats(userId, result);
+        console.log(`💾 Dashboard stats cached for user: ${userId}`);
         return result;
     }
     calculateTotalQuestions(submissions) {
@@ -749,6 +748,14 @@ class DashboardService {
         // Now sync the actual submission and contest data
         console.log('🔄 Starting comprehensive data synchronization...');
         await this.syncPlatformData(userId, platform, handle, platformData);
+        // Invalidate relevant caches after successful sync
+        console.log('🗑️ Invalidating caches after platform handle update...');
+        await Promise.all([
+            cacheService_1.CacheService.invalidateUserCache(userId),
+            cacheService_1.CacheService.invalidatePlatformCache(platform, handle),
+            // Also invalidate analytics cache since platform data changed
+            this.invalidateAnalyticsCache(userId),
+        ]);
         console.log('💡 Platform handle updated and data synchronized successfully!');
         // Return updated profile with sync info
         return {
@@ -1649,6 +1656,20 @@ class DashboardService {
                 codeforces: [],
                 combined: []
             };
+        }
+    }
+    /**
+     * Invalidate analytics cache for a user
+     */
+    async invalidateAnalyticsCache(userId) {
+        try {
+            // Import AnalyticsService dynamically to avoid circular dependencies
+            const { AnalyticsService } = await Promise.resolve().then(() => __importStar(require('./analyticsService')));
+            await AnalyticsService.invalidateAnalyticsCache(userId);
+        }
+        catch (error) {
+            console.error('❌ Error invalidating analytics cache:', error);
+            // Don't throw error to avoid breaking the main flow
         }
     }
 }

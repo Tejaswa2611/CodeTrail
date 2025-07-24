@@ -30,5 +30,15 @@ exports.config = {
     ai: {
         openRouterApiKey: process.env.OPENROUTER_API_KEY,
     },
+    redis: {
+        url: process.env.REDIS_URL || 'redis://localhost:6379',
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD,
+        db: parseInt(process.env.REDIS_DB || '0'),
+        retryDelayOnFailover: 100,
+        maxRetriesPerRequest: 3,
+        lazyConnect: true, // Don't connect immediately, connect when first command is called
+    },
 };
 exports.default = exports.config;

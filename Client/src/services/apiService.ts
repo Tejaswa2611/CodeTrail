@@ -395,7 +395,40 @@ export const dashboardApi = {
     },
 
     getAICoachTopicAnalysis: (): Promise<any | null> =>
-        apiCall<any>('/dashboard/ai-coach-topic-analysis'),
+        apiCall<any>('/dashboard/ai-coach-analysis'),
+};
+
+// Analytics API functions
+export const analyticsApi = {
+    getAnalyticsData: (): Promise<any | null> =>
+        apiCall<any>('/analytics/data'),
+
+    getCacheStats: (): Promise<any | null> =>
+        apiCall<any>('/analytics/cache/stats'),
+
+    invalidateCache: async (): Promise<any | null> => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/analytics/cache`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error invalidating analytics cache:', error);
+            throw error;
+        }
+    },
+
+    healthCheck: (): Promise<any | null> =>
+        apiCall<any>('/analytics/health'),
 };
 
 // New Dashboard API interfaces matching the backend
