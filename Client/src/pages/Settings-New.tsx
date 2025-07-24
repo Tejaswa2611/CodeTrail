@@ -40,7 +40,7 @@ export default function Settings() {
     },
   ]);
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -61,8 +61,7 @@ export default function Settings() {
         }
       } catch (error) {
         console.error('Error loading platform handles:', error);
-      } finally {
-        setIsLoading(false);
+        // Silently fail - user can still use the settings page
       }
     };
 
@@ -131,23 +130,7 @@ export default function Settings() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6 animate-fade-in-up">
-        <div className="animate-slide-in-left">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-            Settings
-          </h1>
-          <p className="text-muted-foreground text-lg terminal-text" style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace" }}>
-            Loading your platform settings...
-          </p>
-        </div>
-        <div className="flex items-center justify-center h-32">
-          <div className="w-8 h-8 border-2 border-tech-primary-green border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      </div>
-    );
-  }
+  // Removed loading screen - Settings now opens instantly
 
   return (
     <div className="space-y-6 animate-fade-in-up">

@@ -43,12 +43,12 @@ export default function Settings() {
     },
   ]);
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Load existing platform handles
+  // Load existing platform handles in background
   useEffect(() => {
     const loadPlatformHandles = async () => {
       try {
@@ -64,8 +64,7 @@ export default function Settings() {
         }
       } catch (error) {
         console.error('Error loading platform handles:', error);
-      } finally {
-        setIsLoading(false);
+        // Silently fail - user can still use the settings page
       }
     };
 
@@ -134,16 +133,7 @@ export default function Settings() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-tech-dark">
-        <LogoLoading 
-          size="lg" 
-          message="Loading settings configuration"
-        />
-      </div>
-    );
-  }
+  // Removed loading screen - Settings now opens instantly
 
   return (
             <div className="space-y-6">

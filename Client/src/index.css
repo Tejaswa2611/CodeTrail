@@ -117,6 +117,36 @@
   h5 { font-size: 1.125rem; }
   h6 { font-size: 1rem; }
 
+  /* Custom animations for theme loaders */
+  @keyframes wave {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .animate-wave {
+    animation: wave 2s ease-in-out infinite;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
   /* Code font for code blocks only */
   code, pre {
     font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;

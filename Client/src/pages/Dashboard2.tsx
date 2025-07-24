@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { ThemeLoader, CodeSpinLoader, MatrixDotsLoader, OrbitLoader, CardSkeletonLoader, TypingLoader } from '@/components/ThemeLoaders';
 
 // Import platform images
 import codeforcesDarkLogo from '../assets/codeforces_dark.png';
@@ -41,20 +42,12 @@ const InfoTooltip = ({ message }: { message: string }) => {
 
 // Loading skeleton component
 const LoadingSkeleton = ({ className = "h-4 w-20" }: { className?: string }) => (
-    <div className={`animate-pulse bg-muted rounded ${className}`}></div>
+    <CardSkeletonLoader className={className} />
 );
 
-// Loading spinner component
-const LoadingSpinner = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
-    const sizeClasses = {
-        sm: "w-4 h-4",
-        md: "w-6 h-6", 
-        lg: "w-8 h-8"
-    };
-    
-    return (
-        <div className={`animate-spin rounded-full border-2 border-muted border-t-primary ${sizeClasses[size]}`}></div>
-    );
+// Loading spinner component (legacy - replaced with ThemeLoaders)
+const LoadingSpinner = ({ size = "md", text }: { size?: "sm" | "md" | "lg"; text?: string }) => {
+    return <ThemeLoader variant="code" size={size} text={text} />;
 };
 
 // Helper function to get difficulty colors
@@ -255,7 +248,7 @@ const Sidebar = ({ data, isLoading, refreshData }: { data: DashboardStats | null
             <div className="flex flex-col items-center gap-3 pb-6 border-b border-border">
                 <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold text-white shadow-lg">
                     {isLoading ? (
-                        <LoadingSpinner size="sm" />
+                        <OrbitLoader size="md" />
                     ) : (
                         userProfile?.firstName?.[0]?.toUpperCase() || <User className="w-8 h-8" />
                     )}
@@ -944,7 +937,7 @@ const Dashboard2 = () => {
                             Total Questions
                         </div>
                         <div className="text-3xl lg:text-4xl font-bold text-foreground">
-                            {isLoading ? <LoadingSpinner size="md" /> : formatNumber(getTotalQuestions())}
+                            {isLoading ? <MatrixDotsLoader size="lg" /> : formatNumber(getTotalQuestions())}
                         </div>
                     </Card>
                     {/* Total Active Days */}
@@ -957,7 +950,7 @@ const Dashboard2 = () => {
                             Active Days
                         </div>
                         <div className="text-3xl lg:text-4xl font-bold text-foreground">
-                            {isLoading ? <LoadingSpinner size="md" /> : formatNumber(getTotalActiveDays())}
+                            {isLoading ? <CodeSpinLoader size="lg" /> : formatNumber(getTotalActiveDays())}
                         </div>
                     </Card>
                     {/* Heatmap */}
@@ -1094,7 +1087,7 @@ const Dashboard2 = () => {
                                     </div>
                                     <div className="text-4xl lg:text-5xl font-bold text-foreground">
                                         {isLoading ? (
-                                            <LoadingSpinner size="lg" />
+                                            <OrbitLoader size="xl" />
                                         ) : (
                                             (() => {
                                                 try {
@@ -1197,7 +1190,7 @@ const Dashboard2 = () => {
                                 </h3>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
-                                        <LoadingSpinner size="md" text="Loading rankings..." />
+                                        <TypingLoader text="Loading rankings..." />
                                     </div>
                                 ) : (
                                     <>
@@ -1284,7 +1277,7 @@ const Dashboard2 = () => {
                                 </div>
                                 {isLoading ? (
                                     <div className="flex items-center justify-center h-32">
-                                        <LoadingSpinner size="md" text="Loading problems..." />
+                                        <TypingLoader text="Loading problems..." />
                                     </div>
                                 ) : (
                                     <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center">
