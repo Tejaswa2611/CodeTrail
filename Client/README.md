@@ -1,73 +1,143 @@
-# Welcome to your Lovable project
+# CodeTrail - AI-Powered Coding Tracker
 
-## Project info
+Track your coding journey across multiple platforms with AI-powered insights and personalized recommendations.
 
-**URL**: https://lovable.dev/projects/7cca05fd-b804-4c22-91d5-596b65b2e068
+## 🚀 Features
 
-## How can I edit this code?
+- **Multi-Platform Integration**: Connect LeetCode, Codeforces, and other coding platforms
+- **AI-Powered Coaching**: Get personalized recommendations based on your coding patterns
+- **Unified Analytics**: View your progress across all platforms in one dashboard
+- **Smart Caching**: Optimized performance with Redis-powered caching
+- **Real-time Insights**: Track contest ratings, submission patterns, and topic mastery
+- **Dark/Light Theme**: Adaptive theming with system preference detection
 
-There are several ways of editing your application.
+## 🛠️ Tech Stack
 
-**Use Lovable**
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for fast development
+- **Tailwind CSS** + **shadcn/ui** for styling
+- **Recharts** for data visualization
+- **React Context** for state management
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7cca05fd-b804-4c22-91d5-596b65b2e068) and start prompting.
+### Backend
+- **Node.js** + **Express.js**
+- **PostgreSQL** with **Prisma ORM**
+- **Redis** for caching
+- **JWT** authentication
+- **Deepseek LLM** for AI coaching
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🏗️ Architecture
 
-**Use your preferred IDE**
+- **Client-Server Architecture** with REST APIs
+- **Reverse-engineered GraphQL** integration for LeetCode data
+- **Intelligent caching strategy** with different TTL for various data types
+- **Microservices-style organization** with dedicated controllers and services
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
+- Node.js 18+
+- PostgreSQL
+- Redis (optional, for caching)
 
-Follow these steps:
+### Installation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Tejaswa2611/CodeTrail.git
+   cd CodeTrail
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. **Install dependencies**
+   ```bash
+   # Frontend
+   cd Client
+   npm install
+   
+   # Backend
+   cd ../Server
+   npm install
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. **Environment Setup**
+   ```bash
+   # Copy environment files
+   cp Client/.env.example Client/.env
+   cp Server/.env.example Server/.env
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+4. **Database Setup**
+   ```bash
+   cd Server
+   npx prisma migrate dev
+   npx prisma generate
+   ```
 
-**Edit a file directly in GitHub**
+5. **Start Development Servers**
+   ```bash
+   # Backend (Terminal 1)
+   cd Server
+   npm run dev
+   
+   # Frontend (Terminal 2)
+   cd Client
+   npm run dev
+   ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📦 Deployment
 
-**Use GitHub Codespaces**
+### Frontend (AWS Amplify)
+- Deployed on AWS Amplify with automatic CI/CD
+- Environment variables configured in Amplify console
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Backend (Railway)
+- Deployed on Railway with PostgreSQL and Redis add-ons
+- Automatic deployments from main branch
 
-## What technologies are used for this project?
+## 🔧 Key Features Implementation
 
-This project is built with:
+### LeetCode Integration
+- Reverse-engineered GraphQL API for data access
+- Smart rate limiting and error handling
+- Comprehensive user profile and submission data
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### AI Coaching System
+- Powered by Deepseek LLM
+- Context-aware recommendations
+- Personalized problem suggestions based on weak areas
 
-## How can I deploy this project?
+### Caching Strategy
+- **User Profiles**: 5min TTL
+- **Calendar Data**: 1hr TTL  
+- **Contest Rankings**: 15min TTL
+- **Static Problems**: 24hr TTL
+- **AI Context**: 30min TTL
 
-Simply open [Lovable](https://lovable.dev/projects/7cca05fd-b804-4c22-91d5-596b65b2e068) and click on Share -> Publish.
+## 🤝 Contributing
 
-## Can I connect a custom domain to my Lovable project?
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-Yes, you can!
+## 📄 License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 👨‍💻 Author
+
+**Tejaswa**
+- GitHub: [@Tejaswa2611](https://github.com/Tejaswa2611)
+- Twitter: [@tejaswa2611](https://twitter.com/tejaswa2611)
+
+## 🙏 Acknowledgments
+
+- Thanks to the competitive programming community for inspiration
+- shadcn/ui for the amazing component library
+- All the open-source libraries that made this project possible
+
+---
+
+Built with ❤️ for the competitive programming community

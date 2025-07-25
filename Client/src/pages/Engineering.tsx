@@ -1,400 +1,411 @@
-import { Github, Database, Server, Code, Zap, Brain, BarChart3, Shield, Globe, Cpu } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Github, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useRef } from "react";
 
 export default function Engineering() {
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    // Intersection Observer for scroll animations
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-up');
+            entry.target.classList.remove('opacity-0', 'translate-y-8');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+    );
+
+    // Observe all sections
+    const sections = document.querySelectorAll('.animate-on-scroll');
+    sections.forEach((section) => {
+      section.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700', 'ease-out');
+      observerRef.current?.observe(section);
+    });
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 py-16 max-w-6xl">
-        {/* Header */}
-        <div className="text-center space-y-6 mb-16">
-          <div className="flex justify-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded-2xl flex items-center justify-center shadow-lg">
-              <Code className="text-white h-10 w-10" />
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Simple Home Link */}
+      <div className="absolute top-8 left-8 z-10">
+        <a href="/" className="text-muted-foreground hover:text-[#E64373] transition-colors text-sm font-medium">
+          Home
+        </a>
+      </div>
+
+      {/* Hero Section */}
+      <div className="flex flex-col items-center justify-center text-center px-8 pt-24 pb-16">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-8">
+          <span className="text-white tracking-wider">Engineering behind </span>
+          <span className="bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent tracking-wider">
+            Codetrail
+          </span>
+        </h1>
+        
+        <p className="text-muted-foreground text-lg max-w-4xl leading-relaxed mb-16 whitespace-nowrap">
+          How I reverse-engineered LeetCode's GraphQL and built an AI coach that developers actually love.
+        </p>
+      </div>
+
+      {/* Content Section */}
+      <div className="max-w-4xl mx-auto px-8 py-12">
+        {/* Warming Up */}
+        <div className="animate-on-scroll">
+          <h2 className="text-4xl font-semibold mb-8 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            Warming up: What to expect..?
+          </h2>
+          <p className="text-muted-foreground mb-4 text-lg leading-relaxed">
+            I get it, this seems interesting. So let me tell you what we are going through here. First I will tell you 
+            <span className="text-white font-bold"> what problem this application aims to solve</span>, then very quickly we move on to the 
+            <span className="text-white font-bold"> high level design</span> of this application.
+          </p>
+          <p className="text-muted-foreground mb-4 text-lg leading-relaxed">
+            Still with me? Okay, then we will go through the <span className="text-white font-bold">database design</span> of this project. After that I will quickly share 
+            how I built some of the most <span className="text-white font-bold">interesting features</span> of this project. I will conclude by mentioning the 
+            <span className="text-white font-bold"> tech stack</span>.
+          </p>
+          <p className="text-muted-foreground mb-12 text-lg">
+            <span className="bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent font-semibold text-xl">Let's begin!</span>
+          </p>
+        </div>
+
+        {/* Origin Story */}
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            The problem
+          </h2>
+                      <div className="bg-gradient-to-br from-card to-[#E64373]/5 border border-[#E64373]/20 rounded-lg p-8 mb-8">
+            <p className="text-muted-foreground mb-4">
+              Competetitive programmers are juggling multiple platforms with no unified way to track progress or get personalized insights. The existing tools? Basic, boring, and definitely not intelligent.
+            </p>
+            <p className="text-muted-foreground mb-4">
+              <strong className="text-white font-bold">Fragmented data. No insights. Zero AI guidance.</strong>
+            </p>
+            <p className="text-muted-foreground">
+              That's where CodeTrail comes in—a clean, AI-powered platform that actually helps you improve, not just track numbers.
+            </p>
+          </div>
+        </div>
+
+        {/* High Level Design */}
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            System architecture
+          </h2>
+          <div className="bg-card border-2 border-dashed border-border rounded-lg h-80 flex items-center justify-center mb-8">
+            <span className="text-muted-foreground italic text-lg">
+              [CodeTrail System Architecture Diagram Would Be Here]
+            </span>
+          </div>
+        </div>
+
+        {/* Database Design */}
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            Database design
+          </h2>
+          <div className="bg-card border-2 border-dashed border-border rounded-lg h-80 flex items-center justify-center mb-8">
+            <span className="text-muted-foreground italic text-lg">
+              [CodeTrail Database Schema Diagram Would Be Here]
+            </span>
+          </div>
+        </div>
+
+        {/* The Magic: Reverse Engineering */}
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            The breakthrough
+          </h2>
+          <p className="text-muted-foreground mb-4">
+            LeetCode has no official API. Most developers give up here. I didn't. If their frontend could access the data, so could I.
+          </p>
+          <div className="bg-muted/30 border border-border rounded-md p-4 mb-6 overflow-x-auto font-mono text-sm">
+            <pre className="text-muted-foreground">
+{`// Found their internal GraphQL endpoint
+const getUserProfileQuery = \`
+  query getUserProfile($username: String!) {
+    matchedUser(username: $username) {
+      profile { reputation, ranking }
+      submissionCalendar
+      submitStats { acSubmissionNum, totalSubmissionNum }
+    }
+  }
+\`;
+
+// Smart caching = 80% fewer API calls
+async getUserProfile(username: string) {
+  const cached = await CacheService.get(username);
+  if (cached) return cached;
+  return freshData;
+}`}
+            </pre>
+          </div>
+          <p className="text-muted-foreground mb-4">
+            Result? 80% fewer API calls while keeping data fresh through intelligent caching.
+          </p>
+        </div>
+
+        {/* Redis Implementation */}
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            Redis caching strategy
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Built a sophisticated Redis-powered caching system with intelligent TTL strategies for different data types:
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-white font-bold mb-4">Cache Categories</h4>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">User Profiles</span>
+                  <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] bg-clip-text text-transparent font-mono">5min TTL</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Calendar Data</span>
+                  <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] bg-clip-text text-transparent font-mono">1hr TTL</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Contest Rankings</span>
+                  <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] bg-clip-text text-transparent font-mono">15min TTL</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Static Problems</span>
+                  <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] bg-clip-text text-transparent font-mono">24hr TTL</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">AI Context</span>
+                  <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] bg-clip-text text-transparent font-mono">30min TTL</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-white font-bold mb-4">Key Features</h4>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <div>• Graceful fallback when Redis is unavailable</div>
+                <div>• Organized cache keys with prefixes (lc:, cf:, dash:)</div>
+                <div>• Pattern-based cache invalidation</div>
+                <div>• Connection retry logic with max attempts</div>
+                <div>• Comprehensive health checks and monitoring</div>
+              </div>
             </div>
           </div>
           
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent">
-            🚀 Engineering behind <strong>CodeTrail</strong>
-          </h1>
-          
-          <p className="text-xl text-muted-foreground italic">
-            A documentation of things that matter - by <a href="https://github.com/Tejaswa" className="text-[#644EC9] hover:text-[#E64373] transition-colors">@Tejaswa</a>
-          </p>
-          
-          <div className="w-24 h-1 bg-gradient-to-r from-[#E64373] to-[#644EC9] mx-auto rounded-full"></div>
+          <div className="bg-muted/30 border border-border rounded-md p-4 mb-4 overflow-x-auto font-mono text-sm">
+            <pre className="text-muted-foreground">
+{`// Example: LeetCode profile caching
+static async getLeetCodeProfile(username: string) {
+  const key = \`lc:profile:\${username}\`;
+  return await RedisService.get(key);
+}
+
+static async setLeetCodeProfile(username: string, data: any) {
+  const key = \`lc:profile:\${username}\`;
+  return await RedisService.set(key, data, 300); // 5min TTL
+}`}
+            </pre>
+          </div>
         </div>
 
-        {/* Introduction */}
-        <Card className="mb-12 border-l-4 border-l-[#644EC9]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Brain className="h-6 w-6 text-[#644EC9]" />
-              🧠 Warming up: What to expect...?
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-lg leading-relaxed">
-              CodeTrail is a competitive programming tracker built with cutting-edge technologies. Behind the curtain lies a well-planned architecture with key decisions documented for the engineering mind 🧠.
-            </p>
-            <blockquote className="border-l-4 border-[#E64373] pl-4 italic text-muted-foreground bg-muted/30 p-4 rounded-r-lg">
-              This document dives deep into the design, architecture decisions, and various features implemented in the CodeTrail ecosystem — aimed at fellow developers and curious minds who want to understand how it's built and why it's built this way.
-            </blockquote>
-            <div className="pt-4">
-              <Button asChild variant="outline" className="border-[#644EC9] text-[#644EC9] hover:bg-[#644EC9]/10">
-                <a href="https://github.com/Tejaswa2611/CodeTrail" target="_blank" rel="noopener noreferrer">
-                  <Github className="h-4 w-4 mr-2" />
-                  Visit Project
-                </a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Origin Story */}
-        <Card className="mb-12 border-l-4 border-l-[#E64373]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Globe className="h-6 w-6 text-[#E64373]" />
-              📖 Once upon a time...
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-lg leading-relaxed">
-              In 2024, a developer decided to solve a problem for the competitive programming community. The idea came from the struggle to track progress across multiple platforms consistently. Several trackers existed, but none provided comprehensive analytics with AI insights. With the rise of AI and modern web technologies, the idea evolved into <strong>CodeTrail</strong>.
-            </p>
-            <blockquote className="border-l-4 border-[#5D3B87] pl-4 italic text-muted-foreground bg-muted/30 p-4 rounded-r-lg">
-              CodeTrail is a competitive programming tracker powered by AI-based analysis and comprehensive progress monitoring. It uses intelligent caching, real-time data fetching, and serverless architecture to deliver instant insights and beautiful analytics across all major coding platforms.
-            </blockquote>
-          </CardContent>
-        </Card>
-
-        {/* High Level Architecture */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Server className="h-6 w-6 text-[#644EC9]" />
-              📊 High Level Architecture
-            </CardTitle>
-            <CardDescription>System overview and data flow</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted/30 p-8 rounded-lg mb-6">
-              <h3 className="text-xl font-semibold mb-4 text-center">HIGH LEVEL DIAGRAM OF CODETRAIL</h3>
-              <div className="bg-background p-6 rounded-lg border-2 border-dashed border-muted-foreground/30">
-                <p className="text-center text-muted-foreground italic mb-4">
-                  [Architecture Diagram Placeholder - To be added]
-                </p>
-                <div className="text-sm font-mono text-muted-foreground">
-                  <pre className="whitespace-pre-wrap text-center">{`Client (React + TypeScript)
-  |
-  | HTTP Requests
-  ↓
-[Express.js + Node.js Backend]
-      |
-      ↓
-[Redis Cache Layer]
-      |
----------------------------------
-|         |         |           |
-↓         ↓         ↓           ↓
-LeetCode  Codeforces  PostgreSQL  OpenRouter
-API       API       Database    AI API
-↓         ↓         ↓           ↓
-User Data Contest   Analytics   AI Coach
-Sync      Results   Storage     Insights`}</pre>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Database Design */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Database className="h-6 w-6 text-[#5D3B87]" />
-              🗃️ Database Design
-            </CardTitle>
-            <CardDescription>Entity relationships and data modeling</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-muted/30 p-8 rounded-lg mb-6">
-              <h3 className="text-xl font-semibold mb-4 text-center">DATABASE DESIGN OF CODETRAIL</h3>
-              <div className="bg-background p-6 rounded-lg border-2 border-dashed border-muted-foreground/30 min-h-[300px] flex items-center justify-center">
-                <p className="text-center text-muted-foreground italic">
-                  [Entity Relationship Diagram Placeholder - To be added]
-                </p>
-              </div>
-            </div>
-            <blockquote className="border-l-4 border-[#5D3B87] pl-4 italic text-muted-foreground bg-muted/30 p-4 rounded-r-lg">
-              Uses PostgreSQL with Prisma ORM for type-safe database operations. Relationships between users, platforms, problems, submissions, contests, and AI analysis are carefully modeled for optimal performance and data integrity.
-            </blockquote>
-          </CardContent>
-        </Card>
-
-        {/* APIs & Actions */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Zap className="h-6 w-6 text-[#E64373]" />
-              📲 There are APIs & Actions!
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-lg leading-relaxed">
-              There's a lot more under the hood — user data is fetched from multiple platforms, processed & cached. AI analysis, progress tracking, and analytics are all coordinated through Express.js APIs with Redis caching.
-            </p>
-            <div className="bg-muted/30 p-4 rounded-lg">
-              <pre className="text-sm font-mono overflow-x-auto">
-{`const response = await fetch('/api/dashboard/stats', {
-    method: "GET",
-    headers: {
-        'Authorization': \`Bearer \${token}\`,
-        'Content-Type': 'application/json'
-    }
-});
-
-const data = await response.json();
-// Returns cached analytics or fresh data from platforms`}
-              </pre>
-            </div>
-            <blockquote className="border-l-4 border-[#E64373] pl-4 italic text-muted-foreground bg-muted/30 p-4 rounded-r-lg">
-              This same logic is used to invoke AI models for personalized coaching and problem recommendations.
-            </blockquote>
-          </CardContent>
-        </Card>
-
         {/* Features */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-bold mb-8 text-center">
-            💡 Let's talk about features
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            The cool stuff
           </h2>
-          <p className="text-lg text-muted-foreground text-center mb-12">
-            Let's discuss each of the noteworthy modules and decisions that make up this system.
+          <p className="text-muted-foreground mb-8">
+            Five features that make CodeTrail special, ranked by how fun they were to build:
           </p>
 
-          <div className="grid gap-8">
-            {/* Feature 1 */}
-            <Card className="border-l-4 border-l-[#644EC9]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-[#644EC9]" />
-                  01. AI Analysis & Coaching
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• CodeTrail's backend integrates OpenRouter API for intelligent analysis and personalized coaching.</li>
-                  <li>• The input comes from user's submission history and performance data — the result is tailored advice and problem recommendations.</li>
-                  <li>• AI analyzes weak topics, suggests improvement strategies, and provides topic-specific guidance.</li>
-                </ul>
-              </CardContent>
-            </Card>
+          {/* Feature 1: AI Coaching */}
+          <div className="bg-card border border-border rounded-lg p-6 mb-6 hover:transform hover:-translate-y-1 hover:border-[#E64373]/50 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center mb-4">
+              <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-4">01</span>
+              <h3 className="text-xl font-semibold text-white font-bold">AI Coach</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Not your typical chatbot. This AI analyzes your entire coding profile—weak topics, solving patterns, contest performance—and gives you personalized recommendations with direct problem links.
+            </p>
+            <p className="text-muted-foreground">
+              Powered by <span className="text-white font-bold">Deepseek LLM</span> for context-aware coaching based on your actual performance data.
+            </p>
+          </div>
 
-            {/* Feature 2 */}
-            <Card className="border-l-4 border-l-[#E64373]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-[#E64373]" />
-                  02. Multi-Platform Data Sync
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• The system fetches data from LeetCode, Codeforces, and other platforms in real-time.</li>
-                  <li>• Smart caching with Redis ensures fast response times and reduces API calls.</li>
-                  <li>• Automatic data synchronization keeps user profiles updated across all platforms.</li>
-                </ul>
-                <div className="bg-muted/30 p-4 rounded-lg">
-                  <pre className="text-sm font-mono">
-{`Platform Data → API Fetch → Redis Cache → Database
-                           ↘
-                        Real-time Dashboard Updates`}
-                  </pre>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Feature 2: Light/Dark Mode */}
+          <div className="bg-card border border-border rounded-lg p-6 mb-6 hover:transform hover:-translate-y-1 hover:border-[#E64373]/50 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center mb-4">
+              <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-4">02</span>
+              <h3 className="text-xl font-semibold text-white font-bold">Adaptive Theming</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Built a comprehensive theming system with light/dark mode support that adapts to user preferences. Platform logos, charts, and UI elements all switch seamlessly.
+            </p>
+            <p className="text-muted-foreground">
+              Uses <span className="text-white font-bold">React Context</span> for global state management with system preference detection and localStorage persistence.
+            </p>
+          </div>
 
-            {/* Feature 3 */}
-            <Card className="border-l-4 border-l-[#5D3B87]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Cpu className="h-5 w-5 text-[#5D3B87]" />
-                  03. Intelligent Caching System
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Redis-powered caching system with different TTL strategies for various data types.</li>
-                  <li>• Smart cache invalidation ensures data freshness while maintaining performance.</li>
-                  <li>• Graceful fallback to direct API calls when cache is unavailable.</li>
-                </ul>
-              </CardContent>
-            </Card>
+          {/* Feature 3: Platform Sync */}
+          <div className="bg-card border border-border rounded-lg p-6 mb-6 hover:transform hover:-translate-y-1 hover:border-[#E64373]/50 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center mb-4">
+              <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-4">03</span>
+              <h3 className="text-xl font-semibold text-white font-bold">Platform Sync</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Pulls data from LeetCode, Codeforces, and other platforms. Smart aggregation detects duplicates and gives you unified analytics across your entire competitive programming journey.
+            </p>
+            <p className="text-muted-foreground">
+              Parallel data fetching with intelligent normalization, powered by <span className="text-white font-bold">Redis</span> for real-time updates.
+            </p>
+          </div>
 
-            {/* Feature 4 */}
-            <Card className="border-l-4 border-l-[#6E1453]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-[#6E1453]" />
-                  04. Secure Authentication
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• JWT-based authentication with secure token management.</li>
-                  <li>• Password hashing using bcrypt for maximum security.</li>
-                  <li>• Protected routes and middleware for API security.</li>
-                </ul>
-              </CardContent>
-            </Card>
+          {/* Feature 4: Smart Caching */}
+          <div className="bg-card border border-border rounded-lg p-6 mb-6 hover:transform hover:-translate-y-1 hover:border-[#E64373]/50 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center mb-4">
+              <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-4">04</span>
+              <h3 className="text-xl font-semibold text-white font-bold">Smart Caching</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Users wanted real-time updates, even when external APIs were slow. So I built a Redis-powered caching system with different TTL strategies for different data types.
+            </p>
+            <p className="text-muted-foreground">
+              Profile data: 5min cache. Calendar data: 1hr. Static problems: 24hr. Result: <span className="text-white font-bold">sub-50ms response times</span>.
+            </p>
+          </div>
 
-            {/* Feature 5 */}
-            <Card className="border-l-4 border-l-[#644EC9]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-[#644EC9]" />
-                  05. Beautiful Analytics Dashboard
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Interactive charts and graphs using Recharts for data visualization.</li>
-                  <li>• Real-time progress tracking with beautiful UI components.</li>
-                  <li>• Comprehensive analytics including submission trends, topic analysis, and contest performance.</li>
-                </ul>
-              </CardContent>
-            </Card>
+          {/* Feature 5: Visual Analytics */}
+          <div className="bg-card border border-border rounded-lg p-6 mb-8 hover:transform hover:-translate-y-1 hover:border-[#E64373]/50 transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center mb-4">
+              <span className="bg-gradient-to-r from-[#E64373] to-[#644EC9] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-4">05</span>
+              <h3 className="text-xl font-semibold text-white font-bold">Visual Analytics</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Interactive charts, submission heatmaps, contest rating trends, and topic mastery visualization. All powered by intelligent caching for instant updates.
+            </p>
+            <p className="text-muted-foreground">
+              Built with <span className="text-white font-bold">Recharts</span> for beautiful, responsive visualizations that actually help you understand your progress.
+            </p>
+          </div>
+        </div>
 
-            {/* Feature 6 */}
-            <Card className="border-l-4 border-l-[#E64373]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="h-5 w-5 text-[#E64373]" />
-                  06. Modern UI/UX Design
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Professional dark/light mode with smooth transitions.</li>
-                  <li>• Responsive design using Tailwind CSS and shadcn/ui components.</li>
-                  <li>• Smooth animations and modern glassmorphism effects.</li>
-                </ul>
-              </CardContent>
-            </Card>
+        {/* Bonus: GraphQL Discovery */}
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            The detective work
+          </h2>
+          <p className="text-muted-foreground mb-4">
+            Here's the thing: when most developers hit a wall (no LeetCode API), they pivot. I got curious. After digging through network requests, I found their internal <span className="text-white font-bold">GraphQL endpoint</span>.
+          </p>
+          <div className="bg-warning/10 border-l-4 border-warning p-4 mb-6 rounded-r">
+            <p className="text-warning">
+              This required careful rate limiting and graceful fallbacks for when LeetCode changes their schema. But the payoff? Access to data that even LeetCode's own analytics don't provide.
+            </p>
           </div>
         </div>
 
         {/* Tech Stack */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Code className="h-6 w-6 text-[#644EC9]" />
-              🧰 Tech Stack
-            </CardTitle>
-            <CardDescription>Built with modern technologies for scale and performance</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <p className="text-lg leading-relaxed mb-8">
-              Built completely in <strong>TypeScript</strong>. Why? Type safety prevents runtime errors and improves developer productivity.
-            </p>
-
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#E64373]/10 text-[#E64373] border-[#E64373]/30">React + Vite</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> Lightning-fast development with hot module replacement and modern build tooling. React's component architecture scales beautifully.
-                  </p>
-                </div>
+        <div className="animate-on-scroll">
+          <h2 className="text-3xl font-semibold mb-6 bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent relative pl-6">
+            <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
+            Tech choices
+          </h2>
+          <div className="bg-card border border-border rounded-lg p-8 mb-8">
+            <p className="text-foreground mb-6">Built entirely in <span className="text-white font-bold">TypeScript</span> because life's too short for runtime errors.</p>
+            
+            <div className="space-y-4">
+              <div className="pb-4 border-b border-border">
+                <div className="text-white font-bold text-lg">React + TypeScript + Vite</div>
+                <div className="text-muted-foreground text-sm mt-1">Lightning-fast development with hot reload and type safety.</div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#644EC9]/10 text-[#644EC9] border-[#644EC9]/30">Tailwind + shadcn/ui</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> Utility-first CSS for rapid prototyping combined with beautiful, accessible components. Design system consistency out of the box.
-                  </p>
-                </div>
+              
+              <div className="pb-4 border-b border-border">
+                <div className="text-white font-bold text-lg">Node.js + Express.js</div>
+                <div className="text-muted-foreground text-sm mt-1">JavaScript everywhere = less context switching. Mature ecosystem.</div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#5D3B87]/10 text-[#5D3B87] border-[#5D3B87]/30">Express.js + Node.js</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> Mature, battle-tested backend framework with excellent ecosystem. JavaScript everywhere means faster development cycles.
-                  </p>
-                </div>
+              
+              <div className="pb-4 border-b border-border">
+                <div className="text-white font-bold text-lg">PostgreSQL + Prisma</div>
+                <div className="text-muted-foreground text-sm mt-1">ACID compliance for data integrity. Type-safe queries eliminate runtime errors.</div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#6E1453]/10 text-[#6E1453] border-[#6E1453]/30">PostgreSQL + Prisma</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> ACID compliance for data integrity with Prisma's type-safe ORM. Complex queries made simple, migrations handled elegantly.
-                  </p>
-                </div>
+              
+              <div className="pb-4 border-b border-border">
+                <div className="text-white font-bold text-lg">Redis</div>
+                <div className="text-muted-foreground text-sm mt-1">Sub-millisecond response times. Reduces external API calls by 80%.</div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#E64373]/10 text-[#E64373] border-[#E64373]/30">Redis</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> Sub-millisecond response times for cached data. Reduces API calls to external platforms by 80% while maintaining data freshness.
-                  </p>
-                </div>
+              
+              <div className="pb-4 border-b border-border">
+                <div className="text-white font-bold text-lg">Deepseek LLM</div>
+                <div className="text-muted-foreground text-sm mt-1">Advanced AI model for intelligent coaching and personalized recommendations.</div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#644EC9]/10 text-[#644EC9] border-[#644EC9]/30">OpenRouter AI</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> Access to multiple LLM providers through one API. Cost-effective AI integration with fallback models for reliability.
-                  </p>
-                </div>
+              
+              <div className="pb-4 border-b border-border">
+                <div className="text-white font-bold text-lg">Tailwind CSS + shadcn/ui</div>
+                <div className="text-muted-foreground text-sm mt-1">Utility-first CSS for rapid prototyping. Consistent design system.</div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#5D3B87]/10 text-[#5D3B87] border-[#5D3B87]/30">Recharts</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> Beautiful, responsive charts built on D3.js. Perfect for data visualization with minimal configuration.
-                  </p>
-                </div>
+              
+              <div className="pb-4 border-b border-border">
+                <div className="text-white font-bold text-lg">Recharts</div>
+                <div className="text-muted-foreground text-sm mt-1">Beautiful, responsive charts built on D3.js with minimal configuration.</div>
               </div>
-
-              <div className="flex items-start gap-4">
-                <Badge variant="outline" className="mt-1 bg-[#6E1453]/10 text-[#6E1453] border-[#6E1453]/30">Docker</Badge>
-                <div>
-                  <p className="text-muted-foreground">
-                    <strong>Why?</strong> Containerization ensures consistent environments across development, testing, and production. One-command deployment.
-                  </p>
-                </div>
+              
+              <div>
+                <div className="text-white font-bold text-lg">AWS Amplify + Railway</div>
+                <div className="text-muted-foreground text-sm mt-1">Frontend deployed on AWS Amplify, backend on Railway with automated CI/CD.</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Footer */}
-        <div className="text-center py-8 border-t">
-          <p className="text-muted-foreground">
-            Designed and built with ❤️ by Tejaswa
-          </p>
-          <div className="flex justify-center gap-4 mt-4">
-            <Button asChild variant="outline" size="sm">
-              <a href="https://github.com/Tejaswa2611/CodeTrail" target="_blank" rel="noopener noreferrer">
-                <Github className="h-4 w-4 mr-2" />
-                GitHub
-              </a>
-            </Button>
           </div>
         </div>
+
+        {/* Footer */}
+        <div className="text-center py-8 border-t border-border animate-on-scroll">
+          <p className="text-muted-foreground mb-6">
+            Built with passion for the competitive programming community by{" "}
+            <span className="text-white font-bold">Tejaswa</span>
+          </p>
+          <Button asChild className="bg-gradient-to-r from-[#E64373] to-[#644EC9] hover:from-[#E64373]/90 hover:to-[#644EC9]/90 text-white font-semibold">
+            <a href="https://github.com/Tejaswa2611/CodeTrail" target="_blank" rel="noopener noreferrer">
+              <Github className="h-4 w-4 mr-2" />
+              Explore the Code
+              <ExternalLink className="h-4 w-4 ml-2" />
+            </a>
+          </Button>
+        </div>
       </div>
+      
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .animate-fade-in-up {
+            animation: fadeInUp 0.7s ease-out forwards;
+          }
+          
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(2rem);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `
+      }} />
     </div>
   );
 } 

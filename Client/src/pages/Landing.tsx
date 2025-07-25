@@ -131,7 +131,7 @@ const Landing = () => {
     {
       icon: Users,
       title: "Community Insights",
-      description: "Compare with peers, join coding challenges, and learn from the global programming community.",
+      description: "Compare with peers, join coding challenges, and learn from the global programming community. Coming Soon!",
       color: "text-[#6E1453]",
       bgColor: "bg-gradient-to-br from-[#6E1453]/20 to-[#6E1453]/10"
     },

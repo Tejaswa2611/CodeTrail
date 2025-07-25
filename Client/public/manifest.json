@@ -1,7 +1,7 @@
 {
   "name": "CodeTrail - AI-Powered Coding Tracker",
   "short_name": "CodeTrail",
-  "description": "Track your coding journey. Let AI guide your next step.",
+  "description": "Track your coding journey across multiple platforms with AI-powered insights. Get personalized recommendations and unified analytics for competitive programming.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#121221",
@@ -19,6 +19,8 @@
       "type": "image/x-icon"
     }
   ],
-  "categories": ["productivity", "developer", "education"],
-  "lang": "en"
+  "categories": ["productivity", "developer", "education", "utilities"],
+  "lang": "en",
+  "scope": "/",
+  "orientation": "portrait-primary"
 } 
