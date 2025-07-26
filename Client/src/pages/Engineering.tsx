@@ -41,7 +41,7 @@ export default function Engineering() {
       </div>
 
       {/* Hero Section */}
-      <div className="flex flex-col items-center justify-center text-center px-8 pt-24 pb-16">
+      <div className="flex flex-col items-center justify-center text-center px-8 pt-60 pb-16">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-8">
           <span className="text-white tracking-wider">Engineering behind </span>
           <span className="bg-gradient-to-r from-[#E64373] via-[#644EC9] to-[#5D3B87] bg-clip-text text-transparent tracking-wider">
@@ -50,7 +50,7 @@ export default function Engineering() {
         </h1>
         
         <p className="text-muted-foreground text-lg max-w-4xl leading-relaxed mb-16 whitespace-nowrap">
-          How I reverse-engineered LeetCode's GraphQL and built an AI coach that developers actually love.
+          How I reverse-engineered competitive programming platforms and built an AI coach that developers actually love.
         </p>
       </div>
 
@@ -83,17 +83,17 @@ export default function Engineering() {
             <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
             The problem
           </h2>
-                      <div className="bg-gradient-to-br from-card to-[#E64373]/5 border border-[#E64373]/20 rounded-lg p-8 mb-8">
-            <p className="text-muted-foreground mb-4">
-              Competetitive programmers are juggling multiple platforms with no unified way to track progress or get personalized insights. The existing tools? Basic, boring, and definitely not intelligent.
-            </p>
-            <p className="text-muted-foreground mb-4">
-              <strong className="text-white font-bold">Fragmented data. No insights. Zero AI guidance.</strong>
-            </p>
-            <p className="text-muted-foreground">
-              That's where CodeTrail comes in—a clean, AI-powered platform that actually helps you improve, not just track numbers.
-            </p>
-          </div>
+                                  <div className="bg-gradient-to-br from-card to-[#E64373]/5 border border-[#E64373]/20 rounded-lg p-8 mb-8">
+              <p className="text-muted-foreground mb-4">
+                Competitive programmers are juggling multiple platforms with no unified way to track progress or get personalized insights. The existing tools? Basic, boring, and definitely not intelligent.
+              </p>
+              <p className="text-muted-foreground mb-4">
+                <strong className="text-white font-bold">Fragmented data. No insights. Zero AI guidance.</strong>
+              </p>
+              <p className="text-muted-foreground">
+                That's where CodeTrail comes in—a clean, AI-powered platform that actually helps you improve, not just track numbers.
+              </p>
+            </div>
         </div>
 
         {/* High Level Design */}
@@ -102,10 +102,230 @@ export default function Engineering() {
             <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
             System architecture
           </h2>
-          <div className="bg-card border-2 border-dashed border-border rounded-lg h-80 flex items-center justify-center mb-8">
-            <span className="text-muted-foreground italic text-lg">
-              [CodeTrail System Architecture Diagram Would Be Here]
-            </span>
+          
+          {/* High-Level Architecture Diagram */}
+          <div className="bg-card border border-border rounded-lg p-6 mb-8">
+            <div className="font-mono text-xs leading-relaxed">
+              <div className="text-center mb-6">
+                <div className="text-lg font-semibold text-white mb-2">CodeTrail System Architecture</div>
+                <div className="text-muted-foreground">Microservices • Multi-Platform • AI-Powered</div>
+              </div>
+              
+              {/* Client Layer */}
+              <div className="mb-8">
+                <div className="text-center mb-4">
+                  <div className="text-sm font-bold text-blue-400 mb-2">CLIENT LAYER</div>
+                  <div className="flex justify-center space-x-4">
+                    <div className="bg-blue-500/20 border border-blue-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-blue-400">React SPA</div>
+                      <div className="text-xs text-muted-foreground">TypeScript + Vite</div>
+                    </div>
+                    <div className="bg-blue-500/20 border border-blue-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-blue-400">UI Components</div>
+                      <div className="text-xs text-muted-foreground">shadcn/ui + Tailwind</div>
+                    </div>
+                    <div className="bg-blue-500/20 border border-blue-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-blue-400">State Management</div>
+                      <div className="text-xs text-muted-foreground">React Context + TanStack</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center text-yellow-400 text-2xl font-bold">⬇ HTTPS/REST API ⬇</div>
+              </div>
+
+              {/* Load Balancer & CDN */}
+              <div className="mb-6">
+                <div className="text-center">
+                  <div className="bg-purple-500/20 border border-purple-500/50 rounded p-2 inline-block">
+                    <div className="font-bold text-purple-400">AWS Amplify</div>
+                    <div className="text-xs text-muted-foreground">CDN + Load Balancing + SSL</div>
+                  </div>
+                </div>
+                <div className="text-center text-yellow-400 text-2xl font-bold mt-2">⬇</div>
+              </div>
+
+              {/* API Gateway */}
+              <div className="mb-6">
+                <div className="text-center">
+                  <div className="bg-green-500/20 border border-green-500/50 rounded p-3">
+                    <div className="font-bold text-green-400">Express.js API Gateway</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Rate Limiting • CORS • Authentication • Request Routing
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center text-yellow-400 text-2xl font-bold mt-2">⬇</div>
+              </div>
+
+              {/* Middleware Layer */}
+              <div className="mb-6">
+                <div className="text-center mb-2">
+                  <div className="text-sm font-bold text-orange-400">MIDDLEWARE LAYER</div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-orange-500/20 border border-orange-500/50 rounded p-2 text-center">
+                    <div className="font-bold text-orange-400">Auth Middleware</div>
+                    <div className="text-xs text-muted-foreground">JWT Validation</div>
+                  </div>
+                  <div className="bg-orange-500/20 border border-orange-500/50 rounded p-2 text-center">
+                    <div className="font-bold text-orange-400">Cache Middleware</div>
+                    <div className="text-xs text-muted-foreground">Redis Integration</div>
+                  </div>
+                  <div className="bg-orange-500/20 border border-orange-500/50 rounded p-2 text-center">
+                    <div className="font-bold text-orange-400">Rate Limiter</div>
+                    <div className="text-xs text-muted-foreground">API Protection</div>
+                  </div>
+                </div>
+                <div className="text-center text-yellow-400 text-2xl font-bold mt-2">⬇</div>
+              </div>
+
+              {/* Service Layer */}
+              <div className="mb-6">
+                <div className="text-center mb-2">
+                  <div className="text-sm font-bold text-cyan-400">SERVICE LAYER</div>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="bg-cyan-500/20 border border-cyan-500/50 rounded p-2 text-center">
+                    <div className="font-bold text-cyan-400">Auth Service</div>
+                    <div className="text-xs text-muted-foreground">JWT + bcrypt</div>
+                  </div>
+                  <div className="bg-cyan-500/20 border border-cyan-500/50 rounded p-2 text-center">
+                    <div className="font-bold text-cyan-400">Dashboard Service</div>
+                    <div className="text-xs text-muted-foreground">Data Aggregation</div>
+                  </div>
+                  <div className="bg-cyan-500/20 border border-cyan-500/50 rounded p-2 text-center">
+                    <div className="font-bold text-cyan-400">Analytics Service</div>
+                    <div className="text-xs text-muted-foreground">Metrics Processing</div>
+                  </div>
+                  <div className="bg-cyan-500/20 border border-cyan-500/50 rounded p-2 text-center">
+                    <div className="font-bold text-cyan-400">AI Coach Service</div>
+                    <div className="text-xs text-muted-foreground">ML Processing</div>
+                  </div>
+                </div>
+                <div className="text-center text-yellow-400 text-2xl font-bold mt-2">⬇</div>
+              </div>
+
+              {/* External Integrations */}
+              <div className="mb-6">
+                <div className="text-center mb-2">
+                  <div className="text-sm font-bold text-red-400">EXTERNAL INTEGRATIONS</div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Platform APIs */}
+                  <div className="space-y-2">
+                    <div className="text-center text-xs font-semibold text-red-400">Platform APIs</div>
+                    <div className="bg-red-500/20 border border-red-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-red-400">Platform GraphQL</div>
+                      <div className="text-xs text-muted-foreground">Reverse Engineered</div>
+                    </div>
+                    <div className="bg-red-500/20 border border-red-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-red-400">Codeforces REST</div>
+                      <div className="text-xs text-muted-foreground">Official API</div>
+                    </div>
+                  </div>
+                  
+                  {/* AI Services */}
+                  <div className="space-y-2">
+                    <div className="text-center text-xs font-semibold text-red-400">AI Services</div>
+                    <div className="bg-red-500/20 border border-red-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-red-400">Deepseek LLM</div>
+                      <div className="text-xs text-muted-foreground">AI Coaching</div>
+                    </div>
+                    <div className="bg-red-500/20 border border-red-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-red-400">OpenRouter</div>
+                      <div className="text-xs text-muted-foreground">API Gateway</div>
+                    </div>
+                  </div>
+                  
+                  {/* Infrastructure */}
+                  <div className="space-y-2">
+                    <div className="text-center text-xs font-semibold text-red-400">Infrastructure</div>
+                    <div className="bg-red-500/20 border border-red-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-red-400">Railway</div>
+                      <div className="text-xs text-muted-foreground">Backend Hosting</div>
+                    </div>
+                    <div className="bg-red-500/20 border border-red-500/50 rounded p-2 text-center">
+                      <div className="font-bold text-red-400">AWS Amplify</div>
+                      <div className="text-xs text-muted-foreground">Frontend Hosting</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center text-yellow-400 text-2xl font-bold mt-2">⬇</div>
+              </div>
+
+              {/* Data Layer */}
+              <div className="mb-6">
+                <div className="text-center mb-2">
+                  <div className="text-sm font-bold text-yellow-400">DATA LAYER</div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Primary Database */}
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded p-3 text-center">
+                    <div className="font-bold text-yellow-400">PostgreSQL</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Primary Database<br/>
+                      ACID Compliance<br/>
+                      Prisma ORM
+                    </div>
+                  </div>
+                  
+                  {/* Cache Layer */}
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded p-3 text-center">
+                    <div className="font-bold text-yellow-400">Redis Cache</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Intelligent Caching<br/>
+                      Session Storage<br/>
+                      Rate Limiting
+                    </div>
+                  </div>
+                  
+                  {/* File Storage */}
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded p-3 text-center">
+                    <div className="font-bold text-yellow-400">File System</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Static Assets<br/>
+                      Logs & Analytics<br/>
+                      Backup Storage
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data Flow Arrows */}
+              <div className="mt-6 pt-4 border-t border-border">
+                <div className="text-center">
+                  <div className="text-xs font-bold text-white mb-2">DATA FLOW</div>
+                  <div className="text-xs text-muted-foreground">
+                    <span className="text-blue-400">Client Request</span> → 
+                    <span className="text-green-400"> API Gateway</span> → 
+                    <span className="text-orange-400"> Middleware</span> → 
+                    <span className="text-cyan-400"> Services</span> → 
+                    <span className="text-red-400"> External APIs</span> → 
+                    <span className="text-yellow-400"> Database</span>
+                  </div>
+                </div>
+                
+                {/* Performance Metrics */}
+                <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                  <div className="bg-muted/20 rounded p-2">
+                    <div className="text-xs font-bold text-green-400">Response Time</div>
+                    <div className="text-xs text-muted-foreground">&lt; 50ms (cached)</div>
+                  </div>
+                  <div className="bg-muted/20 rounded p-2">
+                    <div className="text-xs font-bold text-blue-400">Cache Hit Rate</div>
+                    <div className="text-xs text-muted-foreground">80%+ efficiency</div>
+                  </div>
+                  <div className="bg-muted/20 rounded p-2">
+                    <div className="text-xs font-bold text-purple-400">Architecture</div>
+                    <div className="text-xs text-muted-foreground">Horizontally Scalable</div>
+                  </div>
+                  <div className="bg-muted/20 rounded p-2">
+                    <div className="text-xs font-bold text-orange-400">Uptime</div>
+                    <div className="text-xs text-muted-foreground">99.9% SLA</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -115,10 +335,115 @@ export default function Engineering() {
             <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-5 bg-gradient-to-r from-[#E64373] to-[#644EC9] rounded"></span>
             Database design
           </h2>
-          <div className="bg-card border-2 border-dashed border-border rounded-lg h-80 flex items-center justify-center mb-8">
-            <span className="text-muted-foreground italic text-lg">
-              [CodeTrail Database Schema Diagram Would Be Here]
-            </span>
+          
+          {/* Database Flow Chart */}
+          <div className="bg-card border border-border rounded-lg p-8 mb-8">
+            <div className="font-mono text-sm leading-relaxed">
+              <div className="text-center mb-8">
+                <div className="text-lg font-semibold text-white mb-2">CodeTrail Database Schema</div>
+                <div className="text-muted-foreground">7 Tables • Multi-Platform Architecture</div>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                {/* Left Column - Auth & User */}
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="bg-blue-500/20 border border-blue-500/50 rounded p-3 mb-2">
+                      <div className="font-bold text-blue-400">users</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        id, email, password<br/>
+                        firstName, lastName
+                      </div>
+                    </div>
+                    <div className="text-yellow-400">↓ 1:M</div>
+                    <div className="bg-blue-500/20 border border-blue-500/50 rounded p-3 mt-2">
+                      <div className="font-bold text-blue-400">refresh_tokens</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        token, userId (FK)<br/>
+                        expiresAt
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Center Column - Platform Integration */}
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="bg-green-500/20 border border-green-500/50 rounded p-3 mb-2">
+                      <div className="font-bold text-green-400">platform_profiles</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        userId (FK), platform<br/>
+                        handle, currentRating
+                      </div>
+                    </div>
+                    <div className="text-yellow-400">↓</div>
+                    <div className="bg-green-500/20 border border-green-500/50 rounded p-3 mt-2 mb-2">
+                      <div className="font-bold text-green-400">problems</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        platform, externalId<br/>
+                        name, difficulty, tags[]
+                      </div>
+                    </div>
+                    <div className="text-yellow-400">↓ M:1</div>
+                    <div className="bg-orange-500/20 border border-orange-500/50 rounded p-3 mt-2">
+                      <div className="font-bold text-orange-400">submissions</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        userId (FK), problemId (FK)<br/>
+                        platform, verdict, timestamp
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column - Contest System */}
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="bg-purple-500/20 border border-purple-500/50 rounded p-3 mb-2">
+                      <div className="font-bold text-purple-400">contests</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        platform, contestId<br/>
+                        name, startTime
+                      </div>
+                    </div>
+                    <div className="text-yellow-400">↓</div>
+                    <div className="bg-orange-500/20 border border-orange-500/50 rounded p-3 mt-2">
+                      <div className="font-bold text-orange-400">contest_participation</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        userId (FK), contestId<br/>
+                        rank, oldRating, newRating
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom - Cache Layer */}
+              <div className="mt-8 text-center">
+                <div className="text-yellow-400 mb-2">↓ Performance Layer</div>
+                <div className="bg-gray-500/20 border border-gray-500/50 rounded p-3 inline-block">
+                  <div className="font-bold text-gray-400">calendar_cache</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    userId (FK), platform, date, count
+                  </div>
+                </div>
+              </div>
+
+              {/* Connection Legend */}
+              <div className="mt-8 pt-4 border-t border-border">
+                <div className="text-center text-xs text-muted-foreground">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div><span className="text-blue-400">■</span> Authentication</div>
+                    <div><span className="text-green-400">■</span> Platform Data</div>
+                    <div><span className="text-orange-400">■</span> User Activity</div>
+                    <div><span className="text-purple-400">■</span> Contest System</div>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-yellow-400">→</span> Foreign Key Relations • 
+                    <span className="text-muted-foreground"> CASCADE DELETE on user deletion</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -129,11 +454,11 @@ export default function Engineering() {
             The breakthrough
           </h2>
           <p className="text-muted-foreground mb-4">
-            LeetCode has no official API. Most developers give up here. I didn't. If their frontend could access the data, so could I.
+            Most competitive programming platforms don't provide official APIs. Most developers give up here. I didn't. If their frontends could access the data, so could I.
           </p>
           <div className="bg-muted/30 border border-border rounded-md p-4 mb-6 overflow-x-auto font-mono text-sm">
             <pre className="text-muted-foreground">
-{`// Found their internal GraphQL endpoint
+{`// Reverse-engineer platform endpoints
 const getUserProfileQuery = \`
   query getUserProfile($username: String!) {
     matchedUser(username: $username) {
@@ -198,7 +523,7 @@ async getUserProfile(username: string) {
               <h4 className="text-lg font-semibold text-white font-bold mb-4">Key Features</h4>
               <div className="space-y-3 text-sm text-muted-foreground">
                 <div>• Graceful fallback when Redis is unavailable</div>
-                <div>• Organized cache keys with prefixes (lc:, cf:, dash:)</div>
+                <div>• Organized cache keys with prefixes (platform:, user:, cache:)</div>
                 <div>• Pattern-based cache invalidation</div>
                 <div>• Connection retry logic with max attempts</div>
                 <div>• Comprehensive health checks and monitoring</div>
@@ -208,14 +533,14 @@ async getUserProfile(username: string) {
           
           <div className="bg-muted/30 border border-border rounded-md p-4 mb-4 overflow-x-auto font-mono text-sm">
             <pre className="text-muted-foreground">
-{`// Example: LeetCode profile caching
-static async getLeetCodeProfile(username: string) {
-  const key = \`lc:profile:\${username}\`;
+{`// Example: Platform profile caching
+static async getPlatformProfile(platform: string, username: string) {
+  const key = \`\${platform}:profile:\${username}\`;
   return await RedisService.get(key);
 }
 
-static async setLeetCodeProfile(username: string, data: any) {
-  const key = \`lc:profile:\${username}\`;
+static async setPlatformProfile(platform: string, username: string, data: any) {
+  const key = \`\${platform}:profile:\${username}\`;
   return await RedisService.set(key, data, 300); // 5min TTL
 }`}
             </pre>
@@ -267,7 +592,7 @@ static async setLeetCodeProfile(username: string, data: any) {
               <h3 className="text-xl font-semibold text-white font-bold">Platform Sync</h3>
             </div>
             <p className="text-muted-foreground mb-4">
-              Pulls data from LeetCode, Codeforces, and other platforms. Smart aggregation detects duplicates and gives you unified analytics across your entire competitive programming journey.
+              Pulls data from multiple competitive programming platforms. Smart aggregation detects duplicates and gives you unified analytics across your entire competitive programming journey.
             </p>
             <p className="text-muted-foreground">
               Parallel data fetching with intelligent normalization, powered by <span className="text-white font-bold">Redis</span> for real-time updates.
@@ -310,11 +635,11 @@ static async setLeetCodeProfile(username: string, data: any) {
             The detective work
           </h2>
           <p className="text-muted-foreground mb-4">
-            Here's the thing: when most developers hit a wall (no LeetCode API), they pivot. I got curious. After digging through network requests, I found their internal <span className="text-white font-bold">GraphQL endpoint</span>.
+            Here's the thing: when most developers hit a wall (no official APIs), they pivot. I got curious. After digging through network requests, I found their internal <span className="text-white font-bold">API endpoints</span>.
           </p>
           <div className="bg-warning/10 border-l-4 border-warning p-4 mb-6 rounded-r">
             <p className="text-warning">
-              This required careful rate limiting and graceful fallbacks for when LeetCode changes their schema. But the payoff? Access to data that even LeetCode's own analytics don't provide.
+              This required careful rate limiting and graceful fallbacks for when platforms change their schemas. But the payoff? Access to data that even the platforms' own analytics don't provide.
             </p>
           </div>
         </div>

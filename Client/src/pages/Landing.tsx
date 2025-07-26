@@ -6,15 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/Navbar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Link } from "react-router-dom";
-import dashboardDemo from "@/assets/dashboard-demo.jpg";
-import dashboardLight from "@/assets/dashboard light.png";
-import dashboardDark from "@/assets/dashboard dark.png";
-import analyticsLight from "@/assets/analytics lilght.png";
-import analyticsDark from "@/assets/analytics dark.png";
-import aiMentorLight from "@/assets/AI mentor light.png";
-import aiMentorDark from "@/assets/AI mentor dark.png";
-import aiAnalysisLight from "@/assets/AI analysis light.png";
-import aiAnalysisDark from "@/assets/AI analysis dark.png";
+import AIAnalysisLight from "@/assets/AI analysis light.png";
+import AIAnalysisDark from "@/assets/AI analysis Dark.png";
+import dashboardOverviewLight from "@/assets/Dashboard Overview Light.png";
+import dashboardOverviewDark from "@/assets/Dashboard Overview Dark.png";
+import analyticsLight from "@/assets/Analytics Light.png";
+import analyticsDark from "@/assets/Analytics Dark.png";
+import aiBotLight from "@/assets/AI bot light.png";
+import aiBotDark from "@/assets/AI bot dark.png";
 import leetcodeDark from "@/assets/leetcode_dark.png";
 import leetcodeLight from "@/assets/leetcode_light.png";
 import codeforcesDark from "@/assets/codeforces_dark.png";
@@ -73,16 +72,16 @@ const Landing = () => {
   }, []);
 
   const demoImages = [
-    actualTheme === 'dark' ? dashboardDark : dashboardLight,
+    actualTheme === 'dark' ? dashboardOverviewDark : dashboardOverviewLight,
     actualTheme === 'dark' ? analyticsDark : analyticsLight,
-    actualTheme === 'dark' ? aiMentorDark : aiMentorLight,
-    actualTheme === 'dark' ? aiAnalysisDark : aiAnalysisLight,
+    actualTheme === 'dark' ? aiBotDark : aiBotLight, // Using AI Bot image for Analysis as well
+    actualTheme === 'dark' ? AIAnalysisDark : AIAnalysisLight,
   ];
 
   const demoTitles = [
     "Dashboard Overview",
     "Analytics & Insights", 
-    "AI Mentor",
+    "AI Bot",
     "AI Analysis"
   ];
 
