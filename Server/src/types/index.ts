@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import './express'; // Import the type augmentation
 
 export interface User {
   id: string;
