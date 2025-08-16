@@ -364,7 +364,7 @@ export class AICoachService {
                 const serverUrl = process.env.SERVER_URL || 'http://localhost:3001';
                 const response = await fetch(`${serverUrl}/api/leetcode/user/${leetcodeProfile.handle}/profile`);
                 if (response.ok) {
-                    const profileData = await response.json();
+                    const profileData: any = await response.json();
                     const submissionCalendar = JSON.parse(profileData.data.matchedUser.submissionCalendar);
                     
                     // Calculate week and month boundaries

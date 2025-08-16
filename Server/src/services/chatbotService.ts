@@ -556,7 +556,7 @@ Remember: You're a specialized coding mentor who MUST analyze the user's actual 
                 throw new Error(`OpenRouter API error: ${response.status}`);
             }
 
-            const data = await response.json();
+            const data: any = await response.json();
 
             if (data && data.choices && data.choices[0]) {
                 const aiMessage = data.choices[0].message.content;
