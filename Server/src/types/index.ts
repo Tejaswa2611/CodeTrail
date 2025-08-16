@@ -1,5 +1,4 @@
 import { Request } from 'express';
-import './express'; // Import the type augmentation
 
 export interface User {
   id: string;
@@ -29,11 +28,19 @@ export interface JwtPayload {
   type: 'access' | 'refresh';
 }
 
-export interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest {
   user?: {
     userId: string;
     email: string;
   };
+  body: any;
+  cookies: any;
+  headers: any;
+  params: any;
+  query: any;
+  method: any;
+  url: any;
+  path: any;
 }
 
 export interface ApiResponse<T = any> {

@@ -1,18 +1,3 @@
-// {
-//     "compilerOptions": {
-//         "target": "ES2020",
-//         "module": "CommonJS",
-//         "rootDir": "./src",
-//         "outDir": "./dist",
-//         "strict": true,
-//         "esModuleInterop": true,
-//         "skipLibCheck": true,
-//         "forceConsistentCasingInFileNames": true
-//     },
-//     "include": [
-//         "src"
-//     ]
-// }
 {
     "compilerOptions": {
         "target": "ES2020",
@@ -21,13 +6,14 @@
         "moduleResolution": "node",
         "rootDir": "./src",
         "outDir": "./dist",
-        // "strict": true,
+        "strict": false,
+        "noImplicitAny": false,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
+        "forceConsistentCasingInFileNames": false,
         "types": ["node"],
-        "typeRoots": ["./node_modules/@types", "./src/types"],
+        "typeRoots": ["./node_modules/@types"],
         "resolveJsonModule": true
     },
     "include": [
