@@ -33,7 +33,6 @@ export interface AuthenticatedRequest extends Request {
     userId: string;
     email: string;
   };
-  headers: Request['headers'];
 }
 
 export interface ApiResponse<T = any> {
