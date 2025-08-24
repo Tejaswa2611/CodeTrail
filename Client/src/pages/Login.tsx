@@ -170,6 +170,15 @@ export default function Login() {
                     </>
                   )}
                 </Button>
+
+                {/* Render Cold Start Warning */}
+                {isLoading && (
+                  <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                    <p className="text-xs text-orange-700 dark:text-orange-400 text-center">
+                      ⏳ <strong>First visit?</strong> Our server might take up to 30-40 seconds to wake up from sleep mode. Thanks for your patience!
+                    </p>
+                  </div>
+                )}
               </form>
 
               <div className="relative">
